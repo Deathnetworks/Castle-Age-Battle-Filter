@@ -5,6 +5,7 @@
 // @include        https://apps.facebook.com/castle_age/*
 // @include        https://web3.castleagegame.com/castle_ws/*
 // @include        https://web4.castleagegame.com/castle_ws/*
+// @downloadURL    https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/Castle%20Age%20-%20Battle%20Filter.js
 // @require        http://code.jquery.com/jquery-1.9.1.js
 // @require        http://code.jquery.com/ui/1.10.3/jquery-ui.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
