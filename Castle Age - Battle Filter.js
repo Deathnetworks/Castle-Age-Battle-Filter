@@ -10,11 +10,11 @@
 // @require        http://code.jquery.com/ui/1.10.3/jquery-ui.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.1
+// @version        1.1.2
 // @copyright      2013+, Jigoku
 // ==/UserScript==
 
-var version = '1.1.1', clickUrl = '', updated = false;
+var version = '1.1.2', clickUrl = '', updated = false;
 
 /* 
 to-do:
@@ -558,6 +558,14 @@ function cabf_guildbattlefilter() {
         });
     }
     
+	//Add refresh on enemy_guild_tab and your_guild_tab
+	if ($('#enemy_guild_tab').length > 0) {
+		$('#enemy_guild_tab').append('<a href="ten_battle.php?battle_id=&amp;view_allies=false" onclick="ajaxLinkSend(\'globalContainer\',\'ten_battle.php?battle_id=&amp;view_allies=false\'); return false;"><div class="imgButton"><img alt="View Enemies!" src="https://castleagegame1-a.akamaihd.net/graphics/enemy_guild_on.gif"></div></a>');
+	}
+	if ($('#your_guild_tab').length > 0) {
+		$('#your_guild_tab').append('<a href="ten_battle.php?battle_id=&amp;view_allies=true" onclick="ajaxLinkSend(\'globalContainer\',\'ten_battle.php?battle_id=&amp;view_allies=true\'); return false;"><div class="imgButton"><img alt="View Allies!" src="https://castleagegame1-a.akamaihd.net/graphics/your_guild_on.gif"></div></a>');
+	}
+	
     // Saved filter settings
     var _storedClass = item.get('cabfPageGuildBattleClass', 'All');
     var _storedActivity = item.get('cabfPageGuildBattleActivity', 'All');
