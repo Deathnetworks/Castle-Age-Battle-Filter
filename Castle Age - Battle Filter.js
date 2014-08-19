@@ -10,16 +10,11 @@
 // @require        http://code.jquery.com/ui/1.10.3/jquery-ui.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.0
+// @version        1.1.1
 // @copyright      2013+, Jigoku
 // ==/UserScript==
 
-var version = '1.1.0', clickUrl = '', updated = false;
-
-/*
-Changelog:
-1.0.0 - Initial Script Release
-*/
+var version = '1.1.1', clickUrl = '', updated = false;
 
 /* 
 to-do:
