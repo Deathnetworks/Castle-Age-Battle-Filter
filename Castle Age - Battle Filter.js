@@ -522,7 +522,7 @@ function cabf_guildbattlefilter() {
     $('input[value="enter_battle"]').parents('form:first').css({
         'position' : 'relative'
     });
-    $('#guild_battle_banner_section').css('height', 190).find('div:contains("VICTOR")').next().next().css('marginTop', 10).end();
+    $('#guild_battle_banner_section').find('div:contains("VICTOR")').next().next().css('marginTop', 10).end();
     $('#guild_battle_banner_section > div:eq(2)').css('marginTop', 0);
     $('div:contains("The Battle Between"):last').parent().css('marginTop', 20);
     $('input[src*="collect_reward_button2.jpg"]').parents('div:eq(2)').css('marginTop', 0);
@@ -754,7 +754,7 @@ function cabf_festivalbattlefilter() {
     $('input[value="enter_battle"]').parents('form:first').css({
         'position' : 'relative'
     });
-    $('#guild_battle_banner_section').css('height', 190).find('div:contains("VICTOR")').next().next().css('marginTop', 10).end();
+    $('#guild_battle_banner_section').find('div:contains("VICTOR")').next().next().css('marginTop', 10).end();
     $('#guild_battle_banner_section > div:eq(2)').css('marginTop', 0);
     $('div:contains("The Battle Between"):last').parent().css('marginTop', 20);
     $('input[src*="collect_reward_button2.jpg"]').parents('div:eq(2)').css('marginTop', 0);
