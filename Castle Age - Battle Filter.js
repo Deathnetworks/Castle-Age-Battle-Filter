@@ -844,7 +844,7 @@ function cabf_tenbattlefilter() {
             }
             
         });
-        $('#enemy_guild_tab,#your_guild_tab').append('<br/><span style="font-size:14px;font-weight:bold;">Filtered: ' + _count + '</span>'));
+        $('#enemy_guild_tab,#your_guild_tab').append('<br/><span style="font-size:14px;font-weight:bold;">Filtered: ' + _count + '</span>');
     }
     
     // class filter
@@ -1266,7 +1266,7 @@ function cabf_filters() {
 	$("#cabfHealthActionEarth").hide();
 	$("#cabfConquestEarthFilterContainer").hide();
     /* Guild battle or 10vs10 battle*/
-    if ($('#enemy_guild_tab','#your_guild_tab').length > 0) {
+    if ($('#enemy_guild_tab,#your_guild_tab').length > 0) {
     
 		//Switch between 10vs10 battle and Guild battle
 		if ($('#enemy_new_guild_tab_1,#your_new_guild_tab_1').length >0 ) {
@@ -1278,7 +1278,7 @@ function cabf_filters() {
 		}
     } else     
     /* Festival battle */
-    if ($('#enemy_team_tab','#your_team_tab').length > 0) {
+    if ($('#enemy_team_tab,#your_team_tab').length > 0) {
         console.log('Festival battle');
         cabf_festivalbattlefilter();
     } else    
