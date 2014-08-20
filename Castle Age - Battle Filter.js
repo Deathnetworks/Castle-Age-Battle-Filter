@@ -560,13 +560,13 @@ function cabf_guildbattlefilter() {
     
 	//Add refresh on enemy_guild_tab and your_guild_tab for 10vs10 battle
 	if ($('a[href*="ten_battle.php?battle_id="]').length >0 ) {
-		var _battleid = $('a[href*="ten_battle.php?battle_id="]').attr('href');
+		var _battleid = $('input[name="battle_id"]').attr('value');
         console.log('_battleid='+_battleid);
 		if ($('#enemy_guild_tab').length > 0) {
-			$('#enemy_guild_tab').append('<a href="'+_battleid.replace("true","false")+'" onclick="ajaxLinkSend(\'globalContainer\',\''+_battleid.replace("true","false")+'\'); return false;"><div class="imgButton"><img alt="View Enemies!" src="https://castleagegame1-a.akamaihd.net/graphics/enemy_guild_on.gif"></div></a>');
+			$('#enemy_guild_tab').append('<a href="ten_battle.php?battle_id='+_battleid+'&view_allies=false" onclick="ajaxLinkSend(\'globalContainer\',\'ten_battle.php?battle_id='+_battleid+'&view_allies=false\'); return false;"><div class="imgButton"><img alt="View Enemies!" src="https://castleagegame1-a.akamaihd.net/graphics/enemy_guild_on.gif"></div></a>');
 		}
 		if ($('#your_guild_tab').length > 0) {
-			$('#your_guild_tab').append('<a href="'+_battleid+'&view_allies=true" onclick="ajaxLinkSend(\'globalContainer\',\''+_battleid+'&view_allies=true\'); return false;"><div class="imgButton"><img alt="View Allies!" src="https://castleagegame1-a.akamaihd.net/graphics/your_guild_on.gif"></div></a>');
+			$('#your_guild_tab').append('<a href="ten_battle.php?battle_id='+_battleid+'&view_allies=true" onclick="ajaxLinkSend(\'globalContainer\',\'ten_battle.php?battle_id='+_battleid+'&view_allies=true\'); return false;"><div class="imgButton"><img alt="View Allies!" src="https://castleagegame1-a.akamaihd.net/graphics/your_guild_on.gif"></div></a>');
 		}
 	}
 	
