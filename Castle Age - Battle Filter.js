@@ -10,17 +10,17 @@
 // @require        http://code.jquery.com/ui/1.10.3/jquery-ui.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.6
+// @version        1.1.7
 // @copyright      2013+, Jigoku
 // ==/UserScript==
 
-var version = '1.1.6', clickUrl = '', updated = false;
+var version = '1.1.7', clickUrl = '', updated = false;
 
 /* 
 to-do:
 */
 
-
+ 
 var item = {
     get : function(_name, _default) {
         if (localStorage['cabf_' + _name] !== undefined && localStorage['cabf_' + _name] !== null) {
@@ -62,6 +62,11 @@ function cabf_success(event) {
     console.log("cabf_success");
 };
 
+/*******************************************************************************************************************************************************************************
+********************************************************************************************************************************************************************************
+*************    MIST BATTLE ***************************************************************************************************************************************************
+********************************************************************************************************************************************************************************
+*******************************************************************************************************************************************************************************/
 function cabf_conquestmistfilter() {
     
     try {
@@ -263,6 +268,11 @@ function cabf_conquestmistfilter() {
     
 };
 
+/*******************************************************************************************************************************************************************************
+********************************************************************************************************************************************************************************
+*************    EARTH BATTLE **************************************************************************************************************************************************
+********************************************************************************************************************************************************************************
+*******************************************************************************************************************************************************************************/
 function cabf_conquestearthfilter() {
     
     try {
@@ -495,7 +505,11 @@ function cabf_conquestearthfilter() {
     }
     
 };
-
+/*******************************************************************************************************************************************************************************
+********************************************************************************************************************************************************************************
+*************    GUILD BATTLE **************************************************************************************************************************************************
+********************************************************************************************************************************************************************************
+*******************************************************************************************************************************************************************************/
 function cabf_guildbattlefilter() {
     // fix gate reseting when attacking with duel button
     var _gate = /\d/.exec($('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').attr('class'));
@@ -527,7 +541,7 @@ function cabf_guildbattlefilter() {
     $('#guild_battle_banner_section > div:eq(2)').css('marginTop', 0);
     $('div:contains("The Battle Between"):last').parent().css('marginTop', 20);
     $('input[src*="collect_reward_button2.jpg"]').parents('div:eq(2)').css('marginTop', 0);
-    $('#guild_battle_guild_tabs').after('<div id="cabfHealthStatBoard"><div id="cabfStatType">Enemy</div><div><br></div><div id="cabfStatTower">Stat</div><div id="cabfTotalHealth">Total Health: 0</div><div id="cabfAverageHealth">Average Health: 0</div><div id="cabfHealthLeft">Health Left: 0</div><div id="cabfAverageHealthLeft">Average Health Left: 0</div><div id="cabfPercentageHealthLeft">Percentage Health Left: 0%</div><div><br></div><div id="cabfStatCleric">Cleric Stat</div><div id="cabfClericTotalHealth">Total Health: 0</div><div id="cabfClericAverageHealth">Average Health: 0</div><div id="cabfClericHealthLeft">Health Left: 0</div><div id="cabfClericAverageHealthLeft">Average Health Left: 0</div><div id="cabfClericPercentageHealthLeft">Percentage Health Left: 0%</div><div><br></div><div id="cabfStatMage">Mage Stat</div><div id="cabfMageTotalHealth">Total Health: 0</div><div id="cabfMageAverageHealth">Average Health: 0</div><div id="cabfMageHealthLeft">Health Left: 0</div><div id="cabfMageAverageHealthLeft">Average Health Left: 0</div><div id="cabfMagePercentageHealthLeft">Percentage Health Left: 0%</div><div><br></div><div id="cabfStatRogue">Rogue Stat</div><div id="cabfRogueTotalHealth">Total Health: 0</div><div id="cabfRogueAverageHealth">Average Health: 0</div><div id="cabfRogueHealthLeft">Health Left: 0</div><div id="cabfRogueAverageHealthLeft">Average Health Left: 0</div><div id="cabfRoguePercentageHealthLeft">Percentage Health Left: 0%</div><div><br></div><div id="cabfStatWarrior">Warrior Stat</div><div id="cabfWarriorTotalHealth">Total Health: 0</div><div id="cabfWarriorAverageHealth">Average Health: 0</div><div id="cabfWarriorHealthLeft">Health Left: 0</div><div id="cabfWarriorAverageHealthLeft">Average Health Left: 0</div><div id="cabfWarriorPercentageHealthLeft">Percentage Health Left: 0%</div><div><br></div></div>');
+    $('#guild_battle_guild_tabs').after(_statBoard);
     
     // add current tokens to result
     var _tokens = $('div.result div:contains("-1 Battle Tokens"):last');
@@ -565,7 +579,7 @@ function cabf_guildbattlefilter() {
             default: _gateName=' ';
         } 
         $('#cabfStatTower').html(_gateName+' Tower Stat');
-		$('#cabfStatWarrior').html(_gateName+' Cleric Stat');
+		$('#cabfStatCleric').html(_gateName+' Cleric Stat');
 		$('#cabfStatMage').html(_gateName+' Mage Stat');
 		$('#cabfStatRogue').html(_gateName+' Rogue Stat');
 		$('#cabfStatWarrior').html(_gateName+' Warrior Stat');   
@@ -839,7 +853,12 @@ function cabf_guildbattlefilter() {
     }, 10);
     
 };
-
+ 
+/*******************************************************************************************************************************************************************************
+********************************************************************************************************************************************************************************
+*************    10VS10 BATTLE *************************************************************************************************************************************************
+********************************************************************************************************************************************************************************
+*******************************************************************************************************************************************************************************/
 function cabf_tenbattlefilter() {
     // fix gate reseting when attacking with duel button
     var _gate = /\d/.exec($('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').attr('class'));
@@ -871,7 +890,7 @@ function cabf_tenbattlefilter() {
     $('#guild_battle_banner_section > div:eq(2)').css('marginTop', 0);
     $('div:contains("The Battle Between"):last').parent().css('marginTop', 20);
     $('input[src*="collect_reward_button2.jpg"]').parents('div:eq(2)').css('marginTop', 0);
-    $('#guild_battle_guild_tabs').after('<div id="cabfHealthStatBoard"><div id="cabfStatType">Enemy</div><div><br></div><div id="cabfStatTower">Stat</div><div id="cabfTotalHealth">Total Health: 0</div><div id="cabfAverageHealth">Average Health: 0</div><div id="cabfHealthLeft">Health Left: 0</div><div id="cabfAverageHealthLeft">Average Health Left: 0</div><div id="cabfPercentageHealthLeft">Percentage Health Left: 0%</div><div><br></div><div id="cabfStatCleric">Cleric Stat</div><div id="cabfClericTotalHealth">Total Health: 0</div><div id="cabfClericAverageHealth">Average Health: 0</div><div id="cabfClericHealthLeft">Health Left: 0</div><div id="cabfClericAverageHealthLeft">Average Health Left: 0</div><div id="cabfClericPercentageHealthLeft">Percentage Health Left: 0%</div><div><br></div><div id="cabfStatMage">Mage Stat</div><div id="cabfMageTotalHealth">Total Health: 0</div><div id="cabfMageAverageHealth">Average Health: 0</div><div id="cabfMageHealthLeft">Health Left: 0</div><div id="cabfMageAverageHealthLeft">Average Health Left: 0</div><div id="cabfMagePercentageHealthLeft">Percentage Health Left: 0%</div><div><br></div><div id="cabfStatRogue">Rogue Stat</div><div id="cabfRogueTotalHealth">Total Health: 0</div><div id="cabfRogueAverageHealth">Average Health: 0</div><div id="cabfRogueHealthLeft">Health Left: 0</div><div id="cabfRogueAverageHealthLeft">Average Health Left: 0</div><div id="cabfRoguePercentageHealthLeft">Percentage Health Left: 0%</div><div><br></div><div id="cabfStatWarrior">Warrior Stat</div><div id="cabfWarriorTotalHealth">Total Health: 0</div><div id="cabfWarriorAverageHealth">Average Health: 0</div><div id="cabfWarriorHealthLeft">Health Left: 0</div><div id="cabfWarriorAverageHealthLeft">Average Health Left: 0</div><div id="cabfWarriorPercentageHealthLeft">Percentage Health Left: 0%</div><div><br></div></div>');
+    $('#guild_battle_guild_tabs').after(_statBoard);
     
     // add current tokens to result
     var _tokens = $('div.result div:contains("-1 Battle Tokens"):last');
@@ -896,7 +915,7 @@ function cabf_tenbattlefilter() {
 			$('#cabfStatType').html('Ally Stat');
 		}  
         $('#cabfStatTower').html('All Class Stat');
-		$('#cabfStatWarrior').html(' Cleric Stat');
+		$('#cabfStatCleric').html(' Cleric Stat');
 		$('#cabfStatMage').html(' Mage Stat');
 		$('#cabfStatRogue').html(' Rogue Stat');
 		$('#cabfStatWarrior').html(' Warrior Stat');  
@@ -992,11 +1011,11 @@ function cabf_tenbattlefilter() {
 		var _battleid = $('input[name="battle_id"]').attr('value');
         console.log('_battleid='+_battleid);
 		if ($('#enemy_guild_tab').length > 0) {
-			$('#your_guild_tab').css({"font-size":"15px","padding-top":"20px","text-align":"center"});
+			$('#enemy_guild_tab').css({"font-size":"15px","padding-top":"0px","text-align":"center"});
 			$('#enemy_guild_tab').append('<a href="ten_battle.php?battle_id='+_battleid+'&view_allies=false" onclick="ajaxLinkSend(\'globalContainer\',\'ten_battle.php?battle_id='+_battleid+'&view_allies=false\'); return false;"><div class="imgButton"><img alt="View Enemies!" src="https://castleagegame1-a.akamaihd.net/graphics/enemy_guild_on.gif"></div></a>');
 		}
 		if ($('#your_guild_tab').length > 0) {
-			$('#your_guild_tab').css({"font-size":"15px","padding-top":"20px","text-align":"center"});
+			$('#your_guild_tab').css({"font-size":"15px","padding-top":"0px","text-align":"center"});
 			$('#your_guild_tab').append('<a href="ten_battle.php?battle_id='+_battleid+'&view_allies=true" onclick="ajaxLinkSend(\'globalContainer\',\'ten_battle.php?battle_id='+_battleid+'&view_allies=true\'); return false;"><div class="imgButton"><img alt="View Allies!" src="https://castleagegame1-a.akamaihd.net/graphics/your_guild_on.gif"></div></a>');
 		}
 	}
@@ -1166,6 +1185,11 @@ function cabf_tenbattlefilter() {
 };
 
 
+/******************************************************************************************************************************************************************************
+*******************************************************************************************************************************************************************************
+*************    FESTIVAL BATTLE **********************************************************************************************************************************************
+*******************************************************************************************************************************************************************************
+******************************************************************************************************************************************************************************/
 function cabf_festivalbattlefilter() {
     
     // fix gate reseting when attacking with duel button
@@ -1199,18 +1223,52 @@ function cabf_festivalbattlefilter() {
     $('#guild_battle_banner_section > div:eq(2)').css('marginTop', 0);
     $('div:contains("The Battle Between"):last').parent().css('marginTop', 20);
     $('input[src*="collect_reward_button2.jpg"]').parents('div:eq(2)').css('marginTop', 0);
-    
+    $('#guild_battle_guild_tabs').after(_statBoard);
+	
     // add current tokens to result
     var _tokens = $('div.result div:contains("-1 Battle Tokens"):last');
     _tokens.text(_tokens.text() + ' (' + $('#guild_token_current_value').text() + ' left)');
     
     // reduce gate size and add number
-    var _guildnum = 1;
+    var _guildnum = 1, 
+			_count = 0, 
+			_totalhealth = 0, _totalhealthleft = 0, 
+			_clericcount = 0, 
+			_clerictotalhealth = 0, _clerictotalhealthleft = 0, 
+			_magecount = 0, 
+			_magetotalhealth = 0, _magetotalhealthleft = 0, 
+			_roguecount = 0, 
+			_roguetotalhealth = 0, _roguetotalhealthleft = 0, 
+			_warriorcount = 0, 
+			_warriortotalhealth = 0, _warriortotalhealthleft = 0;	
+	var _gateNum = $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').attr('class').match(/\d/)[0];
+	var _gateName='';
+	if ($('#enemy_guild_battle_section_battle_list').length > 0) {
+		$('#cabfStatType').html('Enemy');
+	} else {
+		$('#cabfStatType').html('Ally');
+	}
+	switch (_gateNum) {
+		case '1':  _gateName='North';		
+				break;
+		case '2':  _gateName='West';
+				break;
+		case '3':  _gateName='East';
+				break;
+		case '4':  _gateName='South';
+				break;
+		default: _gateName=' ';
+	} 
+	$('#cabfStatTower').html(_gateName+' Tower Stat');
+	$('#cabfStatCleric').html(_gateName+' Cleric Stat');
+	$('#cabfStatMage').html(_gateName+' Mage Stat');
+	$('#cabfStatRogue').html(_gateName+' Rogue Stat');
+	$('#cabfStatWarrior').html(_gateName+' Warrior Stat');  
     $('#enemy_guild_member_list > div > div, #your_guild_member_list > div > div').each(function(_i, _e) {
 		var _text = $(_e).text().trim(), _FullHealth = true;
 		if (_text && $(_e).text().trim().length > 0) {
 			var _test = /(\d+)\/(\d+)/g.exec(_text);
-        console.log('test4 _guildnum='+_guildnum);
+        //console.log('test4 _guildnum='+_guildnum);
 			if (_test)
 			{
 				_FullHealth = (_test.length === 3 && _test[1] === _test[2]) ? true : false;
@@ -1221,13 +1279,75 @@ function cabf_festivalbattlefilter() {
 			} else {
 				$(_e).append('<span class="GuildNum">' + (_guildnum) + '<span>');
 			}					
-			_guildnum += 1;			
+			_guildnum += 1;	
+			_count+=1;	
+			_totalhealth+=eval(_test[2]);
+			_totalhealthleft+=eval(_test[1]);
+			if ($(_e).find('img[src*="/graphics/class_cleric.gif"]').length>0) {
+				_clericcount+=1;
+				_clerictotalhealth+=eval(_test[2]); 
+				_clerictotalhealthleft+=eval(_test[1]);
+			}
+			if ($(_e).find('img[src*="/graphics/class_mage.gif"]').length>0) {
+				_magecount+=1;
+				_magetotalhealth+=eval(_test[2]); 
+				_magetotalhealthleft+=eval(_test[1]);
+			}
+			if ($(_e).find('img[src*="/graphics/class_rogue.gif"]').length>0) {
+				_roguecount+=1;
+				_roguetotalhealth+=eval(_test[2]); 
+				_roguetotalhealthleft+=eval(_test[1]);
+			}
+			if ($(_e).find('img[src*="/graphics/class_warrior.gif"]').length>0) {
+				_warriorcount+=1;
+				_warriortotalhealth+=eval(_test[2]); 
+				_warriortotalhealthleft+=eval(_test[1]);
+			}		
 		} else {
 			$(_e).remove();
 		}
 		_text = '';
 		_test = [];
     });
+	if (_count>0) {
+		$('#cabfTotalHealth').html('Total Health: '+_totalhealth);
+		$('#cabfAverageHealth').html('Average Health: '+(_totalhealth/_count).toFixed());
+		$('#cabfHealthLeft').html('Health Left: '+_totalhealthleft);
+		$('#cabfAverageHealthLeft').html('Average Health Left: '+(_totalhealthleft/_count).toFixed());
+		$('#cabfPercentageHealthLeft').html('Percentage Health Left: '+(_totalhealthleft*100/_totalhealth).toFixed(1)+'%');
+		
+		if (_clericcount>0) {
+			$('#cabfClericTotalHealth').html('Total Health: '+_clerictotalhealth);
+			$('#cabfClericAverageHealth').html('Average Health: '+(_clerictotalhealth/_clericcount).toFixed());
+			$('#cabfClericHealthLeft').html('Health Left: '+_clerictotalhealthleft);
+			$('#cabfClericAverageHealthLeft').html('Average Health Left: '+(_clerictotalhealthleft/_clericcount).toFixed());
+			$('#cabfClericPercentageHealthLeft').html('Percentage Health Left: '+(_clerictotalhealthleft*100/_clerictotalhealth).toFixed(1)+'%');
+		}
+		
+		if (_magecount>0) {
+			$('#cabfMageTotalHealth').html('Total Health: '+_magetotalhealth);
+			$('#cabfMageAverageHealth').html('Average Health: '+(_magetotalhealth/_magecount).toFixed());
+			$('#cabfMageHealthLeft').html('Health Left: '+_magetotalhealthleft);
+			$('#cabfMageAverageHealthLeft').html('Average Health Left: '+(_magetotalhealthleft/_magecount).toFixed());
+			$('#cabfMagePercentageHealthLeft').html('Percentage Health Left: '+(_magetotalhealthleft*100/_magetotalhealth).toFixed(1)+'%');
+		}
+		
+		if (_roguecount>0) {
+			$('#cabfRogueTotalHealth').html('Total Health: '+_roguetotalhealth);
+			$('#cabfRogueAverageHealth').html('Average Health: '+(_roguetotalhealth/_roguecount).toFixed());
+			$('#cabfRogueHealthLeft').html('Health Left: '+_roguetotalhealthleft);
+			$('#cabfRogueAverageHealthLeft').html('Average Health Left: '+(_roguetotalhealthleft/_roguecount).toFixed());
+			$('#cabfRoguePercentageHealthLeft').html('Percentage Health Left: '+(_roguetotalhealthleft*100/_roguetotalhealth).toFixed(1)+'%');
+		}
+		
+		if (_warriorcount>0) {
+			$('#cabfWarriorTotalHealth').html('Total Health: '+_warriortotalhealth);
+			$('#cabfWarriorAverageHealth').html('Average Health: '+(_warriortotalhealth/_warriorcount).toFixed());
+			$('#cabfWarriorHealthLeft').html('Health Left: '+_warriortotalhealthleft);
+			$('#cabfWarriorAverageHealthLeft').html('Average Health Left: '+(_warriortotalhealthleft/_warriorcount).toFixed());
+			$('#cabfWarriorPercentageHealthLeft').html('Percentage Health Left: '+(_warriortotalhealthleft*100/_warriortotalhealth).toFixed(1)+'%');
+		}
+	} 
     
     // Saved filter settings
     var _storedClass = item.get('cabfPageFestGuildBattleClass', 'All');
@@ -1238,7 +1358,8 @@ function cabf_festivalbattlefilter() {
     // gate filter
     function filterGate() {
         var _count = 0;
-        
+        var _gateNum = $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').attr('class').match(/\d/)[0];
+        var _gate = $('#enemy_arena_tab_' + _gateNum + ' > div, #your_arena_tab_' + _gateNum + ' > div');
         $('#your_guild_member_list > div > div, #enemy_guild_member_list > div > div').each(function(_i, _e) {
             
             var _class = $('#cabfGateClassFilter').val();
@@ -1273,8 +1394,6 @@ function cabf_festivalbattlefilter() {
                 $(_e).hide();
             }
         });
-        var _gateNum = $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').attr('class').match(/\d/)[0];
-        var _gate = $('#enemy_arena_tab_' + _gateNum + ' > div, #your_arena_tab_' + _gateNum + ' > div');
         _gate.html(_gate.html().replace(/\).*/, ')').replace(')', ')<br/><span style="font-size:11px;font-weight:bold;">Filtered: ' + _count + '</span>'));
     }
 	
