@@ -10,11 +10,11 @@
 // @require        http://code.jquery.com/ui/1.10.3/jquery-ui.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.5
+// @version        1.1.6
 // @copyright      2013+, Jigoku
 // ==/UserScript==
 
-var version = '1.1.5', clickUrl = '', updated = false;
+var version = '1.1.6', clickUrl = '', updated = false;
 
 /* 
 to-do:
@@ -36,7 +36,8 @@ var item = {
         localStorage.remove('cabf_' + _name);
     }
 };
-
+var _statBoard = '<div id="cabfHealthStatBoard"><div id="cabfStatType">Enemy</div><div><br></div><div id="cabfStatTower">Stat</div><div id="cabfTotalHealth">Total Health: 0</div><div id="cabfAverageHealth">Average Health: 0</div><div id="cabfHealthLeft">Health Left: 0</div><div id="cabfAverageHealthLeft">Average Health Left: 0</div><div id="cabfPercentageHealthLeft">Percentage Health Left: 0%</div><div><br></div><div id="cabfStatCleric">Cleric Stat</div><div id="cabfClericTotalHealth">Total Health: 0</div><div id="cabfClericAverageHealth">Average Health: 0</div><div id="cabfClericHealthLeft">Health Left: 0</div><div id="cabfClericAverageHealthLeft">Average Health Left: 0</div><div id="cabfClericPercentageHealthLeft">Percentage Health Left: 0%</div><div><br></div><div id="cabfStatMage">Mage Stat</div><div id="cabfMageTotalHealth">Total Health: 0</div><div id="cabfMageAverageHealth">Average Health: 0</div><div id="cabfMageHealthLeft">Health Left: 0</div><div id="cabfMageAverageHealthLeft">Average Health Left: 0</div><div id="cabfMagePercentageHealthLeft">Percentage Health Left: 0%</div><div><br></div><div id="cabfStatRogue">Rogue Stat</div><div id="cabfRogueTotalHealth">Total Health: 0</div><div id="cabfRogueAverageHealth">Average Health: 0</div><div id="cabfRogueHealthLeft">Health Left: 0</div><div id="cabfRogueAverageHealthLeft">Average Health Left: 0</div><div id="cabfRoguePercentageHealthLeft">Percentage Health Left: 0%</div><div><br></div><div id="cabfStatWarrior">Warrior Stat</div><div id="cabfWarriorTotalHealth">Total Health: 0</div><div id="cabfWarriorAverageHealth">Average Health: 0</div><div id="cabfWarriorHealthLeft">Health Left: 0</div><div id="cabfWarriorAverageHealthLeft">Average Health Left: 0</div><div id="cabfWarriorPercentageHealthLeft">Percentage Health Left: 0%</div><div><br></div></div>'
+	
 function addCss(cssString) { 
     try {
         var head = document.getElementsByTagName('head')[0]; 
@@ -526,7 +527,7 @@ function cabf_guildbattlefilter() {
     $('#guild_battle_banner_section > div:eq(2)').css('marginTop', 0);
     $('div:contains("The Battle Between"):last').parent().css('marginTop', 20);
     $('input[src*="collect_reward_button2.jpg"]').parents('div:eq(2)').css('marginTop', 0);
-    $('#guild_battle_guild_tabs').after('<div id="cabfHealthStatBoard"><div id="cabfStatType">Enemy</div><div id="cabfStatTower">Stat</div><div id="cabfTotalHealth">Total Health: 0</div><div id="cabfAverageHealth">Average Health: 0</div><div id="cabfHealthLeft">Health Left: 0</div><div id="cabfAverageHealthLeft">Average Health Left: 0</div><div id="cabfPercentageHealthLeft">Percentage Health Left: 0</div><div><br></div></div>');
+    $('#guild_battle_guild_tabs').after('<div id="cabfHealthStatBoard"><div id="cabfStatType">Enemy</div><div><br></div><div id="cabfStatTower">Stat</div><div id="cabfTotalHealth">Total Health: 0</div><div id="cabfAverageHealth">Average Health: 0</div><div id="cabfHealthLeft">Health Left: 0</div><div id="cabfAverageHealthLeft">Average Health Left: 0</div><div id="cabfPercentageHealthLeft">Percentage Health Left: 0%</div><div><br></div><div id="cabfStatCleric">Cleric Stat</div><div id="cabfClericTotalHealth">Total Health: 0</div><div id="cabfClericAverageHealth">Average Health: 0</div><div id="cabfClericHealthLeft">Health Left: 0</div><div id="cabfClericAverageHealthLeft">Average Health Left: 0</div><div id="cabfClericPercentageHealthLeft">Percentage Health Left: 0%</div><div><br></div><div id="cabfStatMage">Mage Stat</div><div id="cabfMageTotalHealth">Total Health: 0</div><div id="cabfMageAverageHealth">Average Health: 0</div><div id="cabfMageHealthLeft">Health Left: 0</div><div id="cabfMageAverageHealthLeft">Average Health Left: 0</div><div id="cabfMagePercentageHealthLeft">Percentage Health Left: 0%</div><div><br></div><div id="cabfStatRogue">Rogue Stat</div><div id="cabfRogueTotalHealth">Total Health: 0</div><div id="cabfRogueAverageHealth">Average Health: 0</div><div id="cabfRogueHealthLeft">Health Left: 0</div><div id="cabfRogueAverageHealthLeft">Average Health Left: 0</div><div id="cabfRoguePercentageHealthLeft">Percentage Health Left: 0%</div><div><br></div><div id="cabfStatWarrior">Warrior Stat</div><div id="cabfWarriorTotalHealth">Total Health: 0</div><div id="cabfWarriorAverageHealth">Average Health: 0</div><div id="cabfWarriorHealthLeft">Health Left: 0</div><div id="cabfWarriorAverageHealthLeft">Average Health Left: 0</div><div id="cabfWarriorPercentageHealthLeft">Percentage Health Left: 0%</div><div><br></div></div>');
     
     // add current tokens to result
     var _tokens = $('div.result div:contains("-1 Battle Tokens"):last');
@@ -534,25 +535,41 @@ function cabf_guildbattlefilter() {
     
     // reduce gate size and add number
     if ($('#your_new_guild_member_list:contains("No Soldiers Posted In This Position!"), #enemy_new_guild_member_list:contains("No Soldiers Posted In This Position!")').length === 0) {
-        var _guildnum = 1, _count = 0, _totalhealth = 0, _totalhealthleft = 0, _averagehealth = 0, _averagehealthleft = 0;		
+        var _guildnum = 1, 
+			_count = 0, 
+			_totalhealth = 0, _totalhealthleft = 0, 
+			_clericcount = 0, 
+			_clerictotalhealth = 0, _clerictotalhealthleft = 0, 
+			_magecount = 0, 
+			_magetotalhealth = 0, _magetotalhealthleft = 0, 
+			_roguecount = 0, 
+			_roguetotalhealth = 0, _roguetotalhealthleft = 0, 
+			_warriorcount = 0, 
+			_warriortotalhealth = 0, _warriortotalhealthleft = 0;		
         var _gateNum = $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').attr('class').match(/\d/)[0];
-        var _gate = $('#enemy_new_guild_tab_' + _gateNum + ' > div, #your_new_guild_tab_' + _gateNum + ' > div');
+        var _gateName='';
 		if ($('#enemy_guild_battle_section_battle_list').length > 0) {
 			$('#cabfStatType').html('Enemy');
 		} else {
 			$('#cabfStatType').html('Ally');
 		}
 		switch (_gateNum) {
-        	case '1':  $('#cabfStatTower').html('North Tower Stat');
+        	case '1':  _gateName='North';		
                     break;
-        	case '2':  $('#cabfStatTower').html('West Tower Stat');
+        	case '2':  _gateName='West';
                     break;
-        	case '3':  $('#cabfStatTower').html('East Tower Stat');
+        	case '3':  _gateName='East';
                     break;
-        	case '4':  $('#cabfStatTower').html('South Tower Stat');
+        	case '4':  _gateName='South';
                     break;
-            default: $('#cabfStatTower').html('Stat (Tower not Found)');
-        }    
+            default: _gateName=' ';
+        } 
+        $('#cabfStatTower').html(_gateName+' Tower Stat');
+		$('#cabfStatWarrior').html(_gateName+' Cleric Stat');
+		$('#cabfStatMage').html(_gateName+' Mage Stat');
+		$('#cabfStatRogue').html(_gateName+' Rogue Stat');
+		$('#cabfStatWarrior').html(_gateName+' Warrior Stat');   
+		
         $('#enemy_new_guild_member_list > div > div, #your_new_guild_member_list > div > div').each(function(_i, _e) {
             var _text = $(_e).text().trim(), _FullHealth = true;
             if (_text && $(_e).text().trim().length > 0) {
@@ -572,6 +589,26 @@ function cabf_guildbattlefilter() {
 				_count+=1;	
 				_totalhealth+=eval(_test[2]);
 				_totalhealthleft+=eval(_test[1]);
+				if ($(_e).find('img[src*="/graphics/class_cleric.gif"]').length>0) {
+					_clericcount+=1;
+					_clerictotalhealth+=eval(_test[2]); 
+					_clerictotalhealthleft+=eval(_test[1]);
+				}
+				if ($(_e).find('img[src*="/graphics/class_mage.gif"]').length>0) {
+					_magecount+=1;
+					_magetotalhealth+=eval(_test[2]); 
+					_magetotalhealthleft+=eval(_test[1]);
+				}
+				if ($(_e).find('img[src*="/graphics/class_rogue.gif"]').length>0) {
+					_roguecount+=1;
+					_roguetotalhealth+=eval(_test[2]); 
+					_roguetotalhealthleft+=eval(_test[1]);
+				}
+				if ($(_e).find('img[src*="/graphics/class_warrior.gif"]').length>0) {
+					_warriorcount+=1;
+					_warriortotalhealth+=eval(_test[2]); 
+					_warriortotalhealthleft+=eval(_test[1]);
+				}
             } else {
                 $(_e).remove();
             }
@@ -584,8 +621,58 @@ function cabf_guildbattlefilter() {
 			$('#cabfHealthLeft').html('Health Left: '+_totalhealthleft);
 			$('#cabfAverageHealthLeft').html('Average Health Left: '+(_totalhealthleft/_count).toFixed());
 			$('#cabfPercentageHealthLeft').html('Percentage Health Left: '+(_totalhealthleft*100/_totalhealth).toFixed(1)+'%');
+			
+			if (_clericcount>0) {
+				$('#cabfClericTotalHealth').html('Total Health: '+_clerictotalhealth);
+				$('#cabfClericAverageHealth').html('Average Health: '+(_clerictotalhealth/_clericcount).toFixed());
+				$('#cabfClericHealthLeft').html('Health Left: '+_clerictotalhealthleft);
+				$('#cabfClericAverageHealthLeft').html('Average Health Left: '+(_clerictotalhealthleft/_clericcount).toFixed());
+				$('#cabfClericPercentageHealthLeft').html('Percentage Health Left: '+(_clerictotalhealthleft*100/_clerictotalhealth).toFixed(1)+'%');
+			}
+			
+			if (_magecount>0) {
+				$('#cabfMageTotalHealth').html('Total Health: '+_magetotalhealth);
+				$('#cabfMageAverageHealth').html('Average Health: '+(_magetotalhealth/_magecount).toFixed());
+				$('#cabfMageHealthLeft').html('Health Left: '+_magetotalhealthleft);
+				$('#cabfMageAverageHealthLeft').html('Average Health Left: '+(_magetotalhealthleft/_magecount).toFixed());
+				$('#cabfMagePercentageHealthLeft').html('Percentage Health Left: '+(_magetotalhealthleft*100/_magetotalhealth).toFixed(1)+'%');
+			}
+			
+			if (_roguecount>0) {
+				$('#cabfRogueTotalHealth').html('Total Health: '+_roguetotalhealth);
+				$('#cabfRogueAverageHealth').html('Average Health: '+(_roguetotalhealth/_roguecount).toFixed());
+				$('#cabfRogueHealthLeft').html('Health Left: '+_roguetotalhealthleft);
+				$('#cabfRogueAverageHealthLeft').html('Average Health Left: '+(_roguetotalhealthleft/_roguecount).toFixed());
+				$('#cabfRoguePercentageHealthLeft').html('Percentage Health Left: '+(_roguetotalhealthleft*100/_roguetotalhealth).toFixed(1)+'%');
+			}
+			
+			if (_warriorcount>0) {
+				$('#cabfWarriorTotalHealth').html('Total Health: '+_warriortotalhealth);
+				$('#cabfWarriorAverageHealth').html('Average Health: '+(_warriortotalhealth/_warriorcount).toFixed());
+				$('#cabfWarriorHealthLeft').html('Health Left: '+_warriortotalhealthleft);
+				$('#cabfWarriorAverageHealthLeft').html('Average Health Left: '+(_warriortotalhealthleft/_warriorcount).toFixed());
+				$('#cabfWarriorPercentageHealthLeft').html('Percentage Health Left: '+(_warriortotalhealthleft*100/_warriortotalhealth).toFixed(1)+'%');
+			}
+		} 
+	} else {
+		var _gateNum = $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').attr('class').match(/\d/)[0];
+		if ($('#enemy_guild_battle_section_battle_list').length > 0) {
+			$('#cabfStatType').html('Enemy');
+		} else {
+			$('#cabfStatType').html('Ally');
 		}
-    }
+		switch (_gateNum) {
+			case '1':  $('#cabfStatTower').html('North Tower Stat');
+					break;
+			case '2':  $('#cabfStatTower').html('West Tower Stat');
+					break;
+			case '3':  $('#cabfStatTower').html('East Tower Stat');
+					break;
+			case '4':  $('#cabfStatTower').html('South Tower Stat');
+					break;
+			default: $('#cabfStatTower').html('Stat (Tower not Found)');
+		}
+	}
 	
     // Saved filter settings
     var _storedClass = item.get('cabfPageGuildBattleClass', 'All');
@@ -784,7 +871,7 @@ function cabf_tenbattlefilter() {
     $('#guild_battle_banner_section > div:eq(2)').css('marginTop', 0);
     $('div:contains("The Battle Between"):last').parent().css('marginTop', 20);
     $('input[src*="collect_reward_button2.jpg"]').parents('div:eq(2)').css('marginTop', 0);
-    $('#guild_battle_guild_tabs').after('<div id="cabfHealthStatBoard"><div id="cabfStatType">Enemy Stat</div><div id="cabfTotalHealth">Total Health: 0</div><div id="cabfAverageHealth">Average Health: 0</div><div id="cabfHealthLeft">Health Left: 0</div><div id="cabfAverageHealthLeft">Average Health Left: 0</div><div id="cabfPercentageHealthLeft">Percentage Health Left: 0</div><div><br></div></div>');
+    $('#guild_battle_guild_tabs').after('<div id="cabfHealthStatBoard"><div id="cabfStatType">Enemy</div><div><br></div><div id="cabfStatTower">Stat</div><div id="cabfTotalHealth">Total Health: 0</div><div id="cabfAverageHealth">Average Health: 0</div><div id="cabfHealthLeft">Health Left: 0</div><div id="cabfAverageHealthLeft">Average Health Left: 0</div><div id="cabfPercentageHealthLeft">Percentage Health Left: 0%</div><div><br></div><div id="cabfStatCleric">Cleric Stat</div><div id="cabfClericTotalHealth">Total Health: 0</div><div id="cabfClericAverageHealth">Average Health: 0</div><div id="cabfClericHealthLeft">Health Left: 0</div><div id="cabfClericAverageHealthLeft">Average Health Left: 0</div><div id="cabfClericPercentageHealthLeft">Percentage Health Left: 0%</div><div><br></div><div id="cabfStatMage">Mage Stat</div><div id="cabfMageTotalHealth">Total Health: 0</div><div id="cabfMageAverageHealth">Average Health: 0</div><div id="cabfMageHealthLeft">Health Left: 0</div><div id="cabfMageAverageHealthLeft">Average Health Left: 0</div><div id="cabfMagePercentageHealthLeft">Percentage Health Left: 0%</div><div><br></div><div id="cabfStatRogue">Rogue Stat</div><div id="cabfRogueTotalHealth">Total Health: 0</div><div id="cabfRogueAverageHealth">Average Health: 0</div><div id="cabfRogueHealthLeft">Health Left: 0</div><div id="cabfRogueAverageHealthLeft">Average Health Left: 0</div><div id="cabfRoguePercentageHealthLeft">Percentage Health Left: 0%</div><div><br></div><div id="cabfStatWarrior">Warrior Stat</div><div id="cabfWarriorTotalHealth">Total Health: 0</div><div id="cabfWarriorAverageHealth">Average Health: 0</div><div id="cabfWarriorHealthLeft">Health Left: 0</div><div id="cabfWarriorAverageHealthLeft">Average Health Left: 0</div><div id="cabfWarriorPercentageHealthLeft">Percentage Health Left: 0%</div><div><br></div></div>');
     
     // add current tokens to result
     var _tokens = $('div.result div:contains("-1 Battle Tokens"):last');
@@ -792,12 +879,28 @@ function cabf_tenbattlefilter() {
     
     // reduce gate size and add number
     if ($('#your_new_guild_member_list:contains("No Soldiers Posted In This Position!"), #enemy_new_guild_member_list:contains("No Soldiers Posted In This Position!")').length === 0) {
-        var _guildnum = 1, _count = 0, _totalhealth = 0, _totalhealthleft = 0, _averagehealth = 0, _averagehealthleft = 0;		
+        var _guildnum = 1, 
+			_count = 0, 
+			_totalhealth = 0, _totalhealthleft = 0, 
+			_clericcount = 0, 
+			_clerictotalhealth = 0, _clerictotalhealthleft = 0, 
+			_magecount = 0, 
+			_magetotalhealth = 0, _magetotalhealthleft = 0, 
+			_roguecount = 0, 
+			_roguetotalhealth = 0, _roguetotalhealthleft = 0, 
+			_warriorcount = 0, 
+			_warriortotalhealth = 0, _warriortotalhealthleft = 0;	
 		if ($('#enemy_guild_battle_section_battle_list').length > 0) {
 			$('#cabfStatType').html('Enemy Stat');
 		} else {
 			$('#cabfStatType').html('Ally Stat');
-		}   
+		}  
+        $('#cabfStatTower').html('All Class Stat');
+		$('#cabfStatWarrior').html(' Cleric Stat');
+		$('#cabfStatMage').html(' Mage Stat');
+		$('#cabfStatRogue').html(' Rogue Stat');
+		$('#cabfStatWarrior').html(' Warrior Stat');  
+		
         $('#enemy_new_guild_member_list > div > div, #your_new_guild_member_list > div > div').each(function(_i, _e) {
             var _text = $(_e).text().trim(), _FullHealth = true;
             if (_text && $(_e).text().trim().length > 0) {
@@ -817,6 +920,26 @@ function cabf_tenbattlefilter() {
 				_count+=1;	
 				_totalhealth+=eval(_test[2]);
 				_totalhealthleft+=eval(_test[1]);
+				if ($(_e).find('img[src*="/graphics/class_cleric.gif"]').length>0) {
+					_clericcount+=1;
+					_clerictotalhealth+=eval(_test[2]); 
+					_clerictotalhealthleft+=eval(_test[1]);
+				}
+				if ($(_e).find('img[src*="/graphics/class_mage.gif"]').length>0) {
+					_magecount+=1;
+					_magetotalhealth+=eval(_test[2]); 
+					_magetotalhealthleft+=eval(_test[1]);
+				}
+				if ($(_e).find('img[src*="/graphics/class_rogue.gif"]').length>0) {
+					_roguecount+=1;
+					_roguetotalhealth+=eval(_test[2]); 
+					_roguetotalhealthleft+=eval(_test[1]);
+				}
+				if ($(_e).find('img[src*="/graphics/class_warrior.gif"]').length>0) {
+					_warriorcount+=1;
+					_warriortotalhealth+=eval(_test[2]); 
+					_warriortotalhealthleft+=eval(_test[1]);
+				}
             } else {
                 $(_e).remove();
             }
@@ -829,9 +952,41 @@ function cabf_tenbattlefilter() {
 			$('#cabfHealthLeft').html('Health Left: '+_totalhealthleft);
 			$('#cabfAverageHealthLeft').html('Average Health Left: '+(_totalhealthleft/_count).toFixed());
 			$('#cabfPercentageHealthLeft').html('Percentage Health Left: '+(_totalhealthleft*100/_totalhealth).toFixed(1)+'%');
-		}
-    }
-    
+			
+			if (_clericcount>0) {
+				$('#cabfClericTotalHealth').html('Total Health: '+_clerictotalhealth);
+				$('#cabfClericAverageHealth').html('Average Health: '+(_clerictotalhealth/_clericcount).toFixed());
+				$('#cabfClericHealthLeft').html('Health Left: '+_clerictotalhealthleft);
+				$('#cabfClericAverageHealthLeft').html('Average Health Left: '+(_clerictotalhealthleft/_clericcount).toFixed());
+				$('#cabfClericPercentageHealthLeft').html('Percentage Health Left: '+(_clerictotalhealthleft*100/_clerictotalhealth).toFixed(1)+'%');
+			}
+			
+			if (_magecount>0) {
+				$('#cabfMageTotalHealth').html('Total Health: '+_magetotalhealth);
+				$('#cabfMageAverageHealth').html('Average Health: '+(_magetotalhealth/_magecount).toFixed());
+				$('#cabfMageHealthLeft').html('Health Left: '+_magetotalhealthleft);
+				$('#cabfMageAverageHealthLeft').html('Average Health Left: '+(_magetotalhealthleft/_magecount).toFixed());
+				$('#cabfMagePercentageHealthLeft').html('Percentage Health Left: '+(_magetotalhealthleft*100/_magetotalhealth).toFixed(1)+'%');
+			}
+			
+			if (_roguecount>0) {
+				$('#cabfRogueTotalHealth').html('Total Health: '+_roguetotalhealth);
+				$('#cabfRogueAverageHealth').html('Average Health: '+(_roguetotalhealth/_roguecount).toFixed());
+				$('#cabfRogueHealthLeft').html('Health Left: '+_roguetotalhealthleft);
+				$('#cabfRogueAverageHealthLeft').html('Average Health Left: '+(_roguetotalhealthleft/_roguecount).toFixed());
+				$('#cabfRoguePercentageHealthLeft').html('Percentage Health Left: '+(_roguetotalhealthleft*100/_roguetotalhealth).toFixed(1)+'%');
+			}
+			
+			if (_warriorcount>0) {
+				$('#cabfWarriorTotalHealth').html('Total Health: '+_warriortotalhealth);
+				$('#cabfWarriorAverageHealth').html('Average Health: '+(_warriortotalhealth/_warriorcount).toFixed());
+				$('#cabfWarriorHealthLeft').html('Health Left: '+_warriortotalhealthleft);
+				$('#cabfWarriorAverageHealthLeft').html('Average Health Left: '+(_warriortotalhealthleft/_warriorcount).toFixed());
+				$('#cabfWarriorPercentageHealthLeft').html('Percentage Health Left: '+(_warriortotalhealthleft*100/_warriortotalhealth).toFixed(1)+'%');
+			}
+		} 
+	}
+	
 	//Add refresh on enemy_guild_tab and your_guild_tab for 10vs10 battle
 	if ($('a[href*="ten_battle.php?battle_id="]').length >0 ) {
 		var _battleid = $('input[name="battle_id"]').attr('value');
@@ -1404,13 +1559,43 @@ function init() {
         addCss ( '#cabfGateStatusFilter-menu {font-size: 12px;width: 100px !important;}');
         addCss ( '#cabfGateClassFilter,#cabfGateStatusFilter,#cabfGatePointsFilter {	color: #fff;	height: 25px;	border: 1px solid #444444;	background-color: #222;	position: relative;	top: 3px;	left: 9px;	float: left;}');   
         addCss ( "#cabfHealthStatBoard {	position: fixed;	background: #000;	padding: 5px;	color: #fff;	margin-top: 0px; width: 275px;	text-align: center;	opacity: 0.75; top: 58; left: 0;}");
-        addCss ( "#cabfStatType  {color: #fff; font-weight: bold;}");
-        addCss ( "#cabfStatTower {color: #fff; font-weight: bold;}");
+        addCss ( "#cabfStatType  {color:rosybrown; font-weight: bold;}");
+        addCss ( "#cabfStatTower {color:rosybrown; font-weight: bold;}");
+        addCss ( "#cabfStatCleric {color: yellow; font-weight: bold;}");
+        addCss ( "#cabfStatMage {color: blueviolet; font-weight: bold;}");
+        addCss ( "#cabfStatRogue {color: green; font-weight: bold;}");
+        addCss ( "#cabfStatWarrior {color: royalblue; font-weight: bold;}");
+		
         addCss ( "#cabfTotalHealth       {color: #fff;text-align:end;}");
         addCss ( "#cabfAverageHealth     {color: #fff;text-align:end;}");
         addCss ( "#cabfHealthLeft        {color: #fff;text-align:end;}");
         addCss ( "#cabfAverageHealthLeft {color: #fff;text-align:end;}");
 		addCss ( "#cabfPercentageHealthLeft {color: #fff;text-align:end;}");
+		
+        addCss ( "#cabfClericTotalHealth       {color: #fff;text-align:end;}");
+        addCss ( "#cabfClericAverageHealth     {color: #fff;text-align:end;}");
+        addCss ( "#cabfClericHealthLeft        {color: #fff;text-align:end;}");
+        addCss ( "#cabfClericAverageHealthLeft {color: #fff;text-align:end;}");
+		addCss ( "#cabfClericPercentageHealthLeft {color: #fff;text-align:end;}");
+		
+        addCss ( "#cabfMageTotalHealth       {color: #fff;text-align:end;}");
+        addCss ( "#cabfMageAverageHealth     {color: #fff;text-align:end;}");
+        addCss ( "#cabfMageHealthLeft        {color: #fff;text-align:end;}");
+        addCss ( "#cabfMageAverageHealthLeft {color: #fff;text-align:end;}");
+		addCss ( "#cabfMagePercentageHealthLeft {color: #fff;text-align:end;}");
+		
+        addCss ( "#cabfRogueTotalHealth       {color: #fff;text-align:end;}");
+        addCss ( "#cabfRogueAverageHealth     {color: #fff;text-align:end;}");
+        addCss ( "#cabfRogueHealthLeft        {color: #fff;text-align:end;}");
+        addCss ( "#cabfRogueAverageHealthLeft {color: #fff;text-align:end;}");
+		addCss ( "#cabfRoguePercentageHealthLeft {color: #fff;text-align:end;}");
+		
+        addCss ( "#cabfWarriorTotalHealth       {color: #fff;text-align:end;}");
+        addCss ( "#cabfWarriorAverageHealth     {color: #fff;text-align:end;}");
+        addCss ( "#cabfWarriorHealthLeft        {color: #fff;text-align:end;}");
+        addCss ( "#cabfWarriorAverageHealthLeft {color: #fff;text-align:end;}");
+		addCss ( "#cabfWarriorPercentageHealthLeft {color: #fff;text-align:end;}");
+		
         addCss ( '.GuildNum {	color:white;position:relative;top:-100px;left:15px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');   
         addCss ( '.GuildNumG{	color:green;position:relative;top:-100px;left:15px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');   
         addCss ( '.GuildNumR{	color:red;position:relative;top:-100px;left:15px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');   
