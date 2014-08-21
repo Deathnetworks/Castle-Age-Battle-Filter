@@ -10,11 +10,11 @@
 // @require        http://code.jquery.com/ui/1.10.3/jquery-ui.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.4
+// @version        1.1.5
 // @copyright      2013+, Jigoku
 // ==/UserScript==
 
-var version = '1.1.4', clickUrl = '', updated = false;
+var version = '1.1.5', clickUrl = '', updated = false;
 
 /* 
 to-do:
@@ -272,7 +272,7 @@ function cabf_conquestearthfilter() {
 		if ($("#cabfHealthActionEarth").length>0) {
 			$("#cabfHealthActionEarth").show();
 		} else {
-			$('#hinvite_help').after('<div id="cabfHealthActionEarth"><div>Attack Tower</div><div id="cabfEarthFiltered1">Filtered: 0</div><div id="cabfEarthAction1">Health/Action: 0</div><div><br></div><div>Defense Tower</div><div id="cabfEarthFiltered2">Filtered: 0</div><div id="cabfEarthAction2">Health/Action: 0</div><div><br></div><div>Damage Tower</div><div id="cabfEarthFiltered3">Filtered: 0</div><div id="cabfEarthAction3">Health/Action: 0</div><div><br></div><div>Health Tower</div><div id="cabfEarthFiltered4">Filtered: 0</div><div id="cabfEarthAction4">Health/Action: 0</div></div>');
+			$('#conquest_report').after('<div id="cabfHealthActionEarth"><div>Attack Tower</div><div id="cabfEarthFiltered1">Filtered: 0</div><div id="cabfEarthAction1">Health/Action: 0</div><div><br></div><div>Defense Tower</div><div id="cabfEarthFiltered2">Filtered: 0</div><div id="cabfEarthAction2">Health/Action: 0</div><div><br></div><div>Damage Tower</div><div id="cabfEarthFiltered3">Filtered: 0</div><div id="cabfEarthAction3">Health/Action: 0</div><div><br></div><div>Health Tower</div><div id="cabfEarthFiltered4">Filtered: 0</div><div id="cabfEarthAction4">Health/Action: 0</div></div>');
 		}
 		
 		for (var _x in _towers) {
@@ -432,7 +432,7 @@ function cabf_conquestearthfilter() {
 		if ($("#cabfConquestEarthFilterContainer").length>0) {
 			$("#cabfConquestEarthFilterContainer").show();
 		} else {
-			$('#hinvite_help').after('<div id="cabfConquestEarthFilterContainer"><div id="cabfConquestEarthFilter" class="ui-state-default"></div></div>');
+			$('#conquest_report').after('<div id="cabfConquestEarthFilterContainer"><div id="cabfConquestEarthFilter" class="ui-state-default"></div></div>');
 			var _cCBF = $('#cabfConquestEarthFilter');
 			// Battle activity points filter
 			_cCBF.prepend('<span class="cabfGateFilterTitle ui-state-default"> Points </span><select id="cabfGatePointsFilter" class="cabfgatefiltertitle">');
@@ -526,6 +526,7 @@ function cabf_guildbattlefilter() {
     $('#guild_battle_banner_section > div:eq(2)').css('marginTop', 0);
     $('div:contains("The Battle Between"):last').parent().css('marginTop', 20);
     $('input[src*="collect_reward_button2.jpg"]').parents('div:eq(2)').css('marginTop', 0);
+    $('#guild_battle_guild_tabs').after('<div id="cabfHealthStatBoard"><div id="cabfStatType">Enemy</div><div id="cabfStatTower">Stat</div><div id="cabfTotalHealth">Total Health: 0</div><div id="cabfAverageHealth">Average Health: 0</div><div id="cabfHealthLeft">Health Left: 0</div><div id="cabfAverageHealthLeft">Average Health Left: 0</div><div id="cabfPercentageHealthLeft">Percentage Health Left: 0</div><div><br></div></div>');
     
     // add current tokens to result
     var _tokens = $('div.result div:contains("-1 Battle Tokens"):last');
@@ -533,12 +534,30 @@ function cabf_guildbattlefilter() {
     
     // reduce gate size and add number
     if ($('#your_new_guild_member_list:contains("No Soldiers Posted In This Position!"), #enemy_new_guild_member_list:contains("No Soldiers Posted In This Position!")').length === 0) {
-        var _guildnum = 1;      
+        var _guildnum = 1, _count = 0, _totalhealth = 0, _totalhealthleft = 0, _averagehealth = 0, _averagehealthleft = 0;		
+        var _gateNum = $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').attr('class').match(/\d/)[0];
+        var _gate = $('#enemy_new_guild_tab_' + _gateNum + ' > div, #your_new_guild_tab_' + _gateNum + ' > div');
+		if ($('#enemy_guild_battle_section_battle_list').length > 0) {
+			$('#cabfStatType').html('Enemy');
+		} else {
+			$('#cabfStatType').html('Ally');
+		}
+		switch (_gateNum) {
+        	case '1':  $('#cabfStatTower').html('North Tower Stat');
+                    break;
+        	case '2':  $('#cabfStatTower').html('West Tower Stat');
+                    break;
+        	case '3':  $('#cabfStatTower').html('East Tower Stat');
+                    break;
+        	case '4':  $('#cabfStatTower').html('South Tower Stat');
+                    break;
+            default: $('#cabfStatTower').html('Stat (Tower not Found)');
+        }    
         $('#enemy_new_guild_member_list > div > div, #your_new_guild_member_list > div > div').each(function(_i, _e) {
             var _text = $(_e).text().trim(), _FullHealth = true;
             if (_text && $(_e).text().trim().length > 0) {
 				var _test = /(\d+)\/(\d+)/g.exec(_text);
-        console.log('test3 _guildnum='+_guildnum);
+        //console.log('test3 _guildnum='+_guildnum);
 				if (_test)
 				{
 					_FullHealth = (_test.length === 3 && _test[1] === _test[2]) ? true : false;
@@ -549,13 +568,23 @@ function cabf_guildbattlefilter() {
 				} else {
 					$(_e).append('<span class="GuildNum">' + (_guildnum) + '<span>');
 				}					
-				_guildnum += 1;			
+				_guildnum += 1;	
+				_count+=1;	
+				_totalhealth+=eval(_test[2]);
+				_totalhealthleft+=eval(_test[1]);
             } else {
                 $(_e).remove();
             }
 			_text = '';
 			_test = [];
         });
+		if (_count>0) {
+			$('#cabfTotalHealth').html('Total Health: '+_totalhealth);
+			$('#cabfAverageHealth').html('Average Health: '+(_totalhealth/_count).toFixed());
+			$('#cabfHealthLeft').html('Health Left: '+_totalhealthleft);
+			$('#cabfAverageHealthLeft').html('Average Health Left: '+(_totalhealthleft/_count).toFixed());
+			$('#cabfPercentageHealthLeft').html('Percentage Health Left: '+(_totalhealthleft*100/_totalhealth).toFixed(1)+'%');
+		}
     }
 	
     // Saved filter settings
@@ -567,6 +596,8 @@ function cabf_guildbattlefilter() {
     // gate filter
     function filterGate() {
         var _count = 0;
+        var _gateNum = $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').attr('class').match(/\d/)[0];
+        var _gate = $('#enemy_new_guild_tab_' + _gateNum + ' > div, #your_new_guild_tab_' + _gateNum + ' > div');
         $('#your_new_guild_member_list > div > div, #enemy_new_guild_member_list > div > div').each(function(_i, _e) {
             var _class = $('#cabfGateClassFilter').val();
             var _activ = new RegExp($('#cabfGateActivityFilter').val(), "g");
@@ -601,8 +632,6 @@ function cabf_guildbattlefilter() {
             }
             
         });
-        var _gateNum = $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').attr('class').match(/\d/)[0];
-        var _gate = $('#enemy_new_guild_tab_' + _gateNum + ' > div, #your_new_guild_tab_' + _gateNum + ' > div');
         _gate.html(_gate.html().replace(/\).*/, ')').replace(')', ')<br/><span style="font-size:14px;font-weight:bold;">Filtered: ' + _count + '</span>'));
     }
     
@@ -755,6 +784,7 @@ function cabf_tenbattlefilter() {
     $('#guild_battle_banner_section > div:eq(2)').css('marginTop', 0);
     $('div:contains("The Battle Between"):last').parent().css('marginTop', 20);
     $('input[src*="collect_reward_button2.jpg"]').parents('div:eq(2)').css('marginTop', 0);
+    $('#guild_battle_guild_tabs').after('<div id="cabfHealthStatBoard"><div id="cabfStatType">Enemy Stat</div><div id="cabfTotalHealth">Total Health: 0</div><div id="cabfAverageHealth">Average Health: 0</div><div id="cabfHealthLeft">Health Left: 0</div><div id="cabfAverageHealthLeft">Average Health Left: 0</div><div id="cabfPercentageHealthLeft">Percentage Health Left: 0</div><div><br></div></div>');
     
     // add current tokens to result
     var _tokens = $('div.result div:contains("-1 Battle Tokens"):last');
@@ -762,12 +792,17 @@ function cabf_tenbattlefilter() {
     
     // reduce gate size and add number
     if ($('#your_new_guild_member_list:contains("No Soldiers Posted In This Position!"), #enemy_new_guild_member_list:contains("No Soldiers Posted In This Position!")').length === 0) {
-        var _guildnum = 1;      
+        var _guildnum = 1, _count = 0, _totalhealth = 0, _totalhealthleft = 0, _averagehealth = 0, _averagehealthleft = 0;		
+		if ($('#enemy_guild_battle_section_battle_list').length > 0) {
+			$('#cabfStatType').html('Enemy Stat');
+		} else {
+			$('#cabfStatType').html('Ally Stat');
+		}   
         $('#enemy_new_guild_member_list > div > div, #your_new_guild_member_list > div > div').each(function(_i, _e) {
             var _text = $(_e).text().trim(), _FullHealth = true;
             if (_text && $(_e).text().trim().length > 0) {
 				var _test = /(\d+)\/(\d+)/g.exec(_text);
-        console.log('test3 _guildnum='+_guildnum);
+        //console.log('test3 _guildnum='+_guildnum);
 				if (_test)
 				{
 					_FullHealth = (_test.length === 3 && _test[1] === _test[2]) ? true : false;
@@ -778,13 +813,23 @@ function cabf_tenbattlefilter() {
 				} else {
 					$(_e).append('<span class="GuildNum">' + (_guildnum) + '<span>');
 				}					
-				_guildnum += 1;			
+				_guildnum += 1;	
+				_count+=1;	
+				_totalhealth+=eval(_test[2]);
+				_totalhealthleft+=eval(_test[1]);
             } else {
                 $(_e).remove();
             }
 			_text = '';
 			_test = [];
         });
+		if (_count>0) {
+			$('#cabfTotalHealth').html('Total Health: '+_totalhealth);
+			$('#cabfAverageHealth').html('Average Health: '+(_totalhealth/_count).toFixed());
+			$('#cabfHealthLeft').html('Health Left: '+_totalhealthleft);
+			$('#cabfAverageHealthLeft').html('Average Health Left: '+(_totalhealthleft/_count).toFixed());
+			$('#cabfPercentageHealthLeft').html('Percentage Health Left: '+(_totalhealthleft*100/_totalhealth).toFixed(1)+'%');
+		}
     }
     
 	//Add refresh on enemy_guild_tab and your_guild_tab for 10vs10 battle
@@ -1278,7 +1323,7 @@ function cabf_filters() {
 		}
     } else     
     /* Festival battle */
-    if ($('#enemy_team_tab,#your_team_tab').length > 0) {
+    if ($('#enemy_team_tab').length > 0 || $('#your_team_tab').length > 0) {
         console.log('Festival battle');
         cabf_festivalbattlefilter();
     } else    
@@ -1346,8 +1391,8 @@ function init() {
         addCss ( "#cabfEarthAction4 {	color: #fff;}");
         addCss ( "#cabfHealthAction {	position: absolute;	background: #000;	padding: 5px;	color: #fff;	width: 170px;	text-align: center;	opacity: 0.75;}");
         addCss ( "#cabfHealthActionEarth {	position: fixed;	background: #000;	padding: 5px;	color: #fff;	margin-top: 0px; width: 200px;	text-align: center;	opacity: 0.75; top: 58; left: 0;}");
-        addCss ( "#cabfConquestEarthFilterContainer {	width: 740px;	position: fixed;	top: 0px;	margin-bottom: 0px;	height: 57px; z-index: 99;}");
-        addCss ( "#cabfConquestEarthFilter {	height: 30px;	border-bottom-left-radius: 8px;	border-bottom-right-radius: 8px;	box-shadow: 0 5px 5px #000;	padding: 0 11px 0 4px;	position: fixed;	width: 450px;	margin-left: 0px;	opacity: 0.75;}");
+        addCss ( "#cabfConquestEarthFilterContainer {	width: 740px;	position: fixed;	top: 0px;	left: 0px;	margin-bottom: 0px;	height: 57px; z-index: 99;}");
+        addCss ( "#cabfConquestEarthFilter {	height: 30px;	border-bottom-left-radius: 8px;	border-bottom-right-radius: 8px;	box-shadow: 0 5px 5px #000;	padding: 0 11px 0 4px;	position: fixed;	width: 480px;	margin-left: 0px;	opacity: 0.75;}");
         addCss ( "#cabfConquestBattleFilterContainer {	background-image: url('https://castleagegame1-a.akamaihd.net/22284/graphics/conq2_insideland_midrepeat.jpg');	width: 740px;	position: relative;	top: -10px;	margin-bottom: -10px;	height: 57px;}");
         addCss ( "#cabfConquestBattleFilter {	height: 30px;	border-bottom-left-radius: 8px;	border-bottom-right-radius: 8px;	box-shadow: 0 5px 5px #000;	padding: 0 11px 0 4px;	position: relative;	width: 550px;	margin-left: 90px;}");
         addCss ( '.cabfGateFilterTitle {position: relative !important;left: 11px;top: 3px;float: left;font-size: 12px;height: 15px;padding: 4px !important;color: rgb(255, 255, 255);background-color: rgb(34, 34, 34);border: 1px solid rgb(68, 68, 68);}');
@@ -1358,6 +1403,14 @@ function init() {
         addCss ( '#cabfGateStatusFilter-button {color: white;top: 3px;left: 9px;position: relative;float: left;font-size: 12px;border-radius: 0;width: 100px !important;height: 23px;}');
         addCss ( '#cabfGateStatusFilter-menu {font-size: 12px;width: 100px !important;}');
         addCss ( '#cabfGateClassFilter,#cabfGateStatusFilter,#cabfGatePointsFilter {	color: #fff;	height: 25px;	border: 1px solid #444444;	background-color: #222;	position: relative;	top: 3px;	left: 9px;	float: left;}');   
+        addCss ( "#cabfHealthStatBoard {	position: fixed;	background: #000;	padding: 5px;	color: #fff;	margin-top: 0px; width: 275px;	text-align: center;	opacity: 0.75; top: 58; left: 0;}");
+        addCss ( "#cabfStatType  {color: #fff; font-weight: bold;}");
+        addCss ( "#cabfStatTower {color: #fff; font-weight: bold;}");
+        addCss ( "#cabfTotalHealth       {color: #fff;text-align:end;}");
+        addCss ( "#cabfAverageHealth     {color: #fff;text-align:end;}");
+        addCss ( "#cabfHealthLeft        {color: #fff;text-align:end;}");
+        addCss ( "#cabfAverageHealthLeft {color: #fff;text-align:end;}");
+		addCss ( "#cabfPercentageHealthLeft {color: #fff;text-align:end;}");
         addCss ( '.GuildNum {	color:white;position:relative;top:-100px;left:15px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');   
         addCss ( '.GuildNumG{	color:green;position:relative;top:-100px;left:15px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');   
         addCss ( '.GuildNumR{	color:red;position:relative;top:-100px;left:15px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');   
