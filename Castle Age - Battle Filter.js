@@ -1545,7 +1545,7 @@ function init() {
         addCss ( "#cabfEarthAction3 {	color: #fff;}");
         addCss ( "#cabfEarthAction4 {	color: #fff;}");
         addCss ( "#cabfHealthAction {	position: absolute;	background: #000;	padding: 5px;	color: #fff;	width: 170px;	text-align: center;	opacity: 0.75;}");
-        addCss ( "#cabfHealthActionEarth {	position: fixed;	background: #000;	padding: 5px;	color: #fff;	margin-top: 0px; width: 200px;	text-align: center;	opacity: 0.75; top: 58; left: 0;}");
+        addCss ( "#cabfHealthActionEarth {	position: fixed;	background: #000;	padding: 5px;	color: #fff;	margin-top: 0px; width: 200px;	text-align: center;	opacity: 0.75; top: 58px; left: 0px;}");
         addCss ( "#cabfConquestEarthFilterContainer {	width: 740px;	position: fixed;	top: 0px;	left: 0px;	margin-bottom: 0px;	height: 57px; z-index: 99;}");
         addCss ( "#cabfConquestEarthFilter {	height: 30px;	border-bottom-left-radius: 8px;	border-bottom-right-radius: 8px;	box-shadow: 0 5px 5px #000;	padding: 0 11px 0 4px;	position: fixed;	width: 480px;	margin-left: 0px;	opacity: 0.75;}");
         addCss ( "#cabfConquestBattleFilterContainer {	background-image: url('https://castleagegame1-a.akamaihd.net/22284/graphics/conq2_insideland_midrepeat.jpg');	width: 740px;	position: relative;	top: -10px;	margin-bottom: -10px;	height: 57px;}");
