@@ -1558,7 +1558,7 @@ function init() {
         addCss ( '#cabfGateStatusFilter-button {color: white;top: 3px;left: 9px;position: relative;float: left;font-size: 12px;border-radius: 0;width: 100px !important;height: 23px;}');
         addCss ( '#cabfGateStatusFilter-menu {font-size: 12px;width: 100px !important;}');
         addCss ( '#cabfGateClassFilter,#cabfGateStatusFilter,#cabfGatePointsFilter {	color: #fff;	height: 25px;	border: 1px solid #444444;	background-color: #222;	position: relative;	top: 3px;	left: 9px;	float: left;}');   
-        addCss ( "#cabfHealthStatBoard {	position: fixed;	background: #000;	padding: 5px;	color: #fff;	margin-top: 0px; width: 275px;	text-align: center;	opacity: 0.75; top: 58; left: 0;}");
+        addCss ( "#cabfHealthStatBoard {	position: fixed;	background: #000;	padding: 5px;	color: #fff;	margin-top: 0px; width: 275px;	text-align: center;	opacity: 0.75; top: 58px; left: 0px;}");
         addCss ( "#cabfStatType  {color:rosybrown; font-weight: bold;}");
         addCss ( "#cabfStatTower {color:rosybrown; font-weight: bold;}");
         addCss ( "#cabfStatCleric {color: yellow; font-weight: bold;}");
