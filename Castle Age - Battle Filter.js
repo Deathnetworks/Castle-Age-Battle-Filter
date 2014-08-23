@@ -10,11 +10,11 @@
 // @require        http://code.jquery.com/ui/1.10.3/jquery-ui.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.7
+// @version        1.1.8
 // @copyright      2013+, Jigoku
 // ==/UserScript==
 
-var version = '1.1.7', clickUrl = '', updated = false;
+var version = '1.1.8', clickUrl = '', updated = false;
 
 /* 
 to-do:
@@ -765,7 +765,7 @@ function cabf_guildbattlefilter() {
     };
     // Class filter
     $('body > ul.ui-selectmenu-menu').remove();
-    $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').prepend('<div id="cabf_menu" style="padding: 0 0 10px 0;" >');
+    $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').prepend('<div id="cabf_menu" style="padding: 0 0 30px 0;" >');
     $('#cabf_menu').append($('<button>Clear filters</button>').button().css({
         'position' : 'relative !important',
         'left' : 9,
@@ -1012,11 +1012,11 @@ function cabf_tenbattlefilter() {
         console.log('_battleid='+_battleid);
 		if ($('#enemy_guild_tab').length > 0) {
 			$('#enemy_guild_tab').css({"font-size":"15px","padding-top":"0px","text-align":"center"});
-			$('#enemy_guild_tab').append('<a href="ten_battle.php?battle_id='+_battleid+'&view_allies=false" onclick="ajaxLinkSend(\'globalContainer\',\'ten_battle.php?battle_id='+_battleid+'&view_allies=false\'); return false;"><div class="imgButton"><img alt="View Enemies!" src="https://castleagegame1-a.akamaihd.net/graphics/enemy_guild_on.gif"></div></a>');
+			$('#enemy_guild_tab').wrap('<a href="ten_battle.php?battle_id='+_battleid+'&view_allies=false" onclick="ajaxLinkSend(\'globalContainer\', \'ten_battle.php?battle_id='+_battleid+'&view_allies=false\'); return false;"></a>');
 		}
 		if ($('#your_guild_tab').length > 0) {
 			$('#your_guild_tab').css({"font-size":"15px","padding-top":"0px","text-align":"center"});
-			$('#your_guild_tab').append('<a href="ten_battle.php?battle_id='+_battleid+'&view_allies=true" onclick="ajaxLinkSend(\'globalContainer\',\'ten_battle.php?battle_id='+_battleid+'&view_allies=true\'); return false;"><div class="imgButton"><img alt="View Allies!" src="https://castleagegame1-a.akamaihd.net/graphics/your_guild_on.gif"></div></a>');
+			$('#your_guild_tab').wrap('<a href="ten_battle.php?battle_id='+_battleid+'&view_allies=true" onclick="ajaxLinkSend(\'globalContainer\', \'ten_battle.php?battle_id='+_battleid+'&view_allies=true\'); return false;"></a>');
 		}
 	}
 	
@@ -1063,7 +1063,7 @@ function cabf_tenbattlefilter() {
             }
             
         });
-        $('#enemy_guild_tab,#your_guild_tab').append('<br/><span style="font-size:14px;font-weight:bold;">Filtered: ' + _count + '</span>');
+        $('#enemy_guild_tab,#your_guild_tab').append('<br><br><span style="font-size:14px;font-weight:bold;">Filtered: ' + _count + '</span>');
     }
     
     // class filter
@@ -1095,7 +1095,7 @@ function cabf_tenbattlefilter() {
     };
     // Class filter
     $('body > ul.ui-selectmenu-menu').remove();
-    $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').prepend('<div id="cabf_menu" style="padding: 0 0 10px 0;" >');
+    $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').prepend('<div id="cabf_menu" style="padding: 0 0 30px 0;" >');
     $('#cabf_menu').append($('<button>Clear filters</button>').button().css({
         'position' : 'relative !important',
         'left' : 9,
@@ -1424,9 +1424,11 @@ function cabf_festivalbattlefilter() {
         '200' : '200',
         '160' : '160'
     };
-    // Class filter
+    // Add Filter Bar
     $('body > ul.ui-selectmenu-menu').remove();
-    $('#guild_battle_health').append($('<button>Clear filters</button>').button().css({
+    $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').prepend('<div id="cabf_menu" style="padding: 0 0 30px 0;" >');
+    // Clear Filter
+    $('#cabf_menu').append($('<button>Clear filters</button>').button().css({
         'position' : 'relative !important',
         'left' : 9,
         'top' : 3,
@@ -1444,7 +1446,8 @@ function cabf_festivalbattlefilter() {
         item.set('cabfPageFestGuildBattlePoints', 'All');
         filterGate();
     }));
-    $('#guild_battle_health').append('<span class="cabfGateFilterTitle ui-state-default"> Class </span><select id="cabfGateClassFilter" class="cabfgatefiltertitle">');
+    // Class filter
+    $('#cabf_menu').append('<span class="cabfGateFilterTitle ui-state-default"> Class </span><select id="cabfGateClassFilter" class="cabfgatefiltertitle">');
     _sel = $('#cabfGateClassFilter');
     $.each(filterClass, function(_i, _e) {
         _sel.append('<option value="' + _e + '" ' + (_storedClass == _i ? 'selected = "selected"' : '') + ' >' + _i + '</option>');
@@ -1455,7 +1458,7 @@ function cabf_festivalbattlefilter() {
         filterGate();
     });
     // Activity filter
-    $('#guild_battle_health').append('<span class="cabfGateFilterTitle ui-state-default"> Activity </span><select id="cabfGateActivityFilter" class="cabfgatefiltertitle">');
+    $('#cabf_menu').append('<span class="cabfGateFilterTitle ui-state-default"> Activity </span><select id="cabfGateActivityFilter" class="cabfgatefiltertitle">');
     _sel = $('#cabfGateActivityFilter');
     $.each(filterActivity, function(_i, _e) {
         _sel.append('<option value="' + _e + '" ' + (_storedActivity == _i ? 'selected = "selected"' : '') + ' >' + _i + '</option>');
@@ -1466,7 +1469,7 @@ function cabf_festivalbattlefilter() {
         filterGate();
     });
     // status filter
-    $('#guild_battle_health').append('<span class="cabfGateFilterTitle ui-state-default"> Status </span><select id="cabfGateStatusFilter" class="cabfgatefiltertitle">');
+    $('#cabf_menu').append('<span class="cabfGateFilterTitle ui-state-default"> Status </span><select id="cabfGateStatusFilter" class="cabfgatefiltertitle">');
     _sel = $('#cabfGateStatusFilter');
     $.each(filterStatus, function(_i, _e) {
         _sel.append('<option value="' + _e + '" ' + (_storedStatus == _i ? 'selected = "selected"' : '') + ' >' + _i + '</option>');
@@ -1476,19 +1479,8 @@ function cabf_festivalbattlefilter() {
         item.set('cabfPageFestGuildBattleStatus', _storedStatus);
         filterGate();
     });
-    
-    $('#cabfGateStatusFilter, #cabfGateClassFilter, #cabfGateActivityFilter').css({
-        'float' : 'left',
-        'color' : '#fff',
-        'height' : 25,
-        'border' : '1 solid #444444',
-        'backgroundColor' : '#222',
-        'position' : 'relative',
-        'left' : 9,
-        'top' : 3
-    });
     // Battle activity points filter
-    $('#guild_battle_health').append('<span class="cabfGateFilterTitle ui-state-default"> Points </span><select id="cabfGatePointsFilter" class="cabfgatefiltertitle">');
+    $('#cabf_menu').append('<span class="cabfGateFilterTitle ui-state-default"> Points </span><select id="cabfGatePointsFilter" class="cabfgatefiltertitle">');
     _sel = $('#cabfGatePointsFilter');
     $.each(filterPoints, function(_i, _e) {
         _sel.append('<option value="' + _e + '" ' + (_storedPoints == _i ? 'selected = "selected"' : '') + ' >' + _i + '</option>');
