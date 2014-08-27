@@ -10,11 +10,11 @@
 // @require        http://code.jquery.com/ui/1.10.3/jquery-ui.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.9
+// @version        1.1.10
 // @copyright      2013+, Jigoku
 // ==/UserScript==
 
-var version = '1.1.9', clickUrl = '', updated = false;
+var version = '1.1.10', clickUrl = '', updated = false;
 
 /* 
 to-do:
@@ -77,7 +77,7 @@ function cabf_conquestmistfilter() {
         var _storedPoints = item.get('cabfPageConquestBattlePoints', 'All');
         
         $('#your_guild_member_list_1 > div').each(function(_i, _e) {
-            var _text = $(_e).text().trim(), _health, _maxHealth, _fullhealth;
+            var _text = $(_e).text().trim(), _health, _maxHealth, _fullhealth,winStat = '';
             
             // enemy full health
             _health = /(\d+)\//.exec(_text)[1];
@@ -89,12 +89,15 @@ function cabf_conquestmistfilter() {
             }
             _defenderHealth += parseInt(/(\d+)(?:\/)/.exec($(this).text())[1], 10);
             $(_e, 'div > div').append('<div style="clear:both;"></div>');
-			
-        console.log('test1 _i='+_i);
+			if ($('input[name="target_id"]',_e).length>0) {
+				var target_id=$('input[name="target_id"]',_e).attr("value");
+				winStat=getTargetStat(target_id);
+				console.log("_guildnum: target_id="+target_id+"; "+winStat);
+			}
             if (_fullhealth) {
-                $(_e, 'div > div').append('<span class="GuildNumG">' + (_i + 1) + '<span>');
+                $(_e, 'div > div').append('<span class="GuildNumG">' + (_i + 1) + '</span>'+ '<br>' + winStat);
             } else {
-                $(_e, 'div > div').append('<span class="GuildNumR">' + (_i + 1) + '<span>');
+                $(_e, 'div > div').append('<span class="GuildNumR">' + (_i + 1) + '</span>'+ '<br>' + winStat);
             }
             
         });
@@ -302,7 +305,7 @@ function cabf_conquestearthfilter() {
                 _defenderHealth = 0;            
             } else {
                 $('#tower_'+_x+' > div > div').each(function(_i, _e) {
-                    var _text = $(_e).text().trim(), _health, _maxHealth, _fullhealth;
+                    var _text = $(_e).text().trim(), _health, _maxHealth, _fullhealth,winStat = '';
                     
                     // enemy full health
                     _health = /(\d+)\//.exec(_text)[1];
@@ -314,10 +317,15 @@ function cabf_conquestearthfilter() {
                     }
                     _defenderHealth += parseInt(/(\d+)(?:\/)/.exec($(this).text())[1], 10);
                     $(_e, 'div > div').append('<div style="clear:both;"></div>');
+					if ($('input[name="target_id"]',_e).length>0) {
+						var target_id=$('input[name="target_id"]',_e).attr("value");
+						winStat=getTargetStat(target_id);
+						console.log("_guildnum: target_id="+target_id+"; "+winStat);
+					}
                     if (_fullhealth) {
-                        $(_e, 'div > div').append('<span class="GuildNumG">' + (_i + 1) + '<span>');
+                        $(_e, 'div > div').append('<span class="GuildNumG">' + (_i + 1) + '</span>'+ '<br>' + winStat);
                     } else {
-                        $(_e, 'div > div').append('<span class="GuildNumR">' + (_i + 1) + '<span>');
+                        $(_e, 'div > div').append('<span class="GuildNumR">' + (_i + 1) + '</span>'+ '<br>' + winStat);
                     }
                     
                 });
@@ -591,17 +599,22 @@ function cabf_guildbattlefilter() {
             var _text = $(_e).text().trim(), _FullHealth = true;
             if (_text && $(_e).text().trim().length > 0) {
 				var _test = /(\d+)\/(\d+)/g.exec(_text);
-				var _active = /Battle Points: [1-9]/g.exec(_text);
-        //console.log('test3 _guildnum='+_guildnum);
+				var _active = /Battle Points: [1-9]/g.exec(_text);	
+				var winStat = '';
+				if ($('input[name="target_id"]',_e).length>0) {
+					var target_id=$('input[name="target_id"]',_e).attr("value");
+					winStat=getTargetStat(target_id);
+					console.log("_guildnum: target_id="+target_id+"; "+winStat);
+				}
 				if (_test)
 				{
 					_FullHealth = (_test.length === 3 && _test[1] === _test[2]) ? true : false;
 					if (_FullHealth)
-						$(_e).append('<span class="GuildNumG">' + (_guildnum) + '<span>');
+						$(_e).append('<span class="GuildNumG">' + (_guildnum) + '</span>'+ '<br>' + winStat);
 					else
-						$(_e).append('<span class="GuildNumR">' + (_guildnum) + '<span>');	
+						$(_e).append('<span class="GuildNumR">' + (_guildnum) + '</span>'+ '<br>' + winStat);
 				} else {
-					$(_e).append('<span class="GuildNum">' + (_guildnum) + '<span>');
+					$(_e).append('<span class="GuildNum">' + (_guildnum) + '</span>'+ '<br>' + winStat);
 				}					
 				_guildnum += 1;	
 				_count+=1;	
@@ -636,7 +649,7 @@ function cabf_guildbattlefilter() {
 					_activetotalhealth+=eval(_test[2]); 
 					if (_test[1]>0) _activelivecount+=1;
 					_activetotalhealthleft+=eval(_test[1]);
-				}					
+				}				
             } else {
                 $(_e).remove();
             }
@@ -956,16 +969,21 @@ function cabf_tenbattlefilter() {
             var _text = $(_e).text().trim(), _FullHealth = true;
             if (_text && $(_e).text().trim().length > 0) {
 				var _test = /(\d+)\/(\d+)/g.exec(_text);
-        //console.log('test3 _guildnum='+_guildnum);
+				var winStat = '';
+				if ($('input[name="target_id"]',_e).length>0) {
+					var target_id=$('input[name="target_id"]',_e).attr("value");
+					winStat=getTargetStat(target_id);
+					console.log("_guildnum: target_id="+target_id+"; "+winStat);
+				}
 				if (_test)
 				{
 					_FullHealth = (_test.length === 3 && _test[1] === _test[2]) ? true : false;
 					if (_FullHealth)
-						$(_e).append('<span class="GuildNumG">' + (_guildnum) + '<span>');
+						$(_e).append('<span class="GuildNumG">' + (_guildnum) + '</span>'+ '<br>' + winStat);
 					else
-						$(_e).append('<span class="GuildNumR">' + (_guildnum) + '<span>');	
+						$(_e).append('<span class="GuildNumR">' + (_guildnum) + '</span>'+ '<br>' + winStat);	
 				} else {
-					$(_e).append('<span class="GuildNum">' + (_guildnum) + '<span>');
+					$(_e).append('<span class="GuildNum">' + (_guildnum) + '</span>'+ '<br>' + winStat);
 				}					
 				_guildnum += 1;	
 				_count+=1;	
@@ -1300,16 +1318,21 @@ function cabf_festivalbattlefilter() {
 		var _text = $(_e).text().trim(), _FullHealth = true;
 		if (_text && $(_e).text().trim().length > 0) {
 			var _test = /(\d+)\/(\d+)/g.exec(_text);
-        //console.log('test4 _guildnum='+_guildnum);
+			var winStat = '';
+			if ($('input[name="target_id"]',_e).length>0) {
+				var target_id=$('input[name="target_id"]',_e).attr("value");
+				winStat=getTargetStat(target_id);
+				console.log("_guildnum: target_id="+target_id+"; "+winStat);
+			}
 			if (_test)
 			{
 				_FullHealth = (_test.length === 3 && _test[1] === _test[2]) ? true : false;
 				if (_FullHealth)
-					$(_e).append('<span class="GuildNumG">' + (_guildnum) + '<span>');
+					$(_e).append('<span class="GuildNumG">' + (_guildnum) + '</span>'+ '<br>' + winStat);
 				else
-					$(_e).append('<span class="GuildNumR">' + (_guildnum) + '<span>');	
+					$(_e).append('<span class="GuildNumR">' + (_guildnum) + '</span>'+ '<br>' + winStat);	
 			} else {
-				$(_e).append('<span class="GuildNum">' + (_guildnum) + '<span>');
+				$(_e).append('<span class="GuildNum">' + (_guildnum) + '</span>'+ '<br>' + winStat);
 			}					
 			_guildnum += 1;	
 			_count+=1;	
@@ -1601,24 +1624,35 @@ function stunBar() {
 	return '';
 };
 
-var defaultTarget={"target_id":0,"victory":0,"defeat":0};
-function getDefaultObjectAt(array, index)
-{
-	var initTarget=defaultTarget;
-	initTarget.target_id=index;
-    return array[index] = array[index] || initTarget;
-}
+var defaultStats={"targets":[{"target_id":"0","victory":0,"defeat":0}]};
 function getTargetIndex(array, target_id)
 {
 	for (var i = 0; i < array.length; i++){
-		if (array[i].target_id==target_id) { 
+		if (array[i].target_id===target_id) { 
 			return i;
 		}
 	}
 	return -1;
 }
+function getTargetStat(target_id)
+{
+	var stats=item.get('stats',defaultStats);
+	var indexTarget=getTargetIndex(stats.targets,target_id);
+	if (indexTarget>0) {
+		var victory=eval(stats.targets[indexTarget].victory),
+			defeat=eval(stats.targets[indexTarget].defeat);
+		if ((victory+defeat)>0) {
+			if ((victory-defeat)>0) {
+				return '<span class="GuildNumG">'+Math.round(((victory-defeat)*100/(victory+defeat)))+'%</span>';
+			} else {
+				return '<span class="GuildNumR">'+Math.round(((victory-defeat)*100/(victory+defeat)))+'%</span>';
+			}
+		}
+	}
+	return '<span class="GuildNum">0%</span>';
+}
 function battleStats() {
-	var stats=item.get('stats',{"targets":[{defaultTarget}]});
+	var stats=item.get('stats',defaultStats);
 	if ($('#results_main_wrapper>div').length > 0 ) {
 		console.log("Battle Stats");
 		var target = $('#results_main_wrapper input[name="target_id"]'),target_id=0;
@@ -1629,8 +1663,7 @@ function battleStats() {
 			var target_id=target.attr("value"),indexTarget=0;
 			indexTarget=getTargetIndex(stats.targets,target_id);
 			if (indexTarget<0) {
-				var newTarget=defaultTarget;
-				newTarget.target_id=target_id;
+				var newTarget={"target_id":target_id,"victory":0,"defeat":0};
 				stats.targets.push(newTarget);
 				indexTarget=getTargetIndex(stats.targets,target_id);
 			}
@@ -1668,31 +1701,31 @@ function cabf_filters() {
 		//Switch between 10vs10 battle and Guild battle
 		if ($('#enemy_new_guild_tab_1,#your_new_guild_tab_1').length >0 ) {
 			console.log('Guild battle');
-			cabf_guildbattlefilter();
 			battleStats();
+			cabf_guildbattlefilter();
 		} else {
 			console.log('10vs10 battle');
-			cabf_tenbattlefilter();
 			battleStats();
+			cabf_tenbattlefilter();
 		}
     } else     
     /* Festival battle */
     if ($('#enemy_team_tab').length > 0 || $('#your_team_tab').length > 0) {
         console.log('Festival battle');
-        cabf_festivalbattlefilter();
 		battleStats();
+        cabf_festivalbattlefilter();
     } else    
     /* Earth land conquest battle */
     if ($('#tower_1,#tower_2,#tower_3,#tower_4').length > 0) {
         console.log('Earth land conquest battle');
-        cabf_conquestearthfilter();
 		battleStats();
+        cabf_conquestearthfilter();
     } else    
     /* Mist land conquest battle */
     if ($('#your_guild_member_list_1').length > 0) {
         console.log('Mist land conquest battle');
-        cabf_conquestmistfilter();
 		battleStats();
+        cabf_conquestmistfilter();
     }
 	
 	
