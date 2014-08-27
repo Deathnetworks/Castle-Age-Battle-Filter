@@ -10,11 +10,11 @@
 // @require        http://code.jquery.com/ui/1.10.3/jquery-ui.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.8
+// @version        1.1.9
 // @copyright      2013+, Jigoku
 // ==/UserScript==
 
-var version = '1.1.8', clickUrl = '', updated = false;
+var version = '1.1.9', clickUrl = '', updated = false;
 
 /* 
 to-do:
@@ -1611,14 +1611,14 @@ function getDefaultObjectAt(array, index)
 function getTargetIndex(array, target_id)
 {
 	for (var i = 0; i < array.length; i++){
-		if (array[i]==target_id) { 
+		if (array[i].target_id==target_id) { 
 			return i;
 		}
 	}
 	return -1;
 }
 function battleStats() {
-	var targets=item.get('targets',[defaultTarget]);
+	var stats=item.get('stats',{"targets":[{defaultTarget}]});
 	if ($('#results_main_wrapper>div').length > 0 ) {
 		console.log("Battle Stats");
 		var target = $('#results_main_wrapper input[name="target_id"]'),target_id=0;
@@ -1627,17 +1627,19 @@ function battleStats() {
 		console.log('target.attr("value")=',target.attr("value"));
 		if (target.length > 0 ) {
 			var target_id=target.attr("value"),indexTarget=0;
-			indexTarget=getTargetIndex(targets,target_id);
+			indexTarget=getTargetIndex(stats.targets,target_id);
 			if (indexTarget<0) {
-				targets[target_id]=defaultTarget;
-				targets[target_id].target_id=target_id;
+				var newTarget=defaultTarget;
+				newTarget.target_id=target_id;
+				stats.targets.push(newTarget);
+				indexTarget=getTargetIndex(stats.targets,target_id);
 			}
 			if ($('#results_main_wrapper>div:contains("VICTORY")').length > 0 ) {
 				console.log("VICTORY");
-				targets[target_id].victory++;
+				stats.targets[indexTarget].victory++;
 			} else if ($('#results_main_wrapper>div:contains("DEFEAT")').length > 0 ) {
 				console.log("DEFEAT");
-				targets[target_id].defeat++;
+				stats.targets[indexTarget].defeat++;
 			} else if ($('#results_main_wrapper>div:contains("HEAL")').length > 0 ) {
 				console.log("HEAL");
 			} else if ($('#results_main_wrapper>div:contains("DISPEL")').length > 0 ) {
@@ -1649,8 +1651,8 @@ function battleStats() {
 			}
 		}
 	}
-	item.set('targets',targets);
-	console.log("targets",targets);
+	item.set('stats',stats);
+	console.log("targets",stats.targets);
 }
 
 function cabf_filters() {
