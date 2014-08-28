@@ -10,11 +10,11 @@
 // @require        http://code.jquery.com/ui/1.10.3/jquery-ui.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.10
+// @version        1.1.11
 // @copyright      2013+, Jigoku
 // ==/UserScript==
 
-var version = '1.1.10', clickUrl = '', updated = false;
+var version = '1.1.11', clickUrl = '', updated = false;
 
 /* 
 to-do:
@@ -92,7 +92,7 @@ function cabf_conquestmistfilter() {
 			if ($('input[name="target_id"]',_e).length>0) {
 				var target_id=$('input[name="target_id"]',_e).attr("value");
 				winStat=getTargetStat(target_id);
-				console.log("_guildnum: target_id="+target_id+"; "+winStat);
+				addTargetTip(_e);
 			}
             if (_fullhealth) {
                 $(_e, 'div > div').append('<span class="GuildNumG">' + (_i + 1) + '</span>'+ '<br>' + winStat);
@@ -320,7 +320,7 @@ function cabf_conquestearthfilter() {
 					if ($('input[name="target_id"]',_e).length>0) {
 						var target_id=$('input[name="target_id"]',_e).attr("value");
 						winStat=getTargetStat(target_id);
-						console.log("_guildnum: target_id="+target_id+"; "+winStat);
+						addTargetTip(_e);
 					}
                     if (_fullhealth) {
                         $(_e, 'div > div').append('<span class="GuildNumG">' + (_i + 1) + '</span>'+ '<br>' + winStat);
@@ -604,7 +604,7 @@ function cabf_guildbattlefilter() {
 				if ($('input[name="target_id"]',_e).length>0) {
 					var target_id=$('input[name="target_id"]',_e).attr("value");
 					winStat=getTargetStat(target_id);
-					console.log("_guildnum: target_id="+target_id+"; "+winStat);
+					addTargetTip(_e);
 				}
 				if (_test)
 				{
@@ -973,7 +973,7 @@ function cabf_tenbattlefilter() {
 				if ($('input[name="target_id"]',_e).length>0) {
 					var target_id=$('input[name="target_id"]',_e).attr("value");
 					winStat=getTargetStat(target_id);
-					console.log("_guildnum: target_id="+target_id+"; "+winStat);
+					addTargetTip(_e);
 				}
 				if (_test)
 				{
@@ -1322,7 +1322,7 @@ function cabf_festivalbattlefilter() {
 			if ($('input[name="target_id"]',_e).length>0) {
 				var target_id=$('input[name="target_id"]',_e).attr("value");
 				winStat=getTargetStat(target_id);
-				console.log("_guildnum: target_id="+target_id+"; "+winStat);
+				addTargetTip(_e);
 			}
 			if (_test)
 			{
@@ -1561,6 +1561,11 @@ function cabf_festivalbattlefilter() {
     }, 10);
 };
 
+/******************************************************************************************************************************************************************************
+*******************************************************************************************************************************************************************************
+*************    MONSTERS *****************************************************************************************************************************************************
+*******************************************************************************************************************************************************************************
+******************************************************************************************************************************************************************************/
 function monsterBars() {
 	var _monstername = null, _ret = [];
 	// add percentage to top bars
@@ -1624,9 +1629,44 @@ function stunBar() {
 	return '';
 };
 
+/******************************************************************************************************************************************************************************
+*******************************************************************************************************************************************************************************
+*************    STATS BATTLE *************************************************************************************************************************************************
+*******************************************************************************************************************************************************************************
+******************************************************************************************************************************************************************************/
 var defaultStats={"targets":[{"target_id":"0","victory":0,"defeat":0}]};
-function getTargetIndex(array, target_id)
-{
+function addTargetTip(_e) {
+	$(_e).mouseover(function(e) {
+		var stats=item.get('stats',defaultStats),
+			target_id=$('input[name="target_id"]',this).attr("value"),
+			indexTarget=0,
+			victory=0,
+			defeat=0;
+		indexTarget=getTargetIndex(stats.targets,target_id);
+		if (indexTarget>=0) {
+			victory=stats.targets[indexTarget].victory;
+			defeat=stats.targets[indexTarget].defeat;
+		}
+        var tip = $(this).attr('title');   
+        $(this).attr('title',''); 
+		$(this).append('<div id="tooltip"><div class="tipHeader"></div><div class="tipBody">' 
+		+ 'Hits Numbers : '+ eval(victory+defeat) + '<br>'
+		+ 'Victories : '+ victory + '<br>'
+		+ 'Defeats : '+ defeat + '<br>'
+		+ '</div><div class="tipFooter"></div></div>');  
+        $('#tooltip').css('top', e.pageY + 10 );
+        $('#tooltip').css('left', e.pageX + 20 );
+        $('#tooltip').fadeIn('500');
+        $('#tooltip').fadeTo('10',0.8);
+    }).mousemove(function(e) {
+        $('#tooltip').css('top', e.pageY + 10 );
+        $('#tooltip').css('left', e.pageX + 20 );
+    }).mouseout(function() {
+        $(this).attr('title',$('.tipBody').html());
+        $(this).children('div#tooltip').remove();
+    });
+}
+function getTargetIndex(array, target_id) {
 	for (var i = 0; i < array.length; i++){
 		if (array[i].target_id===target_id) { 
 			return i;
@@ -1634,11 +1674,10 @@ function getTargetIndex(array, target_id)
 	}
 	return -1;
 }
-function getTargetStat(target_id)
-{
+function getTargetStat(target_id) {
 	var stats=item.get('stats',defaultStats);
 	var indexTarget=getTargetIndex(stats.targets,target_id);
-	if (indexTarget>0) {
+	if (indexTarget>=0) {
 		var victory=eval(stats.targets[indexTarget].victory),
 			defeat=eval(stats.targets[indexTarget].defeat);
 		if ((victory+defeat)>0) {
@@ -1688,6 +1727,11 @@ function battleStats() {
 	console.log("targets",stats.targets);
 }
 
+/******************************************************************************************************************************************************************************
+*******************************************************************************************************************************************************************************
+*************    FILTERS BATTLE ***********************************************************************************************************************************************
+*******************************************************************************************************************************************************************************
+******************************************************************************************************************************************************************************/
 function cabf_filters() {
     
 	cabf_connect();
@@ -1841,7 +1885,12 @@ function init() {
 		
         addCss ( '.GuildNum {	color:white;position:relative;top:-100px;left:15px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');   
         addCss ( '.GuildNumG{	color:green;position:relative;top:-100px;left:15px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');   
-        addCss ( '.GuildNumR{	color:red;position:relative;top:-100px;left:15px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');   
+        addCss ( '.GuildNumR{	color:red;position:relative;top:-100px;left:15px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');  
+		
+        addCss ( '#tooltip {position:absolute;z-index:9999;color:#fff;font-size:10px;width:180px;}');    
+        addCss ( '#tooltip .tipHeader {height:8px;background:url(images/tipHeader.gif) no-repeat;}');     
+        addCss ( '#tooltip .tipBody {background-color:#000;padding:5px 5px 5px 15px;}');    
+        addCss ( '#tooltip .tipFooter {height:8px;background:url(images/tipFooter.gif) no-repeat;}');   
     } catch (e) {
         console.error("Error addCss",e);
     }
