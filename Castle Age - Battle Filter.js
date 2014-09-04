@@ -1,20 +1,20 @@
-// ==UserScript==
-// @name           Castle Age - Battle Filter
-// @namespace      http://www.facebook.com/
-// @description    This script assists with filtering battles.
-// @include        https://apps.facebook.com/castle_age/*
-// @include        https://web3.castleagegame.com/castle_ws/*
-// @include        https://web4.castleagegame.com/castle_ws/*
-// @downloadURL    https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/Castle%20Age%20-%20Battle%20Filter.js
-// @require        http://code.jquery.com/jquery-1.9.1.js
-// @require        http://code.jquery.com/ui/1.10.3/jquery-ui.js
-// @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
-// @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.12
-// @copyright      2013+, Jigoku
-// ==/UserScript==
+==UserScript==
+@name           Castle Age - Battle Filter
+@namespace      http://www.facebook.com/
+@description    This script assists with filtering battles.
+@include        https://apps.facebook.com/castle_age/*
+@include        https://web3.castleagegame.com/castle_ws/*
+@include        https://web4.castleagegame.com/castle_ws/*
+@downloadURL    https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/Castle%20Age%20-%20Battle%20Filter.js
+@require        http://code.jquery.com/jquery-1.9.1.js
+@require        http://code.jquery.com/ui/1.10.3/jquery-ui.js
+@resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
+@resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
+@version        1.1.13
+@copyright      2013+, Jigoku
+==/UserScript==
 
-var version = '1.1.12', clickUrl = '', updated = false;
+var version = '1.1.13', clickUrl = '', updated = false;
 
 /* 
 to-do:
@@ -91,7 +91,7 @@ function addStatBoard(id) {
 function addCss(cssString) { 
     try {
         var head = document.getElementsByTagName('head')[0]; 
-        //return unless head; 
+        return unless head; 
         if (head) {
             var newCss = document.createElement('style'); 
             newCss.type = "text/css"; 
@@ -121,7 +121,7 @@ function cabf_conquestmistfilter() {
     
     try {
         var _defenderHealth = 0, _actions = parseInt(/\d+/.exec($('#app_body div:contains("ACTIONS LEFT:"):last').text()), 10);
-        // Saved filter settings
+        Saved filter settings
         var _storedClass = item.get('cabfPageConquestBattleClass', 'All');
         var _storedStatus = item.get('cabfPageConquestBattleStatus', 'All');
         var _storedPoints = item.get('cabfPageConquestBattlePoints', 'All');
@@ -129,7 +129,7 @@ function cabf_conquestmistfilter() {
         $('#your_guild_member_list_1 > div').each(function(_i, _e) {
             var _text = $(_e).text().trim(), _health, _maxHealth, _fullhealth,winStat = '';
             
-            // enemy full health
+            enemy full health
             _health = /(\d+)\//.exec(_text)[1];
             _maxHealth = /\/(\d+)/.exec(_text)[1];
             if ((_maxHealth - _health) === 0) {
@@ -154,7 +154,7 @@ function cabf_conquestmistfilter() {
         if (_defenderHealth > 0) {
             $('#app_body div[style*="/graphics/war_art"]:last').prepend('<div id="cabfHealthAction">Health/Action: ' + (_defenderHealth / _actions).toFixed(0) + '</div>');
         }
-        // gate filter
+        gate filter
         function filterGate() {
             var _count = 0;
             var _myLevel = $('a[href*="keep.php"] > div[style="color:#ffffff"]').text().match(/\d+/);
@@ -165,10 +165,10 @@ function cabf_conquestmistfilter() {
                 var _points = $('#cabfGatePointsFilter').val();
                 var _text = $(_e).text().trim(), _health, _maxHealth, _fullhealth, _eClass;
                 
-                // enemy class
+                enemy class
                 _eClass = $(_e).find('img[title="Cleric"], img[title="Mage"], img[title="Warrior"], img[title="Rogue"]').attr("title");
                 
-                // enemy full health
+                enemy full health
                 _health = /(\d+)\//.exec(_text)[1];
                 _maxHealth = /\/(\d+)/.exec(_text)[1];
                 if ((_maxHealth - _health) === 0) {
@@ -233,7 +233,7 @@ function cabf_conquestmistfilter() {
             $('#app_body div[id="cabfHealthAction"]:last').html($('#app_body div[id="cabfHealthAction"]:last').html().replace(/.*Health\/Action:/, 'Health/Action:').replace('Health/Action:', 'Filtered: ' + _count + '<br/>Health/Action:'));
         }
         
-        // class filter
+        class filter
         var filterClass = {
             'All' : '\.',
             'Cleric' : 'Cleric',
@@ -261,7 +261,7 @@ function cabf_conquestmistfilter() {
         
         $('div[style*="/graphics/conq2_insideland_battle_mid.jpg"]').after('<div id="cabfConquestBattleFilterContainer"><div id="cabfConquestBattleFilter" class="ui-state-default"></div></div>');
         var _cCBF = $('#cabfConquestBattleFilter');
-        // Battle activity points filter
+        Battle activity points filter
         _cCBF.prepend('<span class="cabfGateFilterTitle ui-state-default"> Points </span><select id="cabfGatePointsFilter" class="cabfgatefiltertitle">');
         _sel = $('#cabfGatePointsFilter');
         $.each(filterPoints, function(_i, _e) {
@@ -272,7 +272,7 @@ function cabf_conquestmistfilter() {
             item.set('cabfPageConquestBattlePoints', _storedPoints);
             filterGate();
         });
-        // status filter
+        status filter
         _cCBF.prepend('<span class="cabfGateFilterTitle ui-state-default"> Status </span><select id="cabfGateStatusFilter" class="cabfgatefiltertitle">');
         _sel = $('#cabfGateStatusFilter');
         $.each(filterStatus, function(_i, _e) {
@@ -283,7 +283,7 @@ function cabf_conquestmistfilter() {
             item.set('cabfPageConquestBattleStatus', _storedStatus);
             filterGate();
         });
-        // Class filter
+        Class filter
         _cCBF.prepend('<span class="cabfGateFilterTitle ui-state-default"> Class </span><select id="cabfGateClassFilter" class="cabfgatefiltertitle">');
         _sel = $('#cabfGateClassFilter');
         $.each(filterClass, function(_i, _e) {
@@ -294,7 +294,7 @@ function cabf_conquestmistfilter() {
             item.set('cabfPageConquestBattleClass', _storedClass);
             filterGate();
         });
-        // Clear filters
+        Clear filters
         _cCBF.prepend($('<button>Clear filters</button>').button().css({
             'position' : 'relative !important',
             'left' : 9,
@@ -330,7 +330,7 @@ function cabf_conquestearthfilter() {
     
     try {
         
-        //var     _tower = parseInt(/\d+/.exec($('div[class="tower_tab"][style*="display:block"]').attr("id")), 10);
+        var     _tower = parseInt(/\d+/.exec($('div[class="tower_tab"][style*="display:block"]').attr("id")), 10);
 		var _towers = { 1:"Attack Tower",2:"Defense Tower",3:"Damage Tower",4:"Health Tower"};
 		var     _tower = 1;
 		if ($("#cabfHealthActionEarth").length>0) {
@@ -343,7 +343,7 @@ function cabf_conquestearthfilter() {
 			console.log("_tower",_x);
 			
 			var _defenderHealth = 0, _actions = parseInt(/\d+/.exec($('#app_body div[id="actions_left_'+_x+'"]:contains("ACTIONS LEFT:"):last').text()), 10);
-			// Saved filter settings
+			Saved filter settings
 			var _storedClass = item.get('cabfPageConquestBattleClass', 'All');
 			var _storedStatus = item.get('cabfPageConquestBattleStatus', 'All');
 			var _storedPoints = item.get('cabfPageConquestBattlePoints', 'All');
@@ -357,7 +357,7 @@ function cabf_conquestearthfilter() {
                 $('#tower_'+_x+' > div > div').each(function(_i, _e) {
                     var _text = $(_e).text().trim(), _health, _maxHealth, _fullhealth,winStat = '';
                     
-                    // enemy full health
+                    enemy full health
                     _health = /(\d+)\//.exec(_text)[1];
                     _maxHealth = /\/(\d+)/.exec(_text)[1];
                     if ((_maxHealth - _health) === 0) {
@@ -386,7 +386,7 @@ function cabf_conquestearthfilter() {
                 $('#cabfEarthAction'+_x).html('Health/Action: #');
             } 
         }
-		// gate filter
+		gate filter
 		function filterGate() {
 			var _myLevel = $('a[href*="keep.php"] > div[style="color:#ffffff"]').text().match(/\d+/);
 			var myLevel = Number(_myLevel[0]);
@@ -401,10 +401,10 @@ function cabf_conquestearthfilter() {
                         var _points = $('#cabfGatePointsFilter').val();
                         var _text = $(_e).text().trim(), _health, _maxHealth, _fullhealth, _eClass;
                         
-                        // enemy class
+                        enemy class
                         _eClass = $(_e).find('img[title="Cleric"], img[title="Mage"], img[title="Warrior"], img[title="Rogue"]').attr("title");
                         if (!_eClass) return;
-                        // enemy full health
+                        enemy full health
                         _health = /(\d+)\//.exec(_text)[1];
                         _maxHealth = /\/(\d+)/.exec(_text)[1];
                         if ((_maxHealth - _health) === 0) {
@@ -468,11 +468,11 @@ function cabf_conquestearthfilter() {
                     });
                 }
 				$('#cabfEarthFiltered'+_x).html('Filtered: ' + _count);
-				//$('#app_body div[id="cabfHealthActionEarth"]:last').html($('#app_body div[id="cabfHealthActionEarth"]:last').html().replace(/.*Health\/Action:/, 'Health/Action:').replace('Health/Action:', 'Filtered: ' + _count + '<br/>Health/Action:'));
+				$('#app_body div[id="cabfHealthActionEarth"]:last').html($('#app_body div[id="cabfHealthActionEarth"]:last').html().replace(/.*Health\/Action:/, 'Health/Action:').replace('Health/Action:', 'Filtered: ' + _count + '<br/>Health/Action:'));
 			}
 		}
 		
-        // class filter
+        class filter
         var filterClass = {
             'All' : '\.',
             'Cleric' : 'Cleric',
@@ -503,7 +503,7 @@ function cabf_conquestearthfilter() {
 		} else {
 			$('#conquest_report').after('<div id="cabfConquestEarthFilterContainer"><div id="cabfConquestEarthFilter" class="ui-state-default"></div></div>');
 			var _cCBF = $('#cabfConquestEarthFilter');
-			// Battle activity points filter
+			Battle activity points filter
 			_cCBF.prepend('<span class="cabfGateFilterTitle ui-state-default"> Points </span><select id="cabfGatePointsFilter" class="cabfgatefiltertitle">');
 			_sel = $('#cabfGatePointsFilter');
 			$.each(filterPoints, function(_i, _e) {
@@ -514,7 +514,7 @@ function cabf_conquestearthfilter() {
 				item.set('cabfPageConquestBattlePoints', _storedPoints);
 				filterGate();
 			});
-			// status filter
+			status filter
 			_cCBF.prepend('<span class="cabfGateFilterTitle ui-state-default"> Status </span><select id="cabfGateStatusFilter" class="cabfgatefiltertitle">');
 			_sel = $('#cabfGateStatusFilter');
 			$.each(filterStatus, function(_i, _e) {
@@ -525,7 +525,7 @@ function cabf_conquestearthfilter() {
 				item.set('cabfPageConquestBattleStatus', _storedStatus);
 				filterGate();
 			});
-			// Class filter
+			Class filter
 			_cCBF.prepend('<span class="cabfGateFilterTitle ui-state-default"> Class </span><select id="cabfGateClassFilter" class="cabfgatefiltertitle">');
 			_sel = $('#cabfGateClassFilter');
 			$.each(filterClass, function(_i, _e) {
@@ -536,7 +536,7 @@ function cabf_conquestearthfilter() {
 				item.set('cabfPageConquestBattleClass', _storedClass);
 				filterGate();
 			});
-			// Clear filters
+			Clear filters
 			_cCBF.prepend($('<button>Clear filters</button>').button().css({
 				'position' : 'relative !important',
 				'left' : 9,
@@ -569,11 +569,11 @@ function cabf_conquestearthfilter() {
 ********************************************************************************************************************************************************************************
 *******************************************************************************************************************************************************************************/
 function cabf_guildbattlefilter() {
-    // fix gate reseting when attacking with duel button
+    fix gate reseting when attacking with duel button
     var _gate = /\d/.exec($('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').attr('class'));
     $('#results_main_wrapper form, #enemy_new_guild_member_list form, #your_new_guild_member_list form').append('<input type="hidden" name="sel_pos" value="' + _gate + '">');
     
-    // add percentage to health bars
+    add percentage to health bars
     var _your = (1 - ($('div[style*="/guild_battle_bar_you.gif"]').width() / $('div[style*="/guild_battle_bar_you.gif"]').parent().width())) * 100;
     var _enemy = (1 - ($('div[style*="/guild_battle_bar_enemy.gif"]').width() / $('div[style*="/guild_battle_bar_enemy.gif"]').parent().width())) * 100;
     var $_your = $('span:contains("YOUR GUILD")');
@@ -581,7 +581,7 @@ function cabf_guildbattlefilter() {
     $_your.html($_your.html() + ' (' + _your.toFixed(1) + '%)');
     $_enemy.html($_enemy.html() + ' (' + _enemy.toFixed(1) + '%)');
     
-    // enemys health added to its name in results
+    enemys health added to its name in results
     $_enemy = $('span.result_body div[style*="width: 285px;"]:last');
     if ($_enemy.length > 0) {
         var _target = $('span.result_body input[name="target_id"]').attr('value');
@@ -591,7 +591,7 @@ function cabf_guildbattlefilter() {
         }
     }
     
-    // resize top image
+    resize top image
     $('input[value="enter_battle"]').parents('form:first').css({
         'position' : 'relative'
     });
@@ -601,11 +601,11 @@ function cabf_guildbattlefilter() {
     $('input[src*="collect_reward_button2.jpg"]').parents('div:eq(2)').css('marginTop', 0);
 	addStatBoard('#guild_battle_guild_tabs');
     
-    // add current tokens to result
+    add current tokens to result
     var _tokens = $('div.result div:contains("-1 Battle Tokens"):last');
     _tokens.text(_tokens.text() + ' (' + $('#guild_token_current_value').text() + ' left)');
     
-    // reduce gate size and add number
+    reduce gate size and add number
     if ($('#your_new_guild_member_list:contains("No Soldiers Posted In This Position!"), #enemy_new_guild_member_list:contains("No Soldiers Posted In This Position!")').length === 0) {
         var _guildnum = 1, 
 			_count = 0, 
@@ -783,13 +783,13 @@ function cabf_guildbattlefilter() {
 		}
 	}
 	
-    // Saved filter settings
+    Saved filter settings
     var _storedClass = item.get('cabfPageGuildBattleClass', 'All');
     var _storedActivity = item.get('cabfPageGuildBattleActivity', 'All');
     var _storedStatus = item.get('cabfPageGuildBattleStatus', 'All');
     var _storedPoints = item.get('cabfPageGuildBattlePoints', 'All');
     
-    // gate filter
+    gate filter
     function filterGate() {
         var _count = 0;
         var _gateNum = $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').attr('class').match(/\d/)[0];
@@ -831,7 +831,7 @@ function cabf_guildbattlefilter() {
         _gate.html(_gate.html().replace(/\).*/, ')').replace(')', ')<br/><span style="font-size:14px;font-weight:bold;">Filtered: ' + _count + '</span>'));
     }
     
-    // class filter
+    class filter
     var filterClass = {
         'All' : 'all',
         'Cleric' : 'cleric',
@@ -858,7 +858,7 @@ function cabf_guildbattlefilter() {
         '200' : '200',
         '160' : '160'
     };
-    // Class filter
+    Class filter
     $('body > ul.ui-selectmenu-menu').remove();
     $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').prepend('<div id="cabf_menu" style="padding: 0 0 30px 0;" >');
     $('#cabf_menu').append($('<button>Clear filters</button>').button().css({
@@ -889,7 +889,7 @@ function cabf_guildbattlefilter() {
         item.set('cabfPageGuildBattleClass', _storedClass);
         filterGate();
     });
-    // Activity filter
+    Activity filter
     $('#cabf_menu').append('<span class="cabfGateFilterTitle ui-state-default"> Activity </span><select id="cabfGateActivityFilter" class="cabfgatefiltertitle">');
     _sel = $('#cabfGateActivityFilter');
     $.each(filterActivity, function(_i, _e) {
@@ -900,7 +900,7 @@ function cabf_guildbattlefilter() {
         item.set('cabfPageGuildBattleActivity', _storedActivity);
         filterGate();
     });
-    // status filter
+    status filter
     $('#cabf_menu').append('<span class="cabfGateFilterTitle ui-state-default"> Status </span><select id="cabfGateStatusFilter" class="cabfgatefiltertitle">');
     _sel = $('#cabfGateStatusFilter');
     $.each(filterStatus, function(_i, _e) {
@@ -921,7 +921,7 @@ function cabf_guildbattlefilter() {
         'left' : 9,
         'top' : 3
     });
-    // Battle activity points filter
+    Battle activity points filter
     $('#cabf_menu').append('<span class="cabfGateFilterTitle ui-state-default"> Points </span><select id="cabfGatePointsFilter" class="cabfgatefiltertitle">');
     _sel = $('#cabfGatePointsFilter');
     $.each(filterPoints, function(_i, _e) {
@@ -955,11 +955,11 @@ function cabf_guildbattlefilter() {
 ********************************************************************************************************************************************************************************
 *******************************************************************************************************************************************************************************/
 function cabf_tenbattlefilter() {
-    // fix gate reseting when attacking with duel button
+    fix gate reseting when attacking with duel button
     var _gate = /\d/.exec($('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').attr('class'));
     $('#results_main_wrapper form, #enemy_new_guild_member_list form, #your_new_guild_member_list form').append('<input type="hidden" name="sel_pos" value="' + _gate + '">');
     
-    // add percentage to health bars
+    add percentage to health bars
     var _your = (1 - ($('div[style*="/guild_battle_bar_you.gif"]').width() / $('div[style*="/guild_battle_bar_you.gif"]').parent().width())) * 100;
     var _enemy = (1 - ($('div[style*="/guild_battle_bar_enemy.gif"]').width() / $('div[style*="/guild_battle_bar_enemy.gif"]').parent().width())) * 100;
     var $_your = $('span:contains("YOUR GUILD")');
@@ -967,7 +967,7 @@ function cabf_tenbattlefilter() {
     $_your.html($_your.html() + ' (' + _your.toFixed(1) + '%)');
     $_enemy.html($_enemy.html() + ' (' + _enemy.toFixed(1) + '%)');
     
-    // enemys health added to its name in results
+    enemys health added to its name in results
     $_enemy = $('span.result_body div[style*="width: 285px;"]:last');
     if ($_enemy.length > 0) {
         var _target = $('span.result_body input[name="target_id"]').attr('value');
@@ -977,7 +977,7 @@ function cabf_tenbattlefilter() {
         }
     }
     
-    // resize top image
+    resize top image
     $('input[value="enter_battle"]').parents('form:first').css({
         'position' : 'relative'
     });
@@ -987,11 +987,11 @@ function cabf_tenbattlefilter() {
     $('input[src*="collect_reward_button2.jpg"]').parents('div:eq(2)').css('marginTop', 0);
 	addStatBoard('#guild_battle_guild_tabs');
     
-    // add current tokens to result
+    add current tokens to result
     var _tokens = $('div.result div:contains("-1 Battle Tokens"):last');
     _tokens.text(_tokens.text() + ' (' + $('#guild_token_current_value').text() + ' left)');
     
-    // reduce gate size and add number
+    reduce gate size and add number
     if ($('#your_new_guild_member_list:contains("No Soldiers Posted In This Position!"), #enemy_new_guild_member_list:contains("No Soldiers Posted In This Position!")').length === 0) {
         var _guildnum = 1, 
 			_count = 0, 
@@ -1004,6 +1004,8 @@ function cabf_tenbattlefilter() {
 			_roguetotalhealth = 0, _roguetotalhealthleft = 0, 
 			_warriorcount = 0, 
 			_warriortotalhealth = 0, _warriortotalhealthleft = 0;	
+			_activecount = 0, _activelivecount = 0, 
+			_activetotalhealth = 0, _activetotalhealthleft = 0;		
 		if ($('#enemy_guild_battle_section_battle_list').length > 0) {
 			$('#cabfStatType').html('Enemy Stat');
 		} else {
@@ -1014,11 +1016,13 @@ function cabf_tenbattlefilter() {
 		$('#cabfStatMage span:last').html(' Mage Stat');
 		$('#cabfStatRogue span:last').html(' Rogue Stat');
 		$('#cabfStatWarrior span:last').html(' Warrior Stat');  
+		$('#cabfStatActive span:last').html(' Active Stat');   
 		
         $('#enemy_new_guild_member_list > div > div, #your_new_guild_member_list > div > div').each(function(_i, _e) {
             var _text = $(_e).text().trim(), _FullHealth = true;
             if (_text && $(_e).text().trim().length > 0) {
 				var _test = /(\d+)\/(\d+)/g.exec(_text);
+				var _active = /Battle Points: [1-9]/g.exec(_text);	
 				var winStat = '';
 				if ($('input[name="target_id"]',_e).length>0) {
 					var target_id=$('input[name="target_id"]',_e).attr("value");
@@ -1059,6 +1063,12 @@ function cabf_tenbattlefilter() {
 					_warriortotalhealth+=eval(_test[2]); 
 					_warriortotalhealthleft+=eval(_test[1]);
 				}
+				if (_active) {
+					_activecount+=1;
+					_activetotalhealth+=eval(_test[2]); 
+					if (_test[1]>0) _activelivecount+=1;
+					_activetotalhealthleft+=eval(_test[1]);
+				}	
             } else {
                 $(_e).remove();
             }
@@ -1102,11 +1112,21 @@ function cabf_tenbattlefilter() {
 				$('#cabfWarriorHealthLeft').html('Health Left: '+_warriortotalhealthleft);
 				$('#cabfWarriorAverageHealthLeft').html('Average Health Left: '+(_warriortotalhealthleft/_warriorcount).toFixed());
 				$('#cabfWarriorPercentageHealthLeft').html('Percentage Health Left: '+(_warriortotalhealthleft*100/_warriortotalhealth).toFixed(1)+'%');
+			}		
+			
+			if (_activecount>0) {
+				$('#cabfActiveTotalHealth').html('Total Health: '+_activetotalhealth);
+				$('#cabfActiveAverageHealth').html('Average Health: '+(_activetotalhealth/_activecount).toFixed());
+				$('#cabfActiveHealthLeft').html('Health Left: '+_activetotalhealthleft);
+				if (_activelivecount>0) {
+					$('#cabfActiveAverageHealthLeft').html('Average Health Left: '+(_activetotalhealthleft/_activelivecount).toFixed());
+				} 
+				$('#cabfActivePercentageHealthLeft').html('Percentage Health Left: '+(_activetotalhealthleft*100/_activetotalhealth).toFixed(1)+'%');
 			}
 		} 
 	}
 	
-	//Add refresh on enemy_guild_tab and your_guild_tab for 10vs10 battle
+	Add refresh on enemy_guild_tab and your_guild_tab for 10vs10 battle
 	if ($('a[href*="ten_battle.php?battle_id="]').length >0 ) {
 		var _battleid = $('input[name="battle_id"]').attr('value');
         console.log('_battleid='+_battleid);
@@ -1120,13 +1140,13 @@ function cabf_tenbattlefilter() {
 		}
 	}
 	
-    // Saved filter settings
+    Saved filter settings
     var _storedClass = item.get('cabfPageTenBattleClass', 'All');
     var _storedActivity = item.get('cabfPageTenBattleActivity', 'All');
     var _storedStatus = item.get('cabfPageTenBattleStatus', 'All');
     var _storedPoints = item.get('cabfPageTenBattlePoints', 'All');
     
-    // gate filter
+    gate filter
     function filterGate() {
         var _count = 0;
         $('#your_new_guild_member_list > div > div, #enemy_new_guild_member_list > div > div').each(function(_i, _e) {
@@ -1166,7 +1186,7 @@ function cabf_tenbattlefilter() {
         $('#enemy_guild_tab,#your_guild_tab').append('<br><br><span style="font-size:14px;font-weight:bold;">Filtered: ' + _count + '</span>');
     }
     
-    // class filter
+    class filter
     var filterClass = {
         'All' : 'all',
         'Cleric' : 'cleric',
@@ -1193,7 +1213,7 @@ function cabf_tenbattlefilter() {
         '200' : '200',
         '160' : '160'
     };
-    // Class filter
+    Class filter
     $('body > ul.ui-selectmenu-menu').remove();
     $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').prepend('<div id="cabf_menu" style="padding: 0 0 30px 0;" >');
     $('#cabf_menu').append($('<button>Clear filters</button>').button().css({
@@ -1224,7 +1244,7 @@ function cabf_tenbattlefilter() {
         item.set('cabfPageTenBattleClass', _storedClass);
         filterGate();
     });
-    // Activity filter
+    Activity filter
     $('#cabf_menu').append('<span class="cabfGateFilterTitle ui-state-default"> Activity </span><select id="cabfGateActivityFilter" class="cabfgatefiltertitle">');
     _sel = $('#cabfGateActivityFilter');
     $.each(filterActivity, function(_i, _e) {
@@ -1235,7 +1255,7 @@ function cabf_tenbattlefilter() {
         item.set('cabfPageTenBattleActivity', _storedActivity);
         filterGate();
     });
-    // status filter
+    status filter
     $('#cabf_menu').append('<span class="cabfGateFilterTitle ui-state-default"> Status </span><select id="cabfGateStatusFilter" class="cabfgatefiltertitle">');
     _sel = $('#cabfGateStatusFilter');
     $.each(filterStatus, function(_i, _e) {
@@ -1256,7 +1276,7 @@ function cabf_tenbattlefilter() {
         'left' : 9,
         'top' : 3
     });
-    // Battle activity points filter
+    Battle activity points filter
     $('#cabf_menu').append('<span class="cabfGateFilterTitle ui-state-default"> Points </span><select id="cabfGatePointsFilter" class="cabfgatefiltertitle">');
     _sel = $('#cabfGatePointsFilter');
     $.each(filterPoints, function(_i, _e) {
@@ -1292,12 +1312,12 @@ function cabf_tenbattlefilter() {
 ******************************************************************************************************************************************************************************/
 function cabf_festivalbattlefilter() {
     
-    // fix gate reseting when attacking with duel button
+    fix gate reseting when attacking with duel button
     var _gate = /\d/.exec($('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').attr('class'));
     $('#results_main_wrapper form, #enemy_guild_member_list form, #your_guild_member_list form').append('<input type="hidden" name="sel_pos" value="' + _gate + '">');
     $('#results_main_wrapper form, #enemy_guild_member_list form, #your_guild_member_list form').append('<input type="hidden" name="attacking_position" value="' + _gate + '">');
     
-    // add percentage to health bars
+    add percentage to health bars
     var _your = (1 - ($('div[style*="/guild_battle_bar_you.gif"]').width() / $('div[style*="/guild_battle_bar_you.gif"]').parent().width())) * 100;
     var _enemy = (1 - ($('div[style*="/guild_battle_bar_enemy.gif"]').width() / $('div[style*="/guild_battle_bar_enemy.gif"]').parent().width())) * 100;
     var $_your = $('#guild_battle_health span:contains("/"):first');
@@ -1305,7 +1325,7 @@ function cabf_festivalbattlefilter() {
     $_your.html($_your.html() + ' (' + _your.toFixed(1) + '%)');
     $_enemy.html($_enemy.html() + ' (' + _enemy.toFixed(1) + '%)');
     
-    // enemys health added to its name in results
+    enemys health added to its name in results
     $_enemy = $('span.result_body div[style*="width: 285px;"]:last');
     if ($_enemy.length > 0) {
         var _target = $('span.result_body input[name="target_id"]').attr('value');
@@ -1315,7 +1335,7 @@ function cabf_festivalbattlefilter() {
         }
     }
     
-    // resize top image
+    resize top image
     $('input[value="enter_battle"]').parents('form:first').css({
         'position' : 'relative'
     });
@@ -1325,11 +1345,11 @@ function cabf_festivalbattlefilter() {
     $('input[src*="collect_reward_button2.jpg"]').parents('div:eq(2)').css('marginTop', 0);
 	addStatBoard('#guild_battle_guild_tabs');
 	
-    // add current tokens to result
+    add current tokens to result
     var _tokens = $('div.result div:contains("-1 Battle Tokens"):last');
     _tokens.text(_tokens.text() + ' (' + $('#guild_token_current_value').text() + ' left)');
     
-    // reduce gate size and add number
+    reduce gate size and add number
     var _guildnum = 1, 
 			_count = 0, 
 			_totalhealth = 0, _totalhealthleft = 0, 
@@ -1341,6 +1361,8 @@ function cabf_festivalbattlefilter() {
 			_roguetotalhealth = 0, _roguetotalhealthleft = 0, 
 			_warriorcount = 0, 
 			_warriortotalhealth = 0, _warriortotalhealthleft = 0;	
+			_activecount = 0, _activelivecount = 0, 
+			_activetotalhealth = 0, _activetotalhealthleft = 0;		
 	var _gateNum = $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').attr('class').match(/\d/)[0];
 	var _gateName='';
 	if ($('#enemy_guild_battle_section_battle_list').length > 0) {
@@ -1364,10 +1386,12 @@ function cabf_festivalbattlefilter() {
 	$('#cabfStatMage span:last').html(_gateName+' Mage Stat');
 	$('#cabfStatRogue span:last').html(_gateName+' Rogue Stat');
 	$('#cabfStatWarrior span:last').html(_gateName+' Warrior Stat');  
+	$('#cabfStatActive span:last').html(_gateName+' Active Stat');   
     $('#enemy_guild_member_list > div > div, #your_guild_member_list > div > div').each(function(_i, _e) {
 		var _text = $(_e).text().trim(), _FullHealth = true;
 		if (_text && $(_e).text().trim().length > 0) {
 			var _test = /(\d+)\/(\d+)/g.exec(_text);
+			var _active = /Battle Points: [1-9]/g.exec(_text);	
 			var winStat = '';
 			if ($('input[name="target_id"]',_e).length>0) {
 				var target_id=$('input[name="target_id"]',_e).attr("value");
@@ -1407,7 +1431,13 @@ function cabf_festivalbattlefilter() {
 				_warriorcount+=1;
 				_warriortotalhealth+=eval(_test[2]); 
 				_warriortotalhealthleft+=eval(_test[1]);
-			}		
+			}	
+			if (_active) {
+				_activecount+=1;
+				_activetotalhealth+=eval(_test[2]); 
+				if (_test[1]>0) _activelivecount+=1;
+				_activetotalhealthleft+=eval(_test[1]);
+			}	
 		} else {
 			$(_e).remove();
 		}
@@ -1452,15 +1482,25 @@ function cabf_festivalbattlefilter() {
 			$('#cabfWarriorAverageHealthLeft').html('Average Health Left: '+(_warriortotalhealthleft/_warriorcount).toFixed());
 			$('#cabfWarriorPercentageHealthLeft').html('Percentage Health Left: '+(_warriortotalhealthleft*100/_warriortotalhealth).toFixed(1)+'%');
 		}
+			
+		if (_activecount>0) {
+			$('#cabfActiveTotalHealth').html('Total Health: '+_activetotalhealth);
+			$('#cabfActiveAverageHealth').html('Average Health: '+(_activetotalhealth/_activecount).toFixed());
+			$('#cabfActiveHealthLeft').html('Health Left: '+_activetotalhealthleft);
+			if (_activelivecount>0) {
+				$('#cabfActiveAverageHealthLeft').html('Average Health Left: '+(_activetotalhealthleft/_activelivecount).toFixed());
+			} 
+			$('#cabfActivePercentageHealthLeft').html('Percentage Health Left: '+(_activetotalhealthleft*100/_activetotalhealth).toFixed(1)+'%');
+		}
 	} 
     
-    // Saved filter settings
+    Saved filter settings
     var _storedClass = item.get('cabfPageFestGuildBattleClass', 'All');
     var _storedActivity = item.get('cabfPageFestGuildBattleActivity', 'All');
     var _storedStatus = item.get('cabfPageFestGuildBattleStatus', 'All');
     var _storedPoints = item.get('cabfPageFestGuildBattlePoints', 'All');
     
-    // gate filter
+    gate filter
     function filterGate() {
         var _count = 0;
         var _gateNum = $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').attr('class').match(/\d/)[0];
@@ -1502,7 +1542,7 @@ function cabf_festivalbattlefilter() {
         _gate.html(_gate.html().replace(/\).*/, ')').replace(')', ')<br/><span style="font-size:11px;font-weight:bold;">Filtered: ' + _count + '</span>'));
     }
 	
-    // class filter
+    class filter
     var filterClass = {
         'All' : 'all',
         'Cleric' : 'cleric',
@@ -1529,10 +1569,10 @@ function cabf_festivalbattlefilter() {
         '200' : '200',
         '160' : '160'
     };
-    // Add Filter Bar
+    Add Filter Bar
     $('body > ul.ui-selectmenu-menu').remove();
     $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').prepend('<div id="cabf_menu" style="padding: 0 0 30px 0;" >');
-    // Clear Filter
+    Clear Filter
     $('#cabf_menu').append($('<button>Clear filters</button>').button().css({
         'position' : 'relative !important',
         'left' : 9,
@@ -1551,7 +1591,7 @@ function cabf_festivalbattlefilter() {
         item.set('cabfPageFestGuildBattlePoints', 'All');
         filterGate();
     }));
-    // Class filter
+    Class filter
     $('#cabf_menu').append('<span class="cabfGateFilterTitle ui-state-default"> Class </span><select id="cabfGateClassFilter" class="cabfgatefiltertitle">');
     _sel = $('#cabfGateClassFilter');
     $.each(filterClass, function(_i, _e) {
@@ -1562,7 +1602,7 @@ function cabf_festivalbattlefilter() {
         item.set('cabfPageFestGuildBattleClass', _storedClass);
         filterGate();
     });
-    // Activity filter
+    Activity filter
     $('#cabf_menu').append('<span class="cabfGateFilterTitle ui-state-default"> Activity </span><select id="cabfGateActivityFilter" class="cabfgatefiltertitle">');
     _sel = $('#cabfGateActivityFilter');
     $.each(filterActivity, function(_i, _e) {
@@ -1573,7 +1613,7 @@ function cabf_festivalbattlefilter() {
         item.set('cabfPageFestGuildBattleActivity', _storedActivity);
         filterGate();
     });
-    // status filter
+    status filter
     $('#cabf_menu').append('<span class="cabfGateFilterTitle ui-state-default"> Status </span><select id="cabfGateStatusFilter" class="cabfgatefiltertitle">');
     _sel = $('#cabfGateStatusFilter');
     $.each(filterStatus, function(_i, _e) {
@@ -1584,7 +1624,7 @@ function cabf_festivalbattlefilter() {
         item.set('cabfPageFestGuildBattleStatus', _storedStatus);
         filterGate();
     });
-    // Battle activity points filter
+    Battle activity points filter
     $('#cabf_menu').append('<span class="cabfGateFilterTitle ui-state-default"> Points </span><select id="cabfGatePointsFilter" class="cabfgatefiltertitle">');
     _sel = $('#cabfGatePointsFilter');
     $.each(filterPoints, function(_i, _e) {
@@ -1618,7 +1658,7 @@ function cabf_festivalbattlefilter() {
 ******************************************************************************************************************************************************************************/
 function monsterBars() {
 	var _monstername = null, _ret = [];
-	// add percentage to top bars
+	add percentage to top bars
 	if ($('#app_body div[style*="nm_bars.jpg"], #app_body div[style*="nm_bars_cross.jpg"]').length > 0) {
 		$('img[src*="monster_health_background.jpg"], [src*="nm_red.jpg"], [src*="nm_orange.jpg"]').each(function(_i, _e) {
 			_monstername = $(_e).parent().parent().find('div:contains("\'s Life"):last, #app_body div:contains("\'s life"):last');
@@ -1644,14 +1684,14 @@ function monsterBars() {
 };
 
 function defenseBar() {
-	// add percentage to defense/forcefield/..
+	add percentage to defense/forcefield/..
 	var _defense = $('img[src*="bar_dispel.gif"],[src*="nm_green.jpg"],[src*="seamonster_ship_health.jpg"]').parent()[0], _defRegs = [
 			'^Castle Defense$', '^Ragnarok\'s Glacial Armor$', '^Your Ship\'s Defense$', '^Illvasa, Plateau City\'s Defense$', '^Skaar\'s Mana Forcefield$', '^Party Health\\/Strength$'
 	], _defReg = new RegExp(_defRegs.join('|'));
 	_defText = $('#app_body').find('div').filter(function() {
 		return $(this).text().match(_defReg);
 	});
-	// _defText = $('#app_body').find('div:containsRegex(/' + _defRegs.join('|') + '/):first');
+	_defText = $('#app_body').find('div:containsRegex(/' + _defRegs.join('|') + '/):first');
 	if (_defense && _defense.style && _defense.style.width !== "" && _defText && _defText.text()) {
 		var _percentage = _defense.style.width.substr(0, 5);
 		var _maxHealth = false;
@@ -1667,7 +1707,7 @@ function defenseBar() {
 };
 
 function stunBar() {
-	// add percentage to Cripple...
+	add percentage to Cripple...
 	var _stun = $('#app_body div > img[src$="nm_stun_bar.gif"]:first');
 	if (_stun.length > 0) {
 		var _text = _stun.parent().next().children('div:first'), _ret;
@@ -1792,7 +1832,7 @@ function cabf_filters() {
     /* Guild battle or 10vs10 battle*/
     if ($('#enemy_guild_tab,#your_guild_tab').length > 0) {
     
-		//Switch between 10vs10 battle and Guild battle
+		Switch between 10vs10 battle and Guild battle
 		if ($('#enemy_new_guild_tab_1,#your_new_guild_tab_1').length >0 ) {
 			console.log('Guild battle');
 			battleStats();
@@ -1834,6 +1874,18 @@ function cabf_filters() {
 function init() {
     var globalContainer = document.querySelector('#globalContainer');
     
+    
+    if (!globalContainer) {
+        if ($("input[src*='crusader2_btn_submit.gif']").length > 0) {
+            
+            setInterval(function () {
+                var button = $("input[src*='crusader2_btn_submit.gif']");
+            	console.log('Try Connection');
+                button.click();
+            }, 30000);
+        }
+    }
+	
     globalContainer.addEventListener('click', function(event) {
         try {
             if(updated)
@@ -1948,7 +2000,7 @@ function init() {
 };
 
 GM_addStyle (GM_getResourceText ("jqueryUiCss") );
-//GM_addStyle (GM_getResourceText ("ca_cabfCss") );
+GM_addStyle (GM_getResourceText ("ca_cabfCss") );
 
 
 function cabf_connect() {
