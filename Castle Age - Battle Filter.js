@@ -10,11 +10,11 @@
 // @require        http://code.jquery.com/ui/1.10.3/jquery-ui.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.14
+// @version        1.1.15
 // @copyright      2013+, Jigoku
 // ==/UserScript==
 
-var version = '1.1.14', clickUrl = '', updated = false;
+var version = '1.1.15', clickUrl = '', updated = false;
 
 /* 
 to-do:
@@ -349,35 +349,37 @@ function cabf_conquestearthfilter() {
 			var _storedPoints = item.get('cabfPageConquestBattlePoints', 'All');
 			
 			console.log("_actions",_actions);
-            if ($('#tower_tab_'+_x+' > #crystal_'+_x).length>0) {
+            if ($('#tower_'+_x+' > #crystal_'+_x).length>0) {
                 _defenderHealth = 0;            
             } else if (!(_actions>0)) {
                 _defenderHealth = 0;            
             } else {
-                $('#tower_tab_'+_x+' > div > div').each(function(_i, _e) {
+				console.log("Add numbers");
+                $('#tower_'+_x+' > div > div').each(function(_i, _e) {
                     var _text = $(_e).text().trim(), _health, _maxHealth, _fullhealth,winStat = '';
-                    
-                    // enemy full health
-                    _health = /(\d+)\//.exec(_text)[1];
-                    _maxHealth = /\/(\d+)/.exec(_text)[1];
-                    if ((_maxHealth - _health) === 0) {
-                        _fullhealth = true;
-                    } else {
-                        _fullhealth = false;
+                    if (_text) {
+						// enemy full health
+						_health = /(\d+)\//.exec(_text)[1];
+						_maxHealth = /\/(\d+)/.exec(_text)[1];
+						if ((_maxHealth - _health) === 0) {
+							_fullhealth = true;
+						} else {
+							_fullhealth = false;
+						}
+						_defenderHealth += parseInt(/(\d+)(?:\/)/.exec($(this).text())[1], 10);
+						console.log("_defenderHealth = ", _defenderHealth);
+						$(_e, 'div > div').append('<div style="clear:both;"></div>');
+						if ($('input[name="target_id"]',_e).length>0) {
+							var target_id=$('input[name="target_id"]',_e).attr("value");
+							winStat=getTargetStat(target_id);
+							addTargetTip(_e);
+						}
+						if (_fullhealth) {
+							$(_e, 'div > div').append('<span class="GuildNumG">' + (_i + 1) + '</span>'+ '<br>' + winStat);
+						} else {
+							$(_e, 'div > div').append('<span class="GuildNumR">' + (_i + 1) + '</span>'+ '<br>' + winStat);
+						}
                     }
-                    _defenderHealth += parseInt(/(\d+)(?:\/)/.exec($(this).text())[1], 10);
-                    $(_e, 'div > div').append('<div style="clear:both;"></div>');
-					if ($('input[name="target_id"]',_e).length>0) {
-						var target_id=$('input[name="target_id"]',_e).attr("value");
-						winStat=getTargetStat(target_id);
-						addTargetTip(_e);
-					}
-                    if (_fullhealth) {
-                        $(_e, 'div > div').append('<span class="GuildNumG">' + (_i + 1) + '</span>'+ '<br>' + winStat);
-                    } else {
-                        $(_e, 'div > div').append('<span class="GuildNumR">' + (_i + 1) + '</span>'+ '<br>' + winStat);
-                    }
-                    
                 });
             }
             if (_actions > 0) {
@@ -392,10 +394,10 @@ function cabf_conquestearthfilter() {
 			var myLevel = Number(_myLevel[0]);
 			for (var _x in _towers) {
 				var _count = 0;
-                if ($('#tower_tab_'+_x+' > #crystal_'+_x).length>0) {
+                if ($('#tower_'+_x+' > #crystal_'+_x).length>0) {
                     _count = 0;            
                 } else {
-                    $('#tower_tab_'+_x+' > div > div').each(function(_i, _e) {
+                    $('#tower_'+_x+' > div > div').each(function(_i, _e) {
                         var _class = new RegExp($('#cabfGateClassFilter').val());
                         var _state = new RegExp($('#cabfGateStatusFilter').val());
                         var _points = $('#cabfGatePointsFilter').val();
@@ -1848,7 +1850,7 @@ function cabf_filters() {
         cabf_festivalbattlefilter();
     } else    
     /* Earth land conquest battle */
-    if ($('#tower_tab_1,#tower_tab_2,#tower_tab_3,#tower_tab_4').length > 0) {
+    if ($('#tower_1,#tower_2,#tower_3,#tower_4').length > 0) {
         console.log('Earth land conquest battle');
 		battleStats();
         cabf_conquestearthfilter();
