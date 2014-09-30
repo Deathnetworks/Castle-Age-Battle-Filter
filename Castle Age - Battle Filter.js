@@ -10,11 +10,11 @@
 // @require        http://code.jquery.com/ui/1.10.3/jquery-ui.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.16
+// @version        1.1.17
 // @copyright      2013+, Jigoku
 // ==/UserScript==
 
-var version = '1.1.16', clickUrl = '', updated = false;
+var version = '1.1.17', clickUrl = '', updated = false;
 
 /* 
 to-do:
@@ -659,6 +659,7 @@ function cabf_guildbattlefilter() {
 					var target_id=$('input[name="target_id"]',_e).attr("value");
 					winStat=getTargetStat(target_id);
 					addTargetTip(_e);
+					
 				}
 				if (_test)
 				{
@@ -1774,13 +1775,13 @@ function getTargetStat(target_id) {
 			defeat=eval(stats.targets[indexTarget].defeat);
 		if ((victory+defeat)>0) {
 			if ((victory-defeat)>0) {
-				return '<span class="GuildNumG">'+Math.round(((victory-defeat)*100/(victory+defeat)))+'%</span>';
+				return '<span class="GuildNumG">'+Math.round(((victory-defeat)*100/(victory+defeat)))+'%</span><br><span><a href="keep?casuser=' + target_id + '">keep link</a></span>';
 			} else {
-				return '<span class="GuildNumR">'+Math.round(((victory-defeat)*100/(victory+defeat)))+'%</span>';
+				return '<span class="GuildNumR">'+Math.round(((victory-defeat)*100/(victory+defeat)))+'%</span><br><span><a href="keep?casuser=' + target_id + '">keep link</a></span>';
 			}
 		}
 	}
-	return '<span class="GuildNum">0%</span>';
+	return '<span class="GuildNum">0%</span><br><span><a href="keep?casuser=' + target_id + '">keep link</a></span>';
 }
 function battleStats() {
 	var stats=item.get('stats',defaultStats);
