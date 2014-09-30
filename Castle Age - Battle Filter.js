@@ -10,11 +10,11 @@
 // @require        http://code.jquery.com/ui/1.10.3/jquery-ui.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.17
+// @version        1.1.18
 // @copyright      2013+, Jigoku
 // ==/UserScript==
 
-var version = '1.1.17', clickUrl = '', updated = false;
+var version = '1.1.18', clickUrl = '', updated = false;
 
 /* 
 to-do:
@@ -1775,13 +1775,13 @@ function getTargetStat(target_id) {
 			defeat=eval(stats.targets[indexTarget].defeat);
 		if ((victory+defeat)>0) {
 			if ((victory-defeat)>0) {
-				return '<span class="GuildNumG">'+Math.round(((victory-defeat)*100/(victory+defeat)))+'%</span><br><span><a href="keep?casuser=' + target_id + '">keep link</a></span>';
+				return '<span class="GuildNumG">'+Math.round(((victory-defeat)*100/(victory+defeat)))+'%</span><br><span class="KeepLink"><a href="keep?casuser=' + target_id + '">Keep</a></span>';
 			} else {
-				return '<span class="GuildNumR">'+Math.round(((victory-defeat)*100/(victory+defeat)))+'%</span><br><span><a href="keep?casuser=' + target_id + '">keep link</a></span>';
+				return '<span class="GuildNumR">'+Math.round(((victory-defeat)*100/(victory+defeat)))+'%</span><br><span class="KeepLink"><a href="keep?casuser=' + target_id + '">Keep</a></span>';
 			}
 		}
 	}
-	return '<span class="GuildNum">0%</span><br><span><a href="keep?casuser=' + target_id + '">keep link</a></span>';
+	return '<span class="GuildNum">0%</span><br><span class="KeepLink"><a href="keep?casuser=' + target_id + '">Keep</a></span>';
 }
 function battleStats() {
 	var stats=item.get('stats',defaultStats);
@@ -2002,6 +2002,7 @@ function init() {
         addCss ( '.GuildNum {	color:white;position:relative;top:-100px;left:15px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');   
         addCss ( '.GuildNumG{	color:green;position:relative;top:-100px;left:15px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');   
         addCss ( '.GuildNumR{	color:red;position:relative;top:-100px;left:15px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');  
+        addCss ( '.KeepLink {	color:white;position:relative;top:-100px;left:15px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}'); 
 		
         addCss ( '#tooltip {position:absolute;z-index:9999;color:#fff;font-size:10px;width:180px;}');    
         addCss ( '#tooltip .tipHeader {height:8px;background:url(images/tipHeader.gif) no-repeat;}');     
