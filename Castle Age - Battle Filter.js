@@ -10,11 +10,11 @@
 // @require        http://code.jquery.com/ui/1.10.3/jquery-ui.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.15
+// @version        1.1.16
 // @copyright      2013+, Jigoku
 // ==/UserScript==
 
-var version = '1.1.15', clickUrl = '', updated = false;
+var version = '1.1.16', clickUrl = '', updated = false;
 
 /* 
 to-do:
@@ -354,10 +354,12 @@ function cabf_conquestearthfilter() {
             } else if (!(_actions>0)) {
                 _defenderHealth = 0;            
             } else {
+				var _nb=0;
 				console.log("Add numbers");
                 $('#tower_'+_x+' > div > div').each(function(_i, _e) {
                     var _text = $(_e).text().trim(), _health, _maxHealth, _fullhealth,winStat = '';
                     if (_text) {
+						_nb++;
 						// enemy full health
 						_health = /(\d+)\//.exec(_text)[1];
 						_maxHealth = /\/(\d+)/.exec(_text)[1];
@@ -375,9 +377,9 @@ function cabf_conquestearthfilter() {
 							addTargetTip(_e);
 						}
 						if (_fullhealth) {
-							$(_e, 'div > div').append('<span class="GuildNumG">' + (_i + 1) + '</span>'+ '<br>' + winStat);
+							$(_e, 'div > div').append('<span class="GuildNumG">' + _nb + '</span>'+ '<br>' + winStat);
 						} else {
-							$(_e, 'div > div').append('<span class="GuildNumR">' + (_i + 1) + '</span>'+ '<br>' + winStat);
+							$(_e, 'div > div').append('<span class="GuildNumR">' + _nb + '</span>'+ '<br>' + winStat);
 						}
                     }
                 });
@@ -1808,6 +1810,12 @@ function battleStats() {
 				console.log("DISPEL");
 			} else if ($('#results_main_wrapper>div:contains("ILLUSION")').length > 0 ) {
 				console.log("ILLUSION");
+			} else if ($('#results_main_wrapper>img[src*="battle_defeat.gif"]')) {
+				console.log("DEFEAT (battle_defeat.gif)");
+				stats.targets[indexTarget].defeat++;
+			} else if ($('#results_main_wrapper>img[src*="battle_victory.gif"]')) {
+				console.log("VICTORY (battle_victory.gif)");
+				stats.targets[indexTarget].victory++;
 			} else {
 				console.log("DEFEAT");
 			}
@@ -1860,6 +1868,11 @@ function cabf_filters() {
         console.log('Mist land conquest battle');
 		battleStats();
         cabf_conquestmistfilter();
+    } else    
+    /* Normal battle */
+    if ($('#blist_pulldown_select').length > 0) {
+        console.log('Normal battle');
+		battleStats();
     }
 	
 	
