@@ -10,11 +10,11 @@
 // @require        http://code.jquery.com/ui/1.10.3/jquery-ui.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.18
+// @version        1.1.19
 // @copyright      2013+, Jigoku
 // ==/UserScript==
 
-var version = '1.1.18', clickUrl = '', updated = false;
+var version = '1.1.19', clickUrl = '', updated = false;
 
 /* 
 to-do:
@@ -1811,14 +1811,14 @@ function battleStats() {
 				console.log("DISPEL");
 			} else if ($('#results_main_wrapper>div:contains("ILLUSION")').length > 0 ) {
 				console.log("ILLUSION");
-			} else if ($('#results_main_wrapper>img[src*="battle_defeat.gif"]')) {
+			} else if ($('#results_main_wrapper>div>div>span>div>img[src*="battle_defeat.gif"]').length > 0) {
 				console.log("DEFEAT (battle_defeat.gif)");
 				stats.targets[indexTarget].defeat++;
-			} else if ($('#results_main_wrapper>img[src*="battle_victory.gif"]')) {
+			} else if ($('#results_main_wrapper>div>div>span>div>img[src*="battle_victory.gif"]').length > 0) {
 				console.log("VICTORY (battle_victory.gif)");
 				stats.targets[indexTarget].victory++;
 			} else {
-				console.log("DEFEAT");
+				console.log("UNKNOWN RESULT");
 			}
 		}
 	}
