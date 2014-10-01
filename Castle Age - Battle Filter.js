@@ -10,11 +10,11 @@
 // @require        http://code.jquery.com/ui/1.10.3/jquery-ui.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.19
+// @version        1.1.20
 // @copyright      2013+, Jigoku
 // ==/UserScript==
 
-var version = '1.1.19', clickUrl = '', updated = false;
+var version = '1.1.20', clickUrl = '', updated = false;
 
 /* 
 to-do:
@@ -1775,13 +1775,13 @@ function getTargetStat(target_id) {
 			defeat=eval(stats.targets[indexTarget].defeat);
 		if ((victory+defeat)>0) {
 			if ((victory-defeat)>0) {
-				return '<span class="GuildNumG">'+Math.round(((victory-defeat)*100/(victory+defeat)))+'%</span><br><span class="KeepLink"><a href="keep.php?casuser=' + target_id + '">Keep</a></span>';
+				return '<span class="GuildNumG">'+Math.round(((victory-defeat)*100/(victory+defeat)))+'%</span><br><span class="KeepLink"><a href="keep.php?casuser=' + target_id + '" target="_blank">Keep</a></span>';
 			} else {
-				return '<span class="GuildNumR">'+Math.round(((victory-defeat)*100/(victory+defeat)))+'%</span><br><span class="KeepLink"><a href="keep.php?casuser=' + target_id + '">Keep</a></span>';
+				return '<span class="GuildNumR">'+Math.round(((victory-defeat)*100/(victory+defeat)))+'%</span><br><span class="KeepLink"><a href="keep.php?casuser=' + target_id + '" target="_blank">Keep</a></span>';
 			}
 		}
 	}
-	return '<span class="GuildNum">0%</span><br><span class="KeepLink"><a href="keep.php?casuser=' + target_id + '">Keep</a></span>';
+	return '<span class="GuildNum">0%</span><br><span class="KeepLink"><a href="keep.php?casuser=' + target_id + '" target="_blank">Keep</a></span>';
 }
 function battleStats() {
 	var stats=item.get('stats',defaultStats);
