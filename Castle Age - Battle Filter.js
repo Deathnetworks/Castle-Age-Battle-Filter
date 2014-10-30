@@ -10,11 +10,11 @@
 // @require        http://code.jquery.com/ui/1.10.3/jquery-ui.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.20
+// @version        1.1.21
 // @copyright      2013+, Jigoku
 // ==/UserScript==
 
-var version = '1.1.20', clickUrl = '', updated = false;
+var version = '1.1.21', clickUrl = '', updated = false;
 
 /* 
 to-do:
@@ -799,6 +799,8 @@ function cabf_guildbattlefilter() {
         var _count = 0;
         var _gateNum = $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').attr('class').match(/\d/)[0];
         var _gate = $('#enemy_new_guild_tab_' + _gateNum + ' > div, #your_new_guild_tab_' + _gateNum + ' > div');
+		var _myLevel = $('a[href*="keep.php"] > div[style="color:#ffffff"]').text().match(/\d+/);
+		var myLevel = Number(_myLevel[0]);
         $('#your_new_guild_member_list > div > div, #enemy_new_guild_member_list > div > div').each(function(_i, _e) {
             var _class = $('#cabfGateClassFilter').val();
             var _activ = new RegExp($('#cabfGateActivityFilter').val(), "g");
@@ -825,9 +827,45 @@ function cabf_guildbattlefilter() {
             
             var _classTest = _class === 'all' ? 1 : $(_e).find('img[src*="/graphics/class_' + _class + '.gif"]').length;
             var _pointTest = _points === 'all' ? 1 : $(_e).find('img[title="Battle Points for Victory: ' + _points + '"]').length;
-            if (_classTest > 0 && _activ.test(_text) && _pointTest > 0 && _stateTest === true) {
-                $(_e).show();
-                _count += 1;
+            if (_classTest > 0 && _activ.test(_text) && /*_pointTest > 0 &&*/ _stateTest === true) {
+				if (_points !== 'All') {
+					if (/Level: \d+/.test(_text)) {
+						var targetLevel = parseInt(/(?:Level: )(\d+)/g.exec(_text)[1]);
+						var _showTarget = false;
+						switch (_points) {
+							case '160':
+								if (targetLevel <=  myLevel*80/100) {
+									_showTarget = true;
+								}
+								break;
+							case '200':
+								if ((targetLevel > myLevel*80/100) && (targetLevel <= myLevel*120/100)) {
+									_showTarget = true;
+								}
+								break;
+							case '240':
+								if (targetLevel > myLevel*120/100) {
+									_showTarget = true;
+								}
+								break;
+							default:
+								_showTarget = true;
+						}
+						if (_showTarget) {
+							$(_e).show();
+							_count += 1;
+						} else {
+							$(_e).hide();
+						}
+					} else {
+						console.log('Error in points filter!');
+						$(_e).show();
+						_count += 1;
+					}
+				} else {
+					$(_e).show();
+					_count += 1;
+				}
             } else {
                 $(_e).hide();
             }
@@ -1154,6 +1192,8 @@ function cabf_tenbattlefilter() {
     // gate filter
     function filterGate() {
         var _count = 0;
+		var _myLevel = $('a[href*="keep.php"] > div[style="color:#ffffff"]').text().match(/\d+/);
+		var myLevel = Number(_myLevel[0]);
         $('#your_new_guild_member_list > div > div, #enemy_new_guild_member_list > div > div').each(function(_i, _e) {
             var _class = $('#cabfGateClassFilter').val();
             var _activ = new RegExp($('#cabfGateActivityFilter').val(), "g");
@@ -1508,6 +1548,8 @@ function cabf_festivalbattlefilter() {
         var _count = 0;
         var _gateNum = $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').attr('class').match(/\d/)[0];
         var _gate = $('#enemy_arena_tab_' + _gateNum + ' > div, #your_arena_tab_' + _gateNum + ' > div');
+		var _myLevel = $('a[href*="keep.php"] > div[style="color:#ffffff"]').text().match(/\d+/);
+		var myLevel = Number(_myLevel[0]);
         $('#your_guild_member_list > div > div, #enemy_guild_member_list > div > div').each(function(_i, _e) {
             
             var _class = $('#cabfGateClassFilter').val();
@@ -1999,10 +2041,10 @@ function init() {
         addCss ( "#cabfActiveAverageHealthLeft {color: #fff;text-align:end;}");
 		addCss ( "#cabfActivePercentageHealthLeft {color: #fff;text-align:end;}");
 		
-        addCss ( '.GuildNum {	color:white;position:relative;top:-100px;left:15px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');   
-        addCss ( '.GuildNumG{	color:green;position:relative;top:-100px;left:15px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');   
-        addCss ( '.GuildNumR{	color:red;position:relative;top:-100px;left:15px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');  
-        addCss ( '.KeepLink {	color:white;position:relative;top:-100px;left:15px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}'); 
+        addCss ( '.GuildNum {	color:white;position:relative;top:-100px;left:35px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');   
+        addCss ( '.GuildNumG{	color:green;position:relative;top:-100px;left:35px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');   
+        addCss ( '.GuildNumR{	color:red;position:relative;top:-100px;left:35px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');  
+        addCss ( '.KeepLink {	color:white;position:relative;top:-100px;left:35px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}'); 
 		
         addCss ( '#tooltip {position:absolute;z-index:9999;color:#fff;font-size:10px;width:180px;}');    
         addCss ( '#tooltip .tipHeader {height:8px;background:url(images/tipHeader.gif) no-repeat;}');     
