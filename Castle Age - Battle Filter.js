@@ -10,11 +10,11 @@
 // @require        http://code.jquery.com/ui/1.10.3/jquery-ui.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.22
+// @version        1.1.23
 // @copyright      2013+, Jigoku
 // ==/UserScript==
 
-var version = '1.1.22', clickUrl = '', updated = false;
+var version = '1.1.23', clickUrl = '', updated = false;
 
 /* 
 to-do:
@@ -593,6 +593,9 @@ function cabf_guildbattlefilter() {
         if (_health !== null) {
             $_enemy.html($_enemy.html() + ' (' + _health[1] + ')');
         }
+		// Clear var
+		_target = '';
+		_health = '';
     }
     
     // resize top image
@@ -768,6 +771,8 @@ function cabf_guildbattlefilter() {
 				$('#cabfActivePercentageHealthLeft').html('Percentage Health Left: '+(_activetotalhealthleft*100/_activetotalhealth).toFixed(1)+'%');
 			}
 		} 
+		// Clear var
+		_gateNum = '';
 	} else {
 		var _gateNum = $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').attr('class').match(/\d/)[0];
 		if ($('#enemy_guild_battle_section_battle_list').length > 0) {
@@ -786,6 +791,8 @@ function cabf_guildbattlefilter() {
 					break;
 			default: $('#cabfStatTower span:last').html('Stat (Tower not Found)');
 		}
+		// Clear var
+		_gateNum = '';
 	}
 	
     // Saved filter settings
@@ -869,9 +876,22 @@ function cabf_guildbattlefilter() {
             } else {
                 $(_e).hide();
             }
-            
+			
+			// Clear var
+            _class = '';
+            _activ = '';
+            _state = '';
+            _points = '';
+            _text = '';
+            _classTest = '';
+            _pointTest = '';            
         });
         _gate.html(_gate.html().replace(/\).*/, ')').replace(')', ')<br/><span style="font-size:14px;font-weight:bold;">Filtered: ' + _count + '</span>'));
+		// Clear var
+		_gateNum = '';
+        _gate = '';
+		_myLevel = '';
+		myLevel = 0;
     }
     
     // class filter
@@ -990,6 +1010,13 @@ function cabf_guildbattlefilter() {
         filterGate();
     }, 10);
     
+    // Clear Var
+    _gate = '';
+    _your = '';
+    _enemy = '';
+    $_your = '';
+    $_enemy = '';
+	_tokens = '';
 };
  
 /*******************************************************************************************************************************************************************************
