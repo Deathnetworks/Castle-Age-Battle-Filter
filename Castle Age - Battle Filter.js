@@ -10,11 +10,11 @@
 // @require        http://code.jquery.com/ui/1.10.3/jquery-ui.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.23
+// @version        1.1.24
 // @copyright      2013+, Jigoku
 // ==/UserScript==
 
-var version = '1.1.23', clickUrl = '', updated = false;
+var version = '1.1.24', clickUrl = '', updated = false;
 
 /* 
 to-do:
@@ -41,8 +41,6 @@ var _statBoard = '<div id="cabfHealthStatBoard"><div id="cabfStatType">Enemy</di
  function runEffect(idButton,idToggle) {
 	
 	var options = {},state;
-	console.log('idButton=',idButton);
-	console.log('idToggle=',idToggle);
 	$(idToggle).toggle( 'clip', options, 500 );
 	state=item.get(idToggle,'false');
 	if (state === 'false' ) {
@@ -52,6 +50,7 @@ var _statBoard = '<div id="cabfHealthStatBoard"><div id="cabfStatType">Enemy</di
 		item.set(idToggle,'false');	
 		$(idButton+' span:first').html('+');	
 	}
+	options=null;
 };
 	
 function addStatBoard(id) { 
@@ -97,7 +96,9 @@ function addCss(cssString) {
             newCss.type = "text/css"; 
             newCss.innerHTML = cssString; 
             head.appendChild(newCss); 
+			newCss=null;
         }
+		head=null;
     } catch (e) {
         console.error("Error in addCss",e);
     }
@@ -712,7 +713,7 @@ function cabf_guildbattlefilter() {
                 $(_e).remove();
             }
 			_text = '';
-			_test = [];
+			_test = null;
         });
 		if (_count>0) {
 			$('#cabfTotalHealth').html('Total Health: '+_totalhealth);
@@ -1143,7 +1144,7 @@ function cabf_tenbattlefilter() {
                 $(_e).remove();
             }
 			_text = '';
-			_test = [];
+			_test = null;
         });
 		if (_count>0) {
 			$('#cabfTotalHealth').html('Total Health: '+_totalhealth);
@@ -1548,7 +1549,7 @@ function cabf_festivalbattlefilter() {
 			$(_e).remove();
 		}
 		_text = '';
-		_test = [];
+		_test = null;
     });
 	if (_count>0) {
 		$('#cabfTotalHealth').html('Total Health: '+_totalhealth);
@@ -1801,7 +1802,7 @@ function cabf_festivalbattlefilter() {
 *******************************************************************************************************************************************************************************
 ******************************************************************************************************************************************************************************/
 function monsterBars() {
-	var _monstername = null, _ret = [];
+	var _monstername = null, _ret = null;
 	// add percentage to top bars
 	if ($('#app_body div[style*="nm_bars.jpg"], #app_body div[style*="nm_bars_cross.jpg"]').length > 0) {
 		$('img[src*="monster_health_background.jpg"], [src*="nm_red.jpg"], [src*="nm_orange.jpg"]').each(function(_i, _e) {
@@ -1892,6 +1893,7 @@ function addTargetTip(_e) {
         $('#tooltip').css('left', e.pageX + 20 );
         $('#tooltip').fadeIn('500');
         $('#tooltip').fadeTo('10',0.8);
+		stats.null;
     }).mousemove(function(e) {
         $('#tooltip').css('top', e.pageY + 10 );
         $('#tooltip').css('left', e.pageX + 20 );
@@ -1916,12 +1918,18 @@ function getTargetStat(target_id) {
 			defeat=eval(stats.targets[indexTarget].defeat);
 		if ((victory+defeat)>0) {
 			if ((victory-defeat)>0) {
+				stats=null;
+				indexTarget=null;
 				return '<span class="GuildNumG">'+Math.round(((victory-defeat)*100/(victory+defeat)))+'%</span><br><span class="KeepLink"><a href="keep.php?casuser=' + target_id + '" target="_blank">Keep</a></span>';
 			} else {
+				stats=null;
+				indexTarget=null;
 				return '<span class="GuildNumR">'+Math.round(((victory-defeat)*100/(victory+defeat)))+'%</span><br><span class="KeepLink"><a href="keep.php?casuser=' + target_id + '" target="_blank">Keep</a></span>';
 			}
 		}
 	}
+	stats=null;
+	indexTarget=null;
 	return '<span class="GuildNum">0%</span><br><span class="KeepLink"><a href="keep.php?casuser=' + target_id + '" target="_blank">Keep</a></span>';
 }
 function battleStats() {
@@ -1939,6 +1947,7 @@ function battleStats() {
 				var newTarget={"target_id":target_id,"victory":0,"defeat":0};
 				stats.targets.push(newTarget);
 				indexTarget=getTargetIndex(stats.targets,target_id);
+				newTarget=null;
 			}
 			if ($('#results_main_wrapper>div:contains("VICTORY")').length > 0 ) {
 				console.log("VICTORY");
@@ -1961,10 +1970,13 @@ function battleStats() {
 			} else {
 				console.log("UNKNOWN RESULT");
 			}
+			target_id=null;
 		}
+		target=null;
 	}
 	item.set('stats',stats);
 	console.log("targets",stats.targets);
+	stats=null;
 }
 
 /******************************************************************************************************************************************************************************
