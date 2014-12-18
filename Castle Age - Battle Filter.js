@@ -10,14 +10,14 @@
 // @require        http://code.jquery.com/ui/1.10.3/jquery-ui.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.25
+// @version        1.1.26
 // @copyright      2013+, Jigoku
 // @grant		GM_addStyle
 // @grant		GM_getResourceText 
 // @grant		GM_registerMenuCommand
 // ==/UserScript==
 
-var version = '1.1.25', clickUrl = '', updated = false;
+var version = '1.1.26', clickUrl = '', updated = false;
 
 /* 
 to-do:
@@ -39,6 +39,8 @@ var item = {
         localStorage.remove('cabf_' + _name);
     }
 };
+
+var _dialogIO = '<div id="dialogIO" title="Import/Export">  <textarea id="statsDg" style="margin: 2px; height: 250px; width: 600px;"></textarea></div>' ;
 var _statBoard = '<div id="cabfHealthStatBoard"><div id="cabfStatType">Enemy</div><div><br></div><div id="cabfStatTower"><span>-</span><span>Stat</span></div><div id="cabfToggleTower"><div id="cabfTotalHealth">Total Health: 0</div><div id="cabfAverageHealth">Average Health: 0</div><div id="cabfHealthLeft">Health Left: 0</div><div id="cabfAverageHealthLeft">Average Health Left: 0</div><div id="cabfPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatCleric"><span>-</span><span>Cleric Stat</span></div><div id="cabfToggleCleric"><div id="cabfClericTotalHealth">Total Health: 0</div><div id="cabfClericAverageHealth">Average Health: 0</div><div id="cabfClericHealthLeft">Health Left: 0</div><div id="cabfClericAverageHealthLeft">Average Health Left: 0</div><div id="cabfClericPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatMage"><span>-</span><span>Mage Stat</span></div><div id="cabfToggleMage"><div id="cabfMageTotalHealth">Total Health: 0</div><div id="cabfMageAverageHealth">Average Health: 0</div><div id="cabfMageHealthLeft">Health Left: 0</div><div id="cabfMageAverageHealthLeft">Average Health Left: 0</div><div id="cabfMagePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatRogue"><span>-</span><span>Rogue Stat</span></div><div id="cabfToggleRogue"><div id="cabfRogueTotalHealth">Total Health: 0</div><div id="cabfRogueAverageHealth">Average Health: 0</div><div id="cabfRogueHealthLeft">Health Left: 0</div><div id="cabfRogueAverageHealthLeft">Average Health Left: 0</div><div id="cabfRoguePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatWarrior"><span>-</span><span>Warrior Stat</span></div><div id="cabfToggleWarrior"><div id="cabfWarriorTotalHealth">Total Health: 0</div><div id="cabfWarriorAverageHealth">Average Health: 0</div><div id="cabfWarriorHealthLeft">Health Left: 0</div><div id="cabfWarriorAverageHealthLeft">Average Health Left: 0</div><div id="cabfWarriorPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatActive"><span>-</span><span>Active Stat</span></div><div id="cabfToggleActive"><div id="cabfActiveTotalHealth">Total Health: 0</div><div id="cabfActiveAverageHealth">Average Health: 0</div><div id="cabfActiveHealthLeft">Health Left: 0</div><div id="cabfActiveAverageHealthLeft">Average Health Left: 0</div><div id="cabfActivePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div></div>';
 
  function runEffect(idButton,idToggle) {
@@ -2041,6 +2043,104 @@ function cabf_filters() {
     }
 };
 
+function diagIO() {
+    if ($('#main_bntp').length > 0) {
+        $('#main_bntp').append(_dialogIO);
+        $( "#dialogIO" ).dialog({
+            modal: true,
+			height: 410,
+			width: 660,
+            buttons: {
+                "Export": function() {
+					try {
+						$(this).children('#statsDg')[0].value=JSON.stringify(item.get('stats',defaultStats), null, '\t');
+						$(this).children('#statsDg')[0].select();
+						console.log('Export succeed.');
+					} catch(e) {
+						console.log('Export failed : ',e);
+					}
+                },
+                "Import": function() {
+					if (!$(this).children('#statsDg')[0].value || $(this).children('#statsDg')[0].value == null || $(this).children('#statsDg')[0].value == "" ) {
+						console.log('Error null value.');						
+						return;
+					}
+					try {
+						item.set('stats',JSON.parse($(this).children('#statsDg')[0].value));
+						$( this ).dialog( "close" );
+						console.log('Import succeed.');
+					} catch(e) {
+						console.log('Import failed : ',e);
+					}
+                },
+                "Merge": function() {
+					if (!$(this).children('#statsDg')[0].value || $(this).children('#statsDg')[0].value == null || $(this).children('#statsDg')[0].value == "" ) {
+						console.log('Error null value.');						
+						return;
+					}
+					try {
+						var statsToMerge = JSON.parse($(this).children('#statsDg')[0].value),
+							statsLocal = item.get('stats',defaultStats);
+						
+						for (var i = 0; i < statsToMerge.targets.length; i++){
+							var target_id=statsToMerge.targets[i].target_id;
+							var indexTarget=getTargetIndex(statsLocal.targets,target_id);
+							if (indexTarget<0) {
+								var newTarget={"target_id":target_id,"victory":0,"defeat":0};
+								statsLocal.targets.push(newTarget);
+								indexTarget=getTargetIndex(statsLocal.targets,target_id);
+								newTarget=null;
+							}
+							statsLocal.targets[indexTarget].victory+=statsToMerge.targets[i].victory;
+							statsLocal.targets[indexTarget].defeat+=statsToMerge.targets[i].defeat;
+						}
+						item.set('stats',statsLocal);
+						$( this ).dialog( "close" );
+						console.log('Merge succeed.');
+						statsToMerge=null;
+						statsLocal=null;
+					} catch(e) {
+						console.log('Merge failed : ',e);
+					}
+                },
+                "Insert non-existent": function() {
+					if (!$(this).children('#statsDg')[0].value || $(this).children('#statsDg')[0].value == null || $(this).children('#statsDg')[0].value == "" ) {
+						console.log('Error null value.');						
+						return;
+					}
+					try {
+						var statsToMerge = JSON.parse($(this).children('#statsDg')[0].value),
+							statsLocal = item.get('stats',defaultStats);
+						
+						for (var i = 0; i < statsToMerge.targets.length; i++){
+							var target_id=statsToMerge.targets[i].target_id;
+							var indexTarget=getTargetIndex(statsLocal.targets,target_id);
+							if (indexTarget<0) {
+								var newTarget={"target_id":target_id,"victory":statsToMerge.targets[i].victory,"defeat":statsToMerge.targets[i].defeat};
+								statsLocal.targets.push(newTarget);
+								newTarget=null;
+							}
+						}
+						item.set('stats',statsLocal);
+						$( this ).dialog( "close" );
+						console.log('Insert succeed.');
+						statsToMerge=null;
+						statsLocal=null;
+					} catch(e) {
+						console.log('Insert failed : ',e);
+					}
+                },
+                Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+            },
+			open: function( event, ui ) {
+				console.log('Import/Export Dialog opened.');
+			}
+        });
+    }
+}
+
 function init() {
     var globalContainer = document.querySelector('#globalContainer');
     
@@ -2086,7 +2186,7 @@ function init() {
         
     }, true);
     
-    GM_registerMenuCommand("Castle Age - Battle Filter", function() {init();});
+    GM_registerMenuCommand("Castle Age - Battle Filter (Import/Export)", function() {diagIO();});
     try {
         addCss ( "#cabfEarthFiltered1 {	color: #fff;}");
         addCss ( "#cabfEarthFiltered2 {	color: #fff;}");
