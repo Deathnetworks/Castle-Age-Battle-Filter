@@ -12,14 +12,14 @@
 // @require		   https://cdn.firebase.com/js/client/2.0.6/firebase.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.26
+// @version        1.1.27
 // @copyright      2013+, Jigoku
 // @grant		GM_addStyle
 // @grant		GM_getResourceText 
 // @grant		GM_registerMenuCommand
 // ==/UserScript==
 
-var version = '1.1.26', clickUrl = '', updated = false;
+var version = '1.1.27', clickUrl = '', updated = false;
  
 var item = {
     get : function(_name, _default) {
