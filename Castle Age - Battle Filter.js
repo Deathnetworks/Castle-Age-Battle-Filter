@@ -12,33 +12,77 @@
 // @require		   https://cdn.firebase.com/js/client/2.0.6/firebase.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.27
+// @version        1.1.28
 // @copyright      2013+, Jigoku
 // @grant		GM_addStyle
 // @grant		GM_getResourceText 
 // @grant		GM_registerMenuCommand
 // ==/UserScript==
 
-var version = '1.1.27', clickUrl = '', updated = false;
+var version = '1.1.28', clickUrl = '', updated = false;
+
+var dataUrl = 'https://cabf.firebaseio.com/users/';
  
 var item = {
     get : function(_name, _default) {
-        if (localStorage['cabf_' + _name] !== undefined && localStorage['cabf_' + _name] !== null) {
-            return JSON.parse(localStorage['cabf_' + _name]);
-        } else {
-            return _default;
-        }
+		if (localStorage['cabf_' + _name] !== undefined && localStorage['cabf_' + _name] !== null) {
+			return JSON.parse(localStorage['cabf_' + _name]);
+		} else {
+			return _default;
+		}
     },
     set : function(_name, _value) {
         localStorage['cabf_' + _name] = JSON.stringify(_value);
+		if (_name=="stats") {
+			try {
+				var key = JSON.parse(localStorage['cabf_syncKey']);
+				if (!key || key == null || key == "" ) {
+					console.log('Sync key not set.');
+				} else {
+					var cabfDataRef = new Firebase(dataUrl);
+					cabfDataRef.child(key).child("lastUpdate").set(Firebase.ServerValue.TIMESTAMP);
+					cabfDataRef.child(key).child("stats").set(_value);
+					console.log('Sync succeed in saving data.');
+					key=null;
+					cabfDataRef=null;
+				}
+			} catch(e) {
+				console.error('Sync failed in saving data : ',e);
+			}
+		}
     },
     del : function(_name) {
         localStorage.remove('cabf_' + _name);
     }
 };
 
-
-var cabfDataRef = new Firebase('https://cabf.firebaseio.com/');
+try {
+	var _syncKey = JSON.parse(localStorage['cabf_syncKey']);
+	if (!_syncKey || _syncKey == null || _syncKey == "" ) {
+		console.log('Sync key not set.');
+	} else {
+		var cabfDataRef = new Firebase(dataUrl);
+		cabfDataRef.child(_syncKey).child("stats").on("child_added", function(statsSnapshot) {
+																				var stats = {"targets":[]};
+																				var targets = statsSnapshot.val();
+																				stats.targets = targets;
+																				localStorage['cabf_stats'] = JSON.stringify(stats);
+																				console.log('targets added');
+																				
+																			}
+												);
+		cabfDataRef.child(_syncKey).child("stats").on("child_changed", function(statsSnapshot) {
+																				var stats = {"targets":[]};
+																				var targets = statsSnapshot.val();
+																				stats.targets = targets;
+																				localStorage['cabf_stats'] = JSON.stringify(stats);
+																				console.log('targets changed');
+																			}
+												);
+	}
+} catch(e) {
+	console.log('Sync key not set.',e);
+}
 
 var _dialogIO = '<div id="dialogIO" title="Import/Export">  <textarea id="statsDg" style="margin: 2px; height: 250px; width: 600px;"></textarea></div>' ;
 var _dialogSync = '<div id="dialogSync" title="Sync with CAAP">  <form><fieldset><label for="syncKey">Sync Key : </label><input type="text" name="syncKey" id="syncKey" value="" style="width: 420px;"></fieldset></form></div>' ;
@@ -1981,7 +2025,6 @@ function battleStats() {
 		target=null;
 	}
 	item.set('stats',stats);
-	console.log("targets",stats.targets);
 	stats=null;
 }
 
@@ -2130,7 +2173,33 @@ function diagIO() {
 					} catch(e) {
 						console.log('Insert failed : ',e);
 					}
-                },
+                },/*
+                "test": function() {
+					try {
+						var key = item.get('syncKey',"");
+						if (!key || key == null || key == "" ) {
+							console.log('Error sync key not set.');						
+							return;
+						}
+						var cabfDataRef = new Firebase(dataUrl);
+						// TEST QUERY 
+						cabfDataRef.child(key).child("stats").on("value", function(statsSnapshot) {
+																							var targets = statsSnapshot.val();
+																							console.log('targets : ',targets);
+																							$( "#statsDg")[0].value=JSON.stringify(targets, null, '\t');
+																							console.log('targets found: ',targets);
+																						}
+														);
+														
+						// TEST TIMESTAMP 
+						cabfDataRef.child(key).child("lastUpdate").set(Firebase.ServerValue.TIMESTAMP);
+						console.log('test succeed.');
+						key=null;
+						cabfDataRef=null;
+					} catch(e) {
+						console.log('test failed : ',e);
+					}
+                },*/
                 Cancel: function() {
 					$( this ).dialog( "close" );
 				}
@@ -2167,14 +2236,8 @@ function sync() {
 					try {
 						var key = $(this).children('form')[0][1].value;
 						item.set('syncKey',key);
-						cabfDataRef.set(key,function(error) {
-											if (error) {
-												console.log('Synchronization failed',error);
-											} else {
-												console.log('Synchronization succeeded');
-											}
-										});
 						console.log('Save succeed.');
+						$( this ).dialog( "close" );
 					} catch(e) {
 						console.log('Save failed : ',e);
 					}
@@ -2194,7 +2257,7 @@ function sync() {
 			},
 			open: function( event, ui ) {
 				$(this).children('form')[0][1].value=item.get('syncKey',"");
-				console.log('Sync Dialog opened.');
+				console.log('Sync Dialog opened.',item.get('syncKey',""));
 			}
         });
     }
