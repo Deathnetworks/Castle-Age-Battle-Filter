@@ -8,6 +8,8 @@
 // @downloadURL    https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/Castle%20Age%20-%20Battle%20Filter.js
 // @require        http://code.jquery.com/jquery-1.9.1.js
 // @require        http://code.jquery.com/ui/1.10.3/jquery-ui.js
+// @require		   https://raw.githubusercontent.com/magowiz/Castle-Age-Autoplayer/master/Chrome/unpacked/extern/utility.js
+// @require		   https://cdn.firebase.com/js/client/2.0.6/firebase.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
 // @version        1.1.26
@@ -18,11 +20,6 @@
 // ==/UserScript==
 
 var version = '1.1.26', clickUrl = '', updated = false;
-
-/* 
-to-do:
-*/
-
  
 var item = {
     get : function(_name, _default) {
@@ -40,7 +37,11 @@ var item = {
     }
 };
 
+
+var cabfDataRef = new Firebase('https://cabf.firebaseio.com/');
+
 var _dialogIO = '<div id="dialogIO" title="Import/Export">  <textarea id="statsDg" style="margin: 2px; height: 250px; width: 600px;"></textarea></div>' ;
+var _dialogSync = '<div id="dialogSync" title="Sync with CAAP">  <form><fieldset><label for="syncKey">Sync Key : </label><input type="text" name="syncKey" id="syncKey" value="" style="width: 420px;"></fieldset></form></div>' ;
 var _statBoard = '<div id="cabfHealthStatBoard"><div id="cabfStatType">Enemy</div><div><br></div><div id="cabfStatTower"><span>-</span><span>Stat</span></div><div id="cabfToggleTower"><div id="cabfTotalHealth">Total Health: 0</div><div id="cabfAverageHealth">Average Health: 0</div><div id="cabfHealthLeft">Health Left: 0</div><div id="cabfAverageHealthLeft">Average Health Left: 0</div><div id="cabfPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatCleric"><span>-</span><span>Cleric Stat</span></div><div id="cabfToggleCleric"><div id="cabfClericTotalHealth">Total Health: 0</div><div id="cabfClericAverageHealth">Average Health: 0</div><div id="cabfClericHealthLeft">Health Left: 0</div><div id="cabfClericAverageHealthLeft">Average Health Left: 0</div><div id="cabfClericPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatMage"><span>-</span><span>Mage Stat</span></div><div id="cabfToggleMage"><div id="cabfMageTotalHealth">Total Health: 0</div><div id="cabfMageAverageHealth">Average Health: 0</div><div id="cabfMageHealthLeft">Health Left: 0</div><div id="cabfMageAverageHealthLeft">Average Health Left: 0</div><div id="cabfMagePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatRogue"><span>-</span><span>Rogue Stat</span></div><div id="cabfToggleRogue"><div id="cabfRogueTotalHealth">Total Health: 0</div><div id="cabfRogueAverageHealth">Average Health: 0</div><div id="cabfRogueHealthLeft">Health Left: 0</div><div id="cabfRogueAverageHealthLeft">Average Health Left: 0</div><div id="cabfRoguePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatWarrior"><span>-</span><span>Warrior Stat</span></div><div id="cabfToggleWarrior"><div id="cabfWarriorTotalHealth">Total Health: 0</div><div id="cabfWarriorAverageHealth">Average Health: 0</div><div id="cabfWarriorHealthLeft">Health Left: 0</div><div id="cabfWarriorAverageHealthLeft">Average Health Left: 0</div><div id="cabfWarriorPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatActive"><span>-</span><span>Active Stat</span></div><div id="cabfToggleActive"><div id="cabfActiveTotalHealth">Total Health: 0</div><div id="cabfActiveAverageHealth">Average Health: 0</div><div id="cabfActiveHealthLeft">Health Left: 0</div><div id="cabfActiveAverageHealthLeft">Average Health Left: 0</div><div id="cabfActivePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div></div>';
 
  function runEffect(idButton,idToggle) {
@@ -2141,6 +2142,64 @@ function diagIO() {
     }
 }
 
+function Generate_key() {
+	try {
+		var ret = "",length=32;
+		while (ret.length < length) {
+			ret += Math.random().toString(16).substring(2);
+		}
+		return ret.substring(0,length);
+	} catch(e) {
+		console.log('Generate_key error : ',e);
+		return "undefined";
+	}
+}
+
+function sync() {
+    if ($('#main_bntp').length > 0) {
+        $('#main_bntp').append(_dialogSync);
+        $( "#dialogSync" ).dialog({
+            modal: true,
+			height: 200,
+			width: 620,
+            buttons: {
+                "Save": function() {
+					try {
+						var key = $(this).children('form')[0][1].value;
+						item.set('syncKey',key);
+						cabfDataRef.set(key,function(error) {
+											if (error) {
+												console.log('Synchronization failed',error);
+											} else {
+												console.log('Synchronization succeeded');
+											}
+										});
+						console.log('Save succeed.');
+					} catch(e) {
+						console.log('Save failed : ',e);
+					}
+				},
+                "Make new Key": function() {
+					try {
+						var key=Generate_key();
+						$(this).children('form')[0][1].value=key;
+						console.log('Make new Key succeed.');
+					} catch(e) {
+						console.log('Make new Key failed : ',e);
+					}
+				},
+                Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+			},
+			open: function( event, ui ) {
+				$(this).children('form')[0][1].value=item.get('syncKey',"");
+				console.log('Sync Dialog opened.');
+			}
+        });
+    }
+}
+
 function init() {
     var globalContainer = document.querySelector('#globalContainer');
     
@@ -2187,6 +2246,7 @@ function init() {
     }, true);
     
     GM_registerMenuCommand("Castle Age - Battle Filter (Import/Export)", function() {diagIO();});
+    GM_registerMenuCommand("Castle Age - Battle Filter (Sync)", function() {sync();});
     try {
         addCss ( "#cabfEarthFiltered1 {	color: #fff;}");
         addCss ( "#cabfEarthFiltered2 {	color: #fff;}");
