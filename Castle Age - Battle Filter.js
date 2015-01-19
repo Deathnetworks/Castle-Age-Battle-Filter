@@ -9,23 +9,61 @@
 // @require        http://code.jquery.com/jquery-1.9.1.js
 // @require        http://code.jquery.com/ui/1.10.3/jquery-ui.js
 // @require		   https://raw.githubusercontent.com/magowiz/Castle-Age-Autoplayer/master/Chrome/unpacked/extern/utility.js
-// @require		   https://cdn.firebase.com/js/client/2.0.6/firebase.js
+// @require		   https://cdn.firebase.com/js/client/2.1.1/firebase.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.28
+// @version        1.1.29
 // @copyright      2013+, Jigoku
 // @grant		GM_addStyle
 // @grant		GM_getResourceText 
 // @grant		GM_registerMenuCommand
 // ==/UserScript==
 
-var version = '1.1.28', clickUrl = '', updated = false;
-
-var dataUrl = 'https://cabf.firebaseio.com/users/';
+var version = '1.1.29', clickUrl = '', updated = false;
  
+
 var item = {
     get : function(_name, _default) {
 		if (localStorage['cabf_' + _name] !== undefined && localStorage['cabf_' + _name] !== null) {
+			if (_name=="stats") {
+                try {
+                    var key = JSON.parse(localStorage['cabf_syncKey']);
+                    if (!key || key == null || key == "" ) {
+                        console.log('Sync key not set.');
+                    } else {
+                        var statsLocal = JSON.parse(localStorage['cabf_' + _name]);
+                		try {
+							$.get(key, function(statsToMerge, textStatus, jqXHR) {		
+								var nbMerge=0;
+								for (var i = 0; i < statsToMerge.targets.length; i++){
+									var target_id=statsToMerge.targets[i].target_id;
+									var indexTarget=getTargetIndex(statsLocal.targets,target_id);
+									if (indexTarget<0) {
+										var newTarget={"target_id":target_id,"victory":statsToMerge.targets[i].victory,"defeat":statsToMerge.targets[i].defeat};
+										statsLocal.targets.push(newTarget);
+										nbMerge++;
+										newTarget=null;
+									} else {
+										if ((statsLocal.targets[indexTarget].victor+statsLocal.targets[indexTarget].defeat)<(statsToMerge.targets[i].victory+statsToMerge.targets[i].defeat) ){
+											statsLocal.targets[indexTarget].victory=statsToMerge.targets[i].victory;
+											statsLocal.targets[indexTarget].defeat=statsToMerge.targets[i].defeat;
+											nbMerge++;
+										}
+									}
+								};
+								localStorage['cabf_' + _name] = JSON.stringify(statsLocal);
+								if (nbMerge>0) console.log('Merge Sync Data succeed.',statsToMerge, textStatus, jqXHR);
+								statsToMerge=null;
+								statsLocal=null;
+							});
+                        } catch(e) {
+                            console.log('Merge failed : ',e);
+                        }; 
+					}
+                } catch(e) {
+                    console.error('Sync failed in saving data : ',e);
+                }
+            }
 			return JSON.parse(localStorage['cabf_' + _name]);
 		} else {
 			return _default;
@@ -39,12 +77,16 @@ var item = {
 				if (!key || key == null || key == "" ) {
 					console.log('Sync key not set.');
 				} else {
-					var cabfDataRef = new Firebase(dataUrl);
-					cabfDataRef.child(key).child("lastUpdate").set(Firebase.ServerValue.TIMESTAMP);
-					cabfDataRef.child(key).child("stats").set(_value);
-					console.log('Sync succeed in saving data.');
-					key=null;
-					cabfDataRef=null;
+                    $.ajax({
+                        url:key,
+                        type:"PUT",
+                        data:JSON.stringify(_value),
+                        contentType:"application/json; charset=utf-8",
+                        dataType:"json",
+                        success: function(data, textStatus, jqXHR){
+                            console.log('Sync success in saving data : ',data,textStatus,jqXHR);
+                        }
+                	}); 
 				}
 			} catch(e) {
 				console.error('Sync failed in saving data : ',e);
@@ -55,34 +97,6 @@ var item = {
         localStorage.remove('cabf_' + _name);
     }
 };
-
-try {
-	var _syncKey = JSON.parse(localStorage['cabf_syncKey']);
-	if (!_syncKey || _syncKey == null || _syncKey == "" ) {
-		console.log('Sync key not set.');
-	} else {
-		var cabfDataRef = new Firebase(dataUrl);
-		cabfDataRef.child(_syncKey).child("stats").on("child_added", function(statsSnapshot) {
-																				var stats = {"targets":[]};
-																				var targets = statsSnapshot.val();
-																				stats.targets = targets;
-																				localStorage['cabf_stats'] = JSON.stringify(stats);
-																				console.log('targets added');
-																				
-																			}
-												);
-		cabfDataRef.child(_syncKey).child("stats").on("child_changed", function(statsSnapshot) {
-																				var stats = {"targets":[]};
-																				var targets = statsSnapshot.val();
-																				stats.targets = targets;
-																				localStorage['cabf_stats'] = JSON.stringify(stats);
-																				console.log('targets changed');
-																			}
-												);
-	}
-} catch(e) {
-	console.log('Sync key not set.',e);
-}
 
 var _dialogIO = '<div id="dialogIO" title="Import/Export">  <textarea id="statsDg" style="margin: 2px; height: 250px; width: 600px;"></textarea></div>' ;
 var _dialogSync = '<div id="dialogSync" title="Sync with CAAP">  <form><fieldset><label for="syncKey">Sync Key : </label><input type="text" name="syncKey" id="syncKey" value="" style="width: 420px;"></fieldset></form></div>' ;
@@ -1983,7 +1997,8 @@ function getTargetStat(target_id) {
 	return '<span class="GuildNum">0%</span><br><span class="KeepLink"><a href="keep.php?casuser=' + target_id + '" target="_blank">Keep</a></span>';
 }
 function battleStats() {
-	var stats=item.get('stats',defaultStats);
+	var stats=item.get('stats',defaultStats),
+		new_data=false;
 	if ($('#results_main_wrapper>div').length > 0 ) {
 		console.log("Battle Stats");
 		var target = $('#results_main_wrapper input[name="target_id"]'),target_id=0;
@@ -2020,11 +2035,12 @@ function battleStats() {
 			} else {
 				console.log("UNKNOWN RESULT");
 			}
+			new_data=true;
 			target_id=null;
 		}
 		target=null;
 	}
-	item.set('stats',stats);
+	if (new_data) item.set('stats',stats);
 	stats=null;
 }
 
@@ -2244,9 +2260,22 @@ function sync() {
 				},
                 "Make new Key": function() {
 					try {
+                        $.ajax({
+                            url:"https://api.myjson.com/bins",
+                            type:"POST",
+                            data:'{"key":"value"}',
+                            contentType:"application/json; charset=utf-8",
+                            dataType:"json",
+                            success: function(data, textStatus, jqXHR){
+                                console.log('data',data);
+								item.set('syncKey',data.uri);
+                            }
+                        });   
+						$( this ).dialog( "close" );
+                        /*
 						var key=Generate_key();
 						$(this).children('form')[0][1].value=key;
-						console.log('Make new Key succeed.');
+						console.log('Make new Key succeed.');*/
 					} catch(e) {
 						console.log('Make new Key failed : ',e);
 					}
