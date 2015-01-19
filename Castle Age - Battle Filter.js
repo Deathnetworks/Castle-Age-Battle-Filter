@@ -12,62 +12,75 @@
 // @require		   https://cdn.firebase.com/js/client/2.1.1/firebase.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.30
+// @version        1.1.31
 // @copyright      2013+, Jigoku
 // @grant		GM_addStyle
 // @grant		GM_getResourceText 
 // @grant		GM_registerMenuCommand
 // ==/UserScript==
 
-var version = '1.1.30', clickUrl = '', updated = false;
+var version = '1.1.31', clickUrl = '', updated = false;
 
-var dataUrl = 'https://cabf.firebaseio.com/users/';
- 
+function syncData() {	
+	var key = JSON.parse(localStorage['cabf_syncKey']);
+	if (!key || key == null || key == "" ) {
+		console.log('Sync key not set.');
+	} else {
+		var requestGET = $.get(key, function(statsToMerge, textStatus, jqXHR){
+						if (statsToMerge.targets) {
+							var statsLocal = JSON.parse(localStorage['cabf_stats']);	
+							var arrayTargets=statsLocal.targets;
+							var nbMerge=0;
+							for (var i = 0; i < statsToMerge.targets.length; i++){
+								var target_id=statsToMerge.targets[i].target_id;
+								var indexTarget=getTargetIndex(arrayTargets,target_id);
+								if (indexTarget<0) {
+									var newTarget={"target_id":target_id,"victory":statsToMerge.targets[i].victory,"defeat":statsToMerge.targets[i].defeat};
+									statsLocal.targets.push(newTarget);
+									nbMerge++;
+									newTarget=null;
+								} else {
+									if ((statsLocal.targets[indexTarget].victor+statsLocal.targets[indexTarget].defeat)<(statsToMerge.targets[i].victory+statsToMerge.targets[i].defeat) ){
+										statsLocal.targets[indexTarget].victory=statsToMerge.targets[i].victory;
+										statsLocal.targets[indexTarget].defeat=statsToMerge.targets[i].defeat;
+										nbMerge++;
+									}
+								}
+							};
+							localStorage['cabf_stats'] = JSON.stringify(statsLocal);
+							console.log('Merge Sync Data succeed. Total of '+nbMerge+' Data');
+							try {	
+								var requestPUT = $.ajax({
+									url:key,
+									type:"PUT",
+									data:JSON.stringify(statsLocal),
+									contentType:"application/json; charset=utf-8",
+									dataType:"json",
+									success: function(data, textStatus, jqXHR){
+										console.log('Sync success in saving data : ',textStatus,data);
+									}
+								}); 
+								requestPUT.onreadystatechange = null;
+								requestPUT.abort = null;
+								requestPUT = null;
+							} catch (ePUT) {
+								console.error(ePUT);
+							}
+							statsToMerge=null;
+							statsLocal=null;
+							arrayTargets=null;
+							
+						}
+		});
+		requestGET.onreadystatechange = null;
+		requestGET.abort = null;
+		requestGET = null;
+	}
+};
 
 var item = {
     get : function(_name, _default) {
 		if (localStorage['cabf_' + _name] !== undefined && localStorage['cabf_' + _name] !== null) {
-			if (_name=="stats") {
-                try {
-                    var key = JSON.parse(localStorage['cabf_syncKey']);
-                    if (!key || key == null || key == "" ) {
-                        console.log('Sync key not set.');
-                    } else {
-                        var statsLocal = JSON.parse(localStorage['cabf_' + _name]);
-                		try {
-							$.get(key, function(statsToMerge, textStatus, jqXHR) {		
-								if (statsToMerge.targets) {
-									var nbMerge=0;
-									for (var i = 0; i < statsToMerge.targets.length; i++){
-										var target_id=statsToMerge.targets[i].target_id;
-										var indexTarget=getTargetIndex(statsLocal.targets,target_id);
-										if (indexTarget<0) {
-											var newTarget={"target_id":target_id,"victory":statsToMerge.targets[i].victory,"defeat":statsToMerge.targets[i].defeat};
-											statsLocal.targets.push(newTarget);
-											nbMerge++;
-											newTarget=null;
-										} else {
-											if ((statsLocal.targets[indexTarget].victor+statsLocal.targets[indexTarget].defeat)<(statsToMerge.targets[i].victory+statsToMerge.targets[i].defeat) ){
-												statsLocal.targets[indexTarget].victory=statsToMerge.targets[i].victory;
-												statsLocal.targets[indexTarget].defeat=statsToMerge.targets[i].defeat;
-												nbMerge++;
-											}
-										}
-									};
-									localStorage['cabf_' + _name] = JSON.stringify(statsLocal);
-									if (nbMerge>0) console.log('Merge Sync Data succeed.',statsToMerge, textStatus, jqXHR);
-									statsToMerge=null;
-									statsLocal=null;
-								}
-							});
-                        } catch(e) {
-                            console.log('Merge failed : ',e);
-                        }; 
-					}
-                } catch(e) {
-                    console.error('Sync failed in saving data : ',e);
-                }
-            }
 			return JSON.parse(localStorage['cabf_' + _name]);
 		} else {
 			return _default;
@@ -75,27 +88,6 @@ var item = {
     },
     set : function(_name, _value) {
         localStorage['cabf_' + _name] = JSON.stringify(_value);
-		if (_name=="stats") {
-			try {
-				var key = JSON.parse(localStorage['cabf_syncKey']);
-				if (!key || key == null || key == "" ) {
-					console.log('Sync key not set.');
-				} else {
-                    $.ajax({
-                        url:key,
-                        type:"PUT",
-                        data:JSON.stringify(_value),
-                        contentType:"application/json; charset=utf-8",
-                        dataType:"json",
-                        success: function(data, textStatus, jqXHR){
-                            console.log('Sync success in saving data : ',data,textStatus,jqXHR);
-                        }
-                	}); 
-				}
-			} catch(e) {
-				console.error('Sync failed in saving data : ',e);
-			}
-		}
     },
     del : function(_name) {
         localStorage.remove('cabf_' + _name);
@@ -424,7 +416,6 @@ function cabf_conquestearthfilter() {
                 _defenderHealth = 0;            
             } else {
 				var _nb=0;
-				console.log("Add numbers");
                 $('#tower_'+_x+' > div > div').each(function(_i, _e) {
                     var _text = $(_e).text().trim(), _health, _maxHealth, _fullhealth,winStat = '';
                     if (_text) {
@@ -438,12 +429,12 @@ function cabf_conquestearthfilter() {
 							_fullhealth = false;
 						}
 						_defenderHealth += parseInt(/(\d+)(?:\/)/.exec($(this).text())[1], 10);
-						console.log("_defenderHealth = ", _defenderHealth);
 						$(_e, 'div > div').append('<div style="clear:both;"></div>');
 						if ($('input[name="target_id"]',_e).length>0) {
 							var target_id=$('input[name="target_id"]',_e).attr("value");
 							winStat=getTargetStat(target_id);
 							addTargetTip(_e);
+							target_id=null;
 						}
 						if (_fullhealth) {
 							$(_e, 'div > div').append('<span class="GuildNumG">' + _nb + '</span>'+ '<br>' + winStat);
@@ -451,6 +442,10 @@ function cabf_conquestearthfilter() {
 							$(_e, 'div > div').append('<span class="GuildNumR">' + _nb + '</span>'+ '<br>' + winStat);
 						}
                     }
+					_text=null;
+					_health=null;
+					_maxHealth=null;
+					winStat=null;
                 });
             }
             if (_actions > 0) {
@@ -458,6 +453,7 @@ function cabf_conquestearthfilter() {
             } else {
                 $('#cabfEarthAction'+_x).html('Health/Action: #');
             } 
+			_actions=null;
         }
 		// gate filter
 		function filterGate() {
@@ -526,6 +522,7 @@ function cabf_conquestearthfilter() {
                                     } else {
                                         $(_e).hide();
                                     }
+									targetLevel=null;
                                 } else {
                                     console.log('Error in points filter!');
                                     $(_e).show();
@@ -538,11 +535,20 @@ function cabf_conquestearthfilter() {
                         } else {
                             $(_e).hide();
                         }
+						_class=null;
+						_state=null;
+						_points=null;
+						_text=null;
+						_eClass=null;
+						_health=null;
+						_maxHealth=null;
                     });
                 }
 				$('#cabfEarthFiltered'+_x).html('Filtered: ' + _count);
 				//$('#app_body div[id="cabfHealthActionEarth"]:last').html($('#app_body div[id="cabfHealthActionEarth"]:last').html().replace(/.*Health\/Action:/, 'Health/Action:').replace('Health/Action:', 'Filtered: ' + _count + '<br/>Health/Action:'));
 			}
+			_myLevel=null;
+			myLevel=null;
 		}
 		
         // class filter
@@ -631,6 +637,7 @@ function cabf_conquestearthfilter() {
         window.setTimeout(function() {
             filterGate();
         }, 10);
+		_towers=null;
     } catch (e) {
         console.error("Error in cabf_conquestearthfilter",e);
     }
@@ -1961,7 +1968,7 @@ function addTargetTip(_e) {
         $('#tooltip').css('left', e.pageX + 20 );
         $('#tooltip').fadeIn('500');
         $('#tooltip').fadeTo('10',0.8);
-		stats.null;
+		stats=null;
     }).mousemove(function(e) {
         $('#tooltip').css('top', e.pageY + 10 );
         $('#tooltip').css('left', e.pageX + 20 );
@@ -2016,14 +2023,17 @@ function battleStats() {
 				var newTarget={"target_id":target_id,"victory":0,"defeat":0};
 				stats.targets.push(newTarget);
 				indexTarget=getTargetIndex(stats.targets,target_id);
+				new_data=true;
 				newTarget=null;
 			}
 			if ($('#results_main_wrapper>div:contains("VICTORY")').length > 0 ) {
 				console.log("VICTORY");
 				stats.targets[indexTarget].victory++;
+				new_data=true;
 			} else if ($('#results_main_wrapper>div:contains("DEFEAT")').length > 0 ) {
 				console.log("DEFEAT");
 				stats.targets[indexTarget].defeat++;
+				new_data=true;
 			} else if ($('#results_main_wrapper>div:contains("HEAL")').length > 0 ) {
 				console.log("HEAL");
 			} else if ($('#results_main_wrapper>div:contains("DISPEL")').length > 0 ) {
@@ -2033,13 +2043,14 @@ function battleStats() {
 			} else if ($('#results_main_wrapper>div>div>span>div>img[src*="battle_defeat.gif"]').length > 0) {
 				console.log("DEFEAT (battle_defeat.gif)");
 				stats.targets[indexTarget].defeat++;
+				new_data=true;
 			} else if ($('#results_main_wrapper>div>div>span>div>img[src*="battle_victory.gif"]').length > 0) {
 				console.log("VICTORY (battle_victory.gif)");
 				stats.targets[indexTarget].victory++;
+				new_data=true;
 			} else {
 				console.log("UNKNOWN RESULT");
 			}
-			new_data=true;
 			target_id=null;
 		}
 		target=null;
@@ -2057,7 +2068,7 @@ function cabf_filters() {
     
 	cabf_connect();
     console.log("cabf_filters");
-	    
+	
 	$("#cabfHealthActionEarth").hide();
 	$("#cabfConquestEarthFilterContainer").hide();
     /* Guild battle or 10vs10 battle*/
@@ -2193,33 +2204,7 @@ function diagIO() {
 					} catch(e) {
 						console.log('Insert failed : ',e);
 					}
-                },/*
-                "test": function() {
-					try {
-						var key = item.get('syncKey',"");
-						if (!key || key == null || key == "" ) {
-							console.log('Error sync key not set.');						
-							return;
-						}
-						var cabfDataRef = new Firebase(dataUrl);
-						// TEST QUERY 
-						cabfDataRef.child(key).child("stats").on("value", function(statsSnapshot) {
-																							var targets = statsSnapshot.val();
-																							console.log('targets : ',targets);
-																							$( "#statsDg")[0].value=JSON.stringify(targets, null, '\t');
-																							console.log('targets found: ',targets);
-																						}
-														);
-														
-						// TEST TIMESTAMP 
-						cabfDataRef.child(key).child("lastUpdate").set(Firebase.ServerValue.TIMESTAMP);
-						console.log('test succeed.');
-						key=null;
-						cabfDataRef=null;
-					} catch(e) {
-						console.log('test failed : ',e);
-					}
-                },*/
+                },
                 Cancel: function() {
 					$( this ).dialog( "close" );
 				}
@@ -2341,8 +2326,9 @@ function init() {
         
     }, true);
     
-    GM_registerMenuCommand("Castle Age - Battle Filter (Import/Export)", function() {diagIO();});
-    GM_registerMenuCommand("Castle Age - Battle Filter (Sync)", function() {sync();});
+    GM_registerMenuCommand("CABF (Import/Export)", function() {diagIO();});
+    GM_registerMenuCommand("CABF (Sync Param)", function() {sync();});
+    GM_registerMenuCommand("CABF (Sync Data)", function() {syncData();});
     try {
         addCss ( "#cabfEarthFiltered1 {	color: #fff;}");
         addCss ( "#cabfEarthFiltered2 {	color: #fff;}");
