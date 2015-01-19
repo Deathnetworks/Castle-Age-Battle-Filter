@@ -12,14 +12,16 @@
 // @require		   https://cdn.firebase.com/js/client/2.1.1/firebase.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.29
+// @version        1.1.30
 // @copyright      2013+, Jigoku
 // @grant		GM_addStyle
 // @grant		GM_getResourceText 
 // @grant		GM_registerMenuCommand
 // ==/UserScript==
 
-var version = '1.1.29', clickUrl = '', updated = false;
+var version = '1.1.30', clickUrl = '', updated = false;
+
+var dataUrl = 'https://cabf.firebaseio.com/users/';
  
 
 var item = {
@@ -34,27 +36,29 @@ var item = {
                         var statsLocal = JSON.parse(localStorage['cabf_' + _name]);
                 		try {
 							$.get(key, function(statsToMerge, textStatus, jqXHR) {		
-								var nbMerge=0;
-								for (var i = 0; i < statsToMerge.targets.length; i++){
-									var target_id=statsToMerge.targets[i].target_id;
-									var indexTarget=getTargetIndex(statsLocal.targets,target_id);
-									if (indexTarget<0) {
-										var newTarget={"target_id":target_id,"victory":statsToMerge.targets[i].victory,"defeat":statsToMerge.targets[i].defeat};
-										statsLocal.targets.push(newTarget);
-										nbMerge++;
-										newTarget=null;
-									} else {
-										if ((statsLocal.targets[indexTarget].victor+statsLocal.targets[indexTarget].defeat)<(statsToMerge.targets[i].victory+statsToMerge.targets[i].defeat) ){
-											statsLocal.targets[indexTarget].victory=statsToMerge.targets[i].victory;
-											statsLocal.targets[indexTarget].defeat=statsToMerge.targets[i].defeat;
+								if (statsToMerge.targets) {
+									var nbMerge=0;
+									for (var i = 0; i < statsToMerge.targets.length; i++){
+										var target_id=statsToMerge.targets[i].target_id;
+										var indexTarget=getTargetIndex(statsLocal.targets,target_id);
+										if (indexTarget<0) {
+											var newTarget={"target_id":target_id,"victory":statsToMerge.targets[i].victory,"defeat":statsToMerge.targets[i].defeat};
+											statsLocal.targets.push(newTarget);
 											nbMerge++;
+											newTarget=null;
+										} else {
+											if ((statsLocal.targets[indexTarget].victor+statsLocal.targets[indexTarget].defeat)<(statsToMerge.targets[i].victory+statsToMerge.targets[i].defeat) ){
+												statsLocal.targets[indexTarget].victory=statsToMerge.targets[i].victory;
+												statsLocal.targets[indexTarget].defeat=statsToMerge.targets[i].defeat;
+												nbMerge++;
+											}
 										}
-									}
-								};
-								localStorage['cabf_' + _name] = JSON.stringify(statsLocal);
-								if (nbMerge>0) console.log('Merge Sync Data succeed.',statsToMerge, textStatus, jqXHR);
-								statsToMerge=null;
-								statsLocal=null;
+									};
+									localStorage['cabf_' + _name] = JSON.stringify(statsLocal);
+									if (nbMerge>0) console.log('Merge Sync Data succeed.',statsToMerge, textStatus, jqXHR);
+									statsToMerge=null;
+									statsLocal=null;
+								}
 							});
                         } catch(e) {
                             console.log('Merge failed : ',e);
