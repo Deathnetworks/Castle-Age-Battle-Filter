@@ -54,7 +54,6 @@ function syncData() {
 		var requestGET = $.ajax({
 					url:key,
 					type:"GET",
-					timeout:5000,
 					contentType:"application/json; charset=utf-8",
 					dataType:"json", 
 					beforeSend:function(){
@@ -88,7 +87,6 @@ function syncData() {
 								var requestPUT = $.ajax({
 									url:key,
 									type:"PUT",
-									timeout:5000,
 									data:JSON.stringify(statsLocal),
 									contentType:"application/json; charset=utf-8",
 									dataType:"json",
