@@ -12,14 +12,14 @@
 // @require        http://fgnass.github.io/spin.js/spin.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.36
+// @version        1.1.37
 // @copyright      2013+, Jigoku
 // @grant		GM_addStyle
 // @grant		GM_getResourceText 
 // @grant		GM_registerMenuCommand
 // ==/UserScript==
 
-var version = '1.1.36', clickUrl = '', updated = false;
+var version = '1.1.37', clickUrl = '', updated = false;
 
 var opts = {
     lines: 17, // The number of lines to draw
@@ -1988,6 +1988,19 @@ function stunBar() {
 
 /******************************************************************************************************************************************************************************
 *******************************************************************************************************************************************************************************
+*************    ARENA BATTLE *************************************************************************************************************************************************
+*******************************************************************************************************************************************************************************
+******************************************************************************************************************************************************************************/
+function cabf_arenabattlefilter() {
+	$('#arena_mid > div > div').each(function(_i, _e) {
+		var target_id=$('input[name="target_id"]',_e).attr("value");
+		addTargetTip(_e);
+	});
+};
+
+
+/******************************************************************************************************************************************************************************
+*******************************************************************************************************************************************************************************
 *************    STATS BATTLE *************************************************************************************************************************************************
 *******************************************************************************************************************************************************************************
 ******************************************************************************************************************************************************************************/
@@ -2057,9 +2070,12 @@ function getTargetStat(target_id) {
 function battleStats() {
 	var stats=item.get('stats',defaultStats),
 		new_data=false;
-	if ($('#results_main_wrapper>div').length > 0 ) {
+	if (($('#results_main_wrapper>div').length > 0 )||($('div[class="result_body"]>div').length > 0)) {
 		console.log("Battle Stats");
 		var target = $('#results_main_wrapper input[name="target_id"]'),target_id=0;
+		if (target.length <= 0 ) {
+			target = $('div[class="result_body"] input[name="target_id"]'),target_id=0;
+		}
 		console.log("target=",target);
 		console.log("target.length=",target.length);
 		console.log('target.attr("value")=',target.attr("value"));
@@ -2079,6 +2095,14 @@ function battleStats() {
 				new_data=true;
 			} else if ($('#results_main_wrapper>div:contains("DEFEAT")').length > 0 ) {
 				console.log("DEFEAT");
+				stats.targets[indexTarget].defeat++;
+				new_data=true;
+			} else if ($('div[class="result_body"]>div>img[src*="battle_victory.gif"]').length > 0 ) {
+				console.log("ARENA VICTORY");
+				stats.targets[indexTarget].victory++;
+				new_data=true;
+			} else if ($('div[class="result_body"]>div>img[src*="battle_defeat.gif"]').length > 0 ) {
+				console.log("ARENA DEFEAT");
 				stats.targets[indexTarget].defeat++;
 				new_data=true;
 			} else if ($('#results_main_wrapper>div:contains("HEAL")').length > 0 ) {
@@ -2149,6 +2173,12 @@ function cabf_filters() {
         console.log('Mist land conquest battle');
 		battleStats();
         cabf_conquestmistfilter();
+    } else    
+    /* Arena battle */
+    if ($('#arena_mid').length > 0) {
+        console.log('Arena battle');
+		battleStats();
+		cabf_arenabattlefilter();
     } else    
     /* Normal battle */
     if ($('#blist_pulldown_select').length > 0) {
