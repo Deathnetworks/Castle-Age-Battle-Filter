@@ -9,24 +9,59 @@
 // @require        http://code.jquery.com/jquery-1.9.1.js
 // @require        http://code.jquery.com/ui/1.10.3/jquery-ui.js
 // @require		   https://raw.githubusercontent.com/magowiz/Castle-Age-Autoplayer/master/Chrome/unpacked/extern/utility.js
-// @require		   https://cdn.firebase.com/js/client/2.1.1/firebase.js
+// @require        http://fgnass.github.io/spin.js/spin.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.31
+// @version        1.1.32
 // @copyright      2013+, Jigoku
 // @grant		GM_addStyle
 // @grant		GM_getResourceText 
 // @grant		GM_registerMenuCommand
 // ==/UserScript==
 
-var version = '1.1.31', clickUrl = '', updated = false;
+var version = '1.1.32', clickUrl = '', updated = false;
+
+var opts = {
+    lines: 17, // The number of lines to draw
+    length: 0, // The length of each line
+    width: 30, // The line thickness
+    radius: 23, // The radius of the inner circle
+    corners: 0.5, // Corner roundness (0..1)
+    rotate: 42, // The rotation offset
+    direction: 1, // 1: clockwise, -1: counterclockwise
+    color: '#41f', // #rgb or #rrggbb or array of colors
+    speed: 1.6, // Rounds per second
+    trail: 25, // Afterglow percentage
+    shadow: true, // Whether to render a shadow
+    hwaccel: false, // Whether to use hardware acceleration
+    className: 'spinner', // The CSS class to assign to the spinner
+    zIndex: 2e9, // The z-index (defaults to 2000000000)
+    top: '50%', // Top position relative to parent
+    left: '50%' // Left position relative to parent
+};
+var spinContainer;
+var spinner;
+function addLoadingImg(id) {
+	target = document.getElementById(id);
+	spinner = new Spinner(opts).spin(target);
+}
 
 function syncData() {	
 	var key = JSON.parse(localStorage['cabf_syncKey']);
 	if (!key || key == null || key == "" ) {
 		console.log('Sync key not set.');
 	} else {
-		var requestGET = $.get(key, function(statsToMerge, textStatus, jqXHR){
+		var requestGET = $.ajax({
+					url:key,
+					type:"GET",
+					timeout:5000,
+					contentType:"application/json; charset=utf-8",
+					dataType:"json", 
+					beforeSend:function(){
+						addLoadingImg('globalContainer');
+						console.log('spinner',spinner);
+					},
+					success: function(statsToMerge, textStatus, jqXHR){
 						if (statsToMerge.targets) {
 							var statsLocal = JSON.parse(localStorage['cabf_stats']);	
 							var arrayTargets=statsLocal.targets;
@@ -53,11 +88,17 @@ function syncData() {
 								var requestPUT = $.ajax({
 									url:key,
 									type:"PUT",
+									timeout:5000,
 									data:JSON.stringify(statsLocal),
 									contentType:"application/json; charset=utf-8",
 									dataType:"json",
 									success: function(data, textStatus, jqXHR){
 										console.log('Sync success in saving data : ',textStatus,data);
+										spinner.stop();
+									},
+									error:function(jqXHR, textStatus, errorThrown ){
+										alert(textStatus+'\n'+errorThrown);
+										spinner.stop();
 									}
 								}); 
 								requestPUT.onreadystatechange = null;
@@ -65,13 +106,19 @@ function syncData() {
 								requestPUT = null;
 							} catch (ePUT) {
 								console.error(ePUT);
+								spinner.stop();
 							}
 							statsToMerge=null;
 							statsLocal=null;
 							arrayTargets=null;
 							
 						}
-		});
+					},
+					error:function(jqXHR, textStatus, errorThrown ){
+						alert(textStatus+'\n'+errorThrown);
+						spinner.stop();
+					}
+				});
 		requestGET.onreadystatechange = null;
 		requestGET.abort = null;
 		requestGET = null;
@@ -88,6 +135,7 @@ var item = {
     },
     set : function(_name, _value) {
         localStorage['cabf_' + _name] = JSON.stringify(_value);
+		syncData();
     },
     del : function(_name) {
         localStorage.remove('cabf_' + _name);
@@ -2422,9 +2470,11 @@ function cabf_connect() {
         console.log('Connection');
         if (document.getElementsByName("player_password")[0].value)
 			button.click();
-	}
+	} 
 }
 
+/*Sync*/
+syncData();
 /* Connection */
 cabf_connect();
 console.log('init()');
