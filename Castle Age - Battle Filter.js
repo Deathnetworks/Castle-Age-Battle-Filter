@@ -12,14 +12,14 @@
 // @require        http://fgnass.github.io/spin.js/spin.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.33
+// @version        1.1.34
 // @copyright      2013+, Jigoku
 // @grant		GM_addStyle
 // @grant		GM_getResourceText 
 // @grant		GM_registerMenuCommand
 // ==/UserScript==
 
-var version = '1.1.33', clickUrl = '', updated = false;
+var version = '1.1.34', clickUrl = '', updated = false;
 
 var opts = {
     lines: 17, // The number of lines to draw
@@ -59,6 +59,7 @@ function syncData() {
 					beforeSend:function(){
 						addLoadingImg('globalContainer');
 						console.log('spinner',spinner);
+						$('div[class="spinner"]').html($('div[class="spinner"]').html()+'Synchronizing');  
 					},
 					success: function(statsToMerge, textStatus, jqXHR){
 						if (statsToMerge.targets) {
