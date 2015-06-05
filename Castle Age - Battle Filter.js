@@ -12,14 +12,14 @@
 // @require        http://fgnass.github.io/spin.js/spin.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.40
+// @version        1.1.41
 // @copyright      2013+, Jigoku
 // @grant		GM_addStyle
 // @grant		GM_getResourceText 
 // @grant		GM_registerMenuCommand
 // ==/UserScript==
 
-var version = '1.1.40', clickUrl = '', updated = false;
+var version = '1.1.41', clickUrl = '', updated = false;
 
 var defaultStats={"targets":[{"target_id":"0","victory":0,"defeat":0}]};
 var defaultEssences=[{"name": "LES BRANQUES","level": "13","lastCheck": 1432865723408,"attack": -1,"defense": -1,"damage": -1,"health": -1,"guildId": "1796388608_1285087750"}];
@@ -3089,6 +3089,7 @@ function diagConnect() {
 ******************************************************************************************************************************************************************************/
 function init() {
     var globalContainer = document.querySelector('#globalContainer');
+    var clicked = false;
     
     
     if (!globalContainer) {
@@ -3112,8 +3113,9 @@ function init() {
             while(obj && !obj.href)
                 obj = obj.parentNode;
             
-            if(obj && obj.href)
+            if(obj && obj.href) 
                 clickUrl = obj.href;
+            clicked = true;
         } catch (e) {
             console.error("Error in globalContainer Click",e);
         }
@@ -3126,9 +3128,10 @@ function init() {
 	// create an observer instance
 	var observer = new MutationObserver(function(mutations) {
 	  mutations.forEach(function(mutation) {
-		//console.log(mutation.type);
-		if (mutation.addedNodes.length>0) {
+		console.log(mutation);
+		if (mutation.addedNodes.length>0 && clicked) {
 			cabf_filters();
+            clicked = false;
 		}			
 	  });    
 	});
