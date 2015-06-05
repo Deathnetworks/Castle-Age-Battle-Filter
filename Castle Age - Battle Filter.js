@@ -12,14 +12,17 @@
 // @require        http://fgnass.github.io/spin.js/spin.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.38
+// @version        1.1.39
 // @copyright      2013+, Jigoku
 // @grant		GM_addStyle
 // @grant		GM_getResourceText 
 // @grant		GM_registerMenuCommand
 // ==/UserScript==
 
-var version = '1.1.38', clickUrl = '', updated = false;
+var version = '1.1.39', clickUrl = '', updated = false;
+
+var defaultStats={"targets":[{"target_id":"0","victory":0,"defeat":0}]};
+var defaultEssences=[{"name": "LES BRANQUES","level": "13","lastCheck": 1432865723408,"attack": -1,"defense": -1,"damage": -1,"health": -1,"guildId": "1796388608_1285087750"}];
 
 var opts = {
     lines: 17, // The number of lines to draw
@@ -141,9 +144,11 @@ var item = {
     }
 };
 
+var _dialogConnect = '<div id="dialogConnect" title="Connect to CAAP">  <form><fieldset><label for="player_email">E-Mail : </label><input type="text" name="player_email" id="player_email" value="" style="width: 420px;"></fieldset><div><br></div><fieldset><label for="player_password">Password : </label><input type="password" name="player_password" id="player_password" value="" style="width: 420px;"></fieldset></form></div>' ;
 var _dialogIO = '<div id="dialogIO" title="Import/Export">  <textarea id="statsDg" style="margin: 2px; height: 250px; width: 600px;"></textarea></div>' ;
 var _dialogSync = '<div id="dialogSync" title="Sync with CAAP">  <form><fieldset><label for="syncKey">Sync Key : </label><input type="text" name="syncKey" id="syncKey" value="" style="width: 420px;"></fieldset></form></div>' ;
 var _statBoard = '<div id="cabfHealthStatBoard"><div id="cabfStatType">Enemy</div><div><br></div><div id="cabfStatTower"><span>-</span><span>Stat</span></div><div id="cabfToggleTower"><div id="cabfTotalHealth">Total Health: 0</div><div id="cabfAverageHealth">Average Health: 0</div><div id="cabfHealthLeft">Health Left: 0</div><div id="cabfAverageHealthLeft">Average Health Left: 0</div><div id="cabfPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatCleric"><span>-</span><span>Cleric Stat</span></div><div id="cabfToggleCleric"><div id="cabfClericTotalHealth">Total Health: 0</div><div id="cabfClericAverageHealth">Average Health: 0</div><div id="cabfClericHealthLeft">Health Left: 0</div><div id="cabfClericAverageHealthLeft">Average Health Left: 0</div><div id="cabfClericPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatMage"><span>-</span><span>Mage Stat</span></div><div id="cabfToggleMage"><div id="cabfMageTotalHealth">Total Health: 0</div><div id="cabfMageAverageHealth">Average Health: 0</div><div id="cabfMageHealthLeft">Health Left: 0</div><div id="cabfMageAverageHealthLeft">Average Health Left: 0</div><div id="cabfMagePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatRogue"><span>-</span><span>Rogue Stat</span></div><div id="cabfToggleRogue"><div id="cabfRogueTotalHealth">Total Health: 0</div><div id="cabfRogueAverageHealth">Average Health: 0</div><div id="cabfRogueHealthLeft">Health Left: 0</div><div id="cabfRogueAverageHealthLeft">Average Health Left: 0</div><div id="cabfRoguePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatWarrior"><span>-</span><span>Warrior Stat</span></div><div id="cabfToggleWarrior"><div id="cabfWarriorTotalHealth">Total Health: 0</div><div id="cabfWarriorAverageHealth">Average Health: 0</div><div id="cabfWarriorHealthLeft">Health Left: 0</div><div id="cabfWarriorAverageHealthLeft">Average Health Left: 0</div><div id="cabfWarriorPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatActive"><span>-</span><span>Active Stat</span></div><div id="cabfToggleActive"><div id="cabfActiveTotalHealth">Total Health: 0</div><div id="cabfActiveAverageHealth">Average Health: 0</div><div id="cabfActiveHealthLeft">Health Left: 0</div><div id="cabfActiveAverageHealthLeft">Average Health Left: 0</div><div id="cabfActivePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div></div>';
+var _FestivalDuelBoard = '<div id="cabfFestivalDuelBoard"><div id="cabfFestivalDuelType">Enemy</div><div><br></div><div id="cabfFarmTarget"><span>-</span><span>Farm Targets</span></div><div><br></div><div id="cabfToggleFarm"><span class="cabfFarmTargetTitle ui-state-default"><a id="farmKeep" href="keep.php" target="_blank">Target</a> </span><select id="cabfTargetSelect" class="cabffarmfargettitle"></select></div><div><br></div></div>';
 
  function runEffect(idButton,idToggle) {
 	
@@ -160,6 +165,15 @@ var _statBoard = '<div id="cabfHealthStatBoard"><div id="cabfStatType">Enemy</di
 	options=null;
 };
 	
+function addFestivalDuelBoard(id) { 
+	$(id).after(_FestivalDuelBoard);
+	$('#cabfFarmTarget').click(function() {runEffect('#cabfFarmTarget','#cabfToggleFarm');});
+	if (item.get('#cabfToggleFarm','false')==='false') {
+		$('#cabfToggleFarm').css("display","none");
+		$('#cabfFarmTarget span:first').html('+');
+	}
+}
+
 function addStatBoard(id) { 
 	$(id).after(_statBoard);
 	$('#cabfStatTower').click(function() {runEffect('#cabfStatTower','#cabfToggleTower');});
@@ -2004,7 +2018,6 @@ function cabf_arenabattlefilter() {
 *************    STATS BATTLE *************************************************************************************************************************************************
 *******************************************************************************************************************************************************************************
 ******************************************************************************************************************************************************************************/
-var defaultStats={"targets":[{"target_id":"0","victory":0,"defeat":0}]};
 function addTargetTip(_e) {
 	$(_e).mouseover(function(e) {
 		var stats=item.get('stats',defaultStats),
@@ -2076,9 +2089,9 @@ function battleStats() {
 		if (target.length <= 0 ) {
 			target = $('div[class="result_body"] input[name="target_id"]'),target_id=0;
 		}
-		console.log("target=",target);
+		/*console.log("target=",target);
 		console.log("target.length=",target.length);
-		console.log('target.attr("value")=',target.attr("value"));
+		console.log('target.attr("value")=',target.attr("value"));*/
 		if (target.length > 0 ) {
 			var target_id=target.attr("value"),indexTarget=0;
 			indexTarget=getTargetIndex(stats.targets,target_id);
@@ -2119,15 +2132,683 @@ function battleStats() {
 				console.log("VICTORY (battle_victory.gif)");
 				stats.targets[indexTarget].victory++;
 				new_data=true;
+			} else if ($('#results_main_wrapper>div[style*="festival_duelchamp_defeat.jpg"]').length > 0) {
+				console.log("DEFEAT (festival_duelchamp_defeat.jpg)");
+				stats.targets[indexTarget].defeat++;
+				new_data=false;
+				chainId=0;
+				if (LostIds.lastIndexOf(target_id)<0) {
+					LostIds.push(target_id);
+					item.set('lostids',LostIds);
+				}
+				window.clearTimeout(FestTimer);
+				FestTimer=window.setTimeout(chainFestNext,1000,target_id);
+			} else if ($('#results_main_wrapper>div[style*="festival_duelchamp_victory.jpg"]').length > 0) {
+				console.log("VICTORY (festival_duelchamp_victory.jpg)");
+				stats.targets[indexTarget].victory++;
+				new_data=false;
+                try {
+                    var _text = $('#results_main_wrapper>div[style*="festival_duelchamp_victory.jpg"]').text().trim();
+                    var _points = /(\d+) Champion Points!/.exec(_text)[1];
+                    console.log("_points=",_points);
+					if (_points==0) {
+						chainId=0;
+						if (DeadIds.lastIndexOf(target_id)<0) {
+							DeadIds.push(target_id);
+							console.log("DeadIds",DeadIds);
+						}
+						window.clearTimeout(FestTimer);
+						FestTimer=window.setTimeout(chainFestNext,1000,target_id);
+                    } else if (target_id==100000433761803) {
+						console.log("100000433761803");
+						chainId=target_id;
+                    	window.clearTimeout(FestTimer);
+						FestTimer=window.setTimeout(chainFest,1000);
+					} else if (_points>chainPointMin) {
+						console.log("_points>"+chainPointMin);
+                        if (_points>11) {
+							console.log("_points>11");
+							try {
+								if (FarmIds.lastIndexOf(target_id)<0) {
+									FarmIds.push(target_id);
+									item.set('farmids',FarmIds);
+									console.log("FarmIds = ",FarmIds);
+									$('#cabfTargetSelect').append('<option value="' + target_id + '" >' + target_id + '</option>');
+								}
+							} catch (err) {
+								console.log("farmids ERROR",err);
+							}
+                        }
+						chainId=target_id;
+                    	window.clearTimeout(FestTimer);
+						FestTimer=window.setTimeout(chainFest,1000);
+					} else {
+						console.log("else chainFestNext");
+						chainId=0;
+						window.clearTimeout(FestTimer);
+						FestTimer=window.setTimeout(chainFestNext,(10-_points)*1000,target_id);
+					}
+                } catch (e) {
+					console.log("UNKNOWN ERROR",e);
+                }
 			} else {
 				console.log("UNKNOWN RESULT");
+				new_data=false;
 			}
 			target_id=null;
+		} else {
+			var myHealth=eval($('#health_current_value').text().trim()),xDelayHealth=1;
+			console.log('at battleStats, Health:',myHealth);
+			if (myHealth<10) {
+				xDelayHealth=30;
+			}
+			if (chainId>0) {
+				var _text = $('#results_main_wrapper>div[class="results"]>div[class="result"]>span[class="result_body"]').text().trim();
+				console.log(_text);	
+				/*var _coins= /You need more Stamina to undertake this action/.exec($('#results_main_wrapper>div>div>div>div').text().trim());*/
+				if (_text.match('Your opponent is dead or too weak to battle.')) { 
+					if (DeadIds.lastIndexOf(chainId)<0) {
+						DeadIds.push(chainId);
+					}
+					console.log("DeadIds",DeadIds);
+					window.clearTimeout(FestTimer);
+					FestTimer=window.setTimeout(chainFestNext,xDelayHealth*1000,chainId);
+				}
+				if (_text.match('Patience Warrior. You cannot initiate battle again so soon.')) { 
+					window.clearTimeout(FestTimer);
+					FestTimer=window.setTimeout(chainFestId,xDelayHealth*1000,chainId);
+				}				
+				if (_text.match('You are too weak to battle. You need at least 10 health.')) { 
+					window.clearTimeout(FestTimer);
+					FestTimer=window.setTimeout(chainFest,xDelayHealth*1000);
+				}				
+				/*console.log('#############################################',_coins);	*/
+				chainId=0;
+                window.clearTimeout(FestTimer);
+				FestTimer=window.setTimeout(chainFest,xDelayHealth*1000);	
+			} else {
+                window.clearTimeout(FestTimer);
+				FestTimer=window.setTimeout(chainFest,xDelayHealth*1000);			
+			}
 		}
 		target=null;
 	}
 	if (new_data) item.set('stats',stats);
 	stats=null;
+}
+var LostIds=item.get('lostids',[]);
+var FarmIds=eliminateDuplicates(item.get('farmids',['100000433761803']));
+item.set('farmids',FarmIds);
+var DeadIds=[];
+var defaultGuildIDs=[
+1614649664,
+100001404200291,
+100002208019895,
+1796388608,
+1209228111,
+1513795125,
+100001670634402,
+100000484685611,
+100001074103633,
+100002931562587,
+100000115372610,
+100000727167447,
+1101141264,
+100000409426435,
+100002370996235,
+1004344009,
+1226526047,
+749256737,
+1814383044,
+553719829,
+1152195662,
+100001655216164,
+1242282335,
+100002507563559,
+1514685682,
+1233511068,
+100000228432745,
+100000515902154,
+100002045456251,
+1317111534,
+1561761279,
+1667642557,
+100001142529160,
+100001739844779,
+1213322293,
+1064781094,
+1305061361,
+1245393433,
+100000587927131,
+100000164289128,
+100000388074002,
+100002728044343,
+100001394000398,
+100002293424199,
+100002637747502,
+100001503597929,
+100002089411089,
+1631484122,
+100002093275444,
+100005636348270,
+749126669,
+100006647884596,
+1611861738,
+100001120999662,
+100000464406032,
+1117242704,
+100001555908841,
+100002911096065,
+100004335552750,
+100002619652042,
+100000004555321,
+1839738622,
+100000528692265,
+100000077934198,
+100001001423496,
+100001705275040,
+100002428701046,
+1405493831,
+100001620131907,
+100000470995410,
+637908815,
+100001878674824,
+100006465367471,
+1093036758,
+100002525950460,
+1329906482,
+100001554402420,
+676767668,
+100000948289882,
+1004918695,
+1342894916,
+1224839012,
+100003365874809,
+100007042083959,
+100000571658869,
+//Guild: ℂℍaɱℙs-Ɛℓyℤées
+100001033725149,
+100000130806515];
+var guildIDs=item.get('guildIDs',defaultGuildIDs);
+var chainId=0;
+var chainRankMin=item.get('chainRankMin',12);
+var chainPointMin=eval(item.get('chainPointMin',10));
+var FestTimer;
+function chainFest() {
+	console.log("chainFest");
+	try {
+		var _button = $("input[src*='festival_duelchamp_duelagain_btn.gif']");
+		if (_button.length>0) {
+			var target = $('#results_main_wrapper input[name="target_id"]');
+			var chainId=target.attr("value");
+			if (LostIds.lastIndexOf(chainId)<0
+				&&guildIDs.lastIndexOf(chainId)<0
+				&&DeadIds.lastIndexOf(chainId)<0) {
+				_button.click();
+			} else {
+				var _list = (LostIds.lastIndexOf(chainId)>=0? "LostIds" : (guildIDs.lastIndexOf(chainId)>=0? "guildIDs" : "LostIds or guildIDs" ));
+				console.log("FarmIds "+chainId+" is in "+_list+"! So, don't chain it.");	
+				window.clearTimeout(FestTimer);
+				FestTimer=window.setTimeout(chainFestNext,1000,chainId);				
+			}
+		} else {
+			window.clearTimeout(FestTimer);
+			FestTimer=window.setTimeout(chainFestId,1000,chainId);
+		}
+	} catch (e) {
+		console.log("chainFest",e);
+		window.clearTimeout(FestTimer);
+		FestTimer=window.setTimeout(chainFestId,1000,chainId);
+	}		
+}
+
+function chainFestId(id) {
+	try {
+		console.log("chainFestId",id);
+		var _button,ready=false;
+		if (LostIds.lastIndexOf(id)<0
+			&&guildIDs.lastIndexOf(id)<0
+			&&DeadIds.lastIndexOf(id)<0) {
+			$('#battleList>div').each(function(_i,_e){
+				if (!ready) {
+					var temp_id=$("input[name='target_id']",_e).attr("value");
+					if (id==temp_id) {
+						var _text = $('div>div[style*="padding: 33px 0 0 0px;"]',_e).text().trim();
+						var _rank = /Rank (\d+)/.exec(_text)[1];
+						if (eval(_rank)>=chainRankMin){
+							_button=$("input[src*='festival_duelchamp_challenge_btn.gif']",_e);
+							if (_button.length>0) {
+								chainId=temp_id;
+								ready=true;
+							}
+						}
+					}
+				}
+			});
+		} else {
+			var _list = (LostIds.lastIndexOf(id)>=0? "LostIds" : (guildIDs.lastIndexOf(id)>=0? "guildIDs" : "LostIds or guildIDs" ));
+			console.log("FarmIds "+id+" is in "+_list+"! So, don't chain it.");			
+		}
+		if (ready){
+			_button.click();
+		} else { 
+			window.clearTimeout(FestTimer);
+			FestTimer=window.setTimeout(chainFestNext,1000,id);
+		}
+	} catch (e) {
+			console.log("Error: chainFestId",e);
+			reloadFest();
+	}
+}
+
+function chainFestNext(id) {
+	try {
+		console.log("chainFestNext",id);
+		var _button,ready=false;
+		$('#battleList>div').each(function(_i,_e){
+			if (!ready) {
+				var temp_id=$("input[name='target_id']",_e).attr("value");
+				if (id!=temp_id
+					&&LostIds.lastIndexOf(temp_id)<0
+					&&guildIDs.lastIndexOf(temp_id)<0
+					&&DeadIds.lastIndexOf(temp_id)<0) {
+					var _text = $('div>div[style*="padding: 33px 0 0 0px;"]',_e).text().trim();
+					var _rank = /Rank (\d+)/.exec(_text)[1];
+					if (eval(_rank)>=chainRankMin){
+						_button=$("input[src*='festival_duelchamp_challenge_btn.gif']",_e);
+						chainId=temp_id;
+						ready=true;
+					}
+				} else {
+					var _list = (LostIds.lastIndexOf(temp_id)>=0? "LostIds" : (guildIDs.lastIndexOf(temp_id)>=0? "guildIDs" : "LostIds or guildIDs" ));
+					console.log("FarmIds "+temp_id+" is in "+_list+"! So, don't chain it.");	
+				}
+			}
+		});
+		if (ready) {
+			_button.click();
+		} else { 
+			reloadFest();
+		}
+	} catch (e) {
+			console.log("Error: chainFestNext",e);
+			reloadFest();
+	}
+}
+function reloadFest() {
+	var _button;
+	var myHealth=eval($('#health_current_value').text().trim()),xDelayHealth=1;
+	console.log('at reloadFest, Health:',myHealth);
+	if (myHealth<10) {
+		xDelayHealth=6;
+	}
+	chainId=0;
+	window.clearTimeout(FestTimer);
+	_button=$("img[src*='festival_duelchamp_question.gif']");
+	_button.parent().attr("href","festival_duel_battle.php");
+	_button.parent().attr("onclick","ajaxLinkSend('globalContainer', 'festival_duel_battle.php'); return false;");
+	_button.parent().html('<img height="41" width="157" src="https://castleagegame1-a.akamaihd.net/graphics/festival_duelchampion/festival_duelchamp_enter.gif" class="imgButton">');
+	FestTimer=window.setTimeout(clickReloadFest,xDelayHealth*5000);
+}
+function clickReloadFest() {
+	var _button;
+	window.clearTimeout(FestTimer);
+	_button=$("img[src*='festival_duelchamp_enter.gif']");
+	_button.click();
+	FestTimer=window.setTimeout(chainFest,5000);
+}
+
+function festivalDuelStats() {
+	var _storedFarm = item.get('cabfPageFestivalDuelPoints', '100000433761803');
+	var _sel=$('#cabfTargetSelect');
+	addFestivalDuelBoard('#battleList');
+	_sel = $('#cabfTargetSelect');
+	$.each(FarmIds, function(_i, _e) {
+		try {
+			if (item.get('cabfCleanCheck', 'false')=='false') {
+				_sel.append('<option value="' + _e + '" ' + (_storedFarm == _e ? 'selected = "selected"' : '') + ' >' + _e + '</option>');
+			} else {
+				if (LostIds.lastIndexOf(_e)<0
+					&&guildIDs.lastIndexOf(_e)<0) {
+					_sel.append('<option value="' + _e + '" ' + (_storedFarm == _e ? 'selected = "selected"' : '') + ' >' + _e + '</option>');
+				} else {
+					var _list = (LostIds.lastIndexOf(_e)>=0? "LostIds" : (guildIDs.lastIndexOf(_e)>=0? "guildIDs" : "LostIds or guildIDs" ));
+					console.log("FarmIds "+_e+" is in "+_list+"! So, don't add it to farm list.");					
+				}
+			}
+		} catch(err) {
+			console.log("Error: FarmIds "+_e,err);
+		}
+	});
+	_sel.change(function() {
+		_storedFarm = $(this).find("option:selected").text();
+		item.set('cabfPageFestivalDuelPoints', _storedFarm);
+		console.log("ToDo set revenge button");
+		festivalDuelFarmButton(_storedFarm);
+		$('#farmKeep').attr('href',"keep.php?casuser=" + _storedFarm);
+	});
+	_sel.after('<div><br></div><div id="cabfFarmTargetButton"><span>BUTTON</span></div><div><br></div><div>Min Rank : <input id="targetMinRank" type="number" min="0" max="18"></input></div><div><br></div><div>Min Points : <input id="targetMinPoint" type="number" min="0" max="18"></input></div><div><br></div><div><input id="autocompleteRemove"></input><button id="RemoveButton">Remove</button></div><div><br></div><div id="cabfFarmStopStartButton"><button id="StopButton">Stop</button><span> - </span><button id="StartButton">Start</button></div><div><br></div><div><input type="checkbox" id="cleanCheck"></input><button id="CleanButton">Clean</button></div><div><br></div><div><button id="ClearButton">Clear</button></div><div><br></div><div><span>Black List : </span><span><textarea id="BlackList" rows="5" cols="35" ></textarea></span></div></div>');
+	$('#farmKeep').attr('href',"keep.php?casuser=" + _storedFarm);
+	$('#targetMinRank')[0].value=chainRankMin;
+	$('#targetMinRank').change(function(){
+		item.set('chainRankMin',this.value);
+		chainRankMin=this.value;
+	});
+	$('#targetMinPoint')[0].value=chainPointMin;
+	$('#targetMinPoint').change(function(){
+		item.set('chainPointMin',this.value);
+		chainPointMin=eval(this.value);
+	});
+	try {
+		if (item.get('cabfCleanCheck', 'false')=='true') {
+			$('#cleanCheck')[0].checked = true;
+		} else {
+			$('#cleanCheck')[0].checked = false;
+		}
+		$('#cleanCheck').change(function(){
+			if (this.checked) {
+				item.set('cabfCleanCheck', 'true');
+			} else {
+				item.set('cabfCleanCheck', 'false');
+			}
+			console.log("cabfCleanCheck",item.get('cabfCleanCheck', 'false'));
+		});
+	} catch (e) {
+		item.set('cabfCleanCheck', 'false');
+		console.error(e);		
+	}
+	festivalDuelFarmButton(_storedFarm);
+	$('#autocompleteRemove').autocomplete({source: FarmIds});
+	$('#RemoveButton').button();
+	$('#RemoveButton').click(function(){
+		var valId=$("#autocompleteRemove").val();
+		if (confirm('Are you sure to retreive '+valId+' from farm targets?')) {
+			var index = FarmIds.indexOf(valId);
+			FarmIds.splice(index, 1);
+			$("#cabfTargetSelect option[value='"+valId+"']").remove();
+		}
+	});
+	$('#StopButton').button();
+	$('#StopButton').click(function(){
+		window.clearTimeout(FestTimer);
+	});
+	$('#StartButton').button();
+	$('#StartButton').click(function(){
+		window.clearTimeout(FestTimer);
+		FestTimer=window.setTimeout(chainFest,5000);
+	});
+	$('#CleanButton').button();
+	$('#CleanButton').click(function(){
+		var _select=$('#cabfTargetSelect'),
+			_selectedFarm = item.get('cabfPageFestivalDuelPoints', '100000433761803');
+			
+		_select.html(' ');
+		$.each(FarmIds, function(_i, _e) {
+			try {
+				if (LostIds.lastIndexOf(_e)<0
+					&&guildIDs.lastIndexOf(_e)<0
+					&&DeadIds.lastIndexOf(_e)<0) {
+					_select.append('<option value="' + _e + '" ' + (_selectedFarm == _e ? 'selected = "selected"' : '') + ' >' + _e + '</option>');
+				} else {
+					var _list = (LostIds.lastIndexOf(_e)>=0? "LostIds" : (guildIDs.lastIndexOf(_e)>=0? "guildIDs" : "LostIds or guildIDs" ));
+					console.log("FarmIds "+_e+" is in "+_list+"! So, don't add it to farm list!");					
+				}
+			} catch(err) {
+				console.log("Error: FarmIds "+_e,err);
+			}
+		});
+		item.set('cabfCleanCheck', 'true');
+		$('#cleanCheck')[0].checked = true;
+	});
+	$('#ClearButton').button();
+	$('#ClearButton').click(function(){
+		if (confirm('Are you sure to clear target from looses definitively?')) {
+			var _select=$('#cabfTargetSelect'),
+				_selectedFarm = item.get('cabfPageFestivalDuelPoints', '100000433761803')
+				_delArray=[];
+				
+			_select.html(' ');
+			$.each(FarmIds, function(_i, _e) {
+				try {
+					if (LostIds.lastIndexOf(_e)<0
+						&&guildIDs.lastIndexOf(_e)<0) {
+						_select.append('<option value="' + _e + '" ' + (_selectedFarm == _e ? 'selected = "selected"' : '') + ' >' + _e + '</option>');
+					} else {
+						var _list = (LostIds.lastIndexOf(_e)>=0? "LostIds" : (guildIDs.lastIndexOf(_e)>=0? "guildIDs" : "LostIds or guildIDs" ));
+						_delArray.push(FarmIds.indexOf(_e));	
+						console.log("FarmIds "+_e+" is in "+_list+"! So, cleared it.");						
+					}
+				} catch(err) {
+					console.log("Error: FarmIds "+_e,err);
+				}
+			});
+			console.log("Before clear FarmIds: length="+FarmIds.length);
+			for (var i=0;i<_delArray.length;i++) {
+				FarmIds.splice(_delArray[i], 1);	
+			}
+			console.log("After clear FarmIds: length="+FarmIds.length);
+			item.set('farmids',FarmIds);
+		}
+	});
+	
+	$('#BlackList').resizable({
+		handles: "se, e, s",
+		maxWidth: "260px",
+		minWidth: "75px"
+	});
+	$('#BlackList')[0].value=JSON.stringify(guildIDs);
+	$('#BlackList').change(function(){
+		item.set('guildIDs',JSON.parse(this.value));
+		guildIDs=JSON.parse(this.value);
+	});
+}
+
+function festivalDuelFarmButton(id) {
+	var _buttonDIV=$('#cabfFarmTargetButton');
+	if (_buttonDIV.length>0) {
+		var _button=$("input[src*='festival_duelchamp_challenge_btn.gif']:first");
+		if (_button.length>0) {
+			_buttonDIV.html(_button.parent().parent().parent().html());
+			$("input[name='target_id']",_buttonDIV).attr("value",id);
+		} else {
+			console.log("_button not found");
+		}
+	} else {
+		console.log("_buttonDIV not found");
+	}
+}
+
+
+function eliminateDuplicates(arr) {
+  var i,
+      len=arr.length,
+      out=[],
+      obj={};
+
+  for (i=0;i<len;i++) {
+    obj[arr[i]]=0;
+  }
+  for (i in obj) {
+    out.push(i);
+  }
+  return out;
+}
+
+/******************************************************************************************************************************************************************************
+*******************************************************************************************************************************************************************************
+*************    GUILD ESSENCES ***********************************************************************************************************************************************
+*******************************************************************************************************************************************************************************
+******************************************************************************************************************************************************************************/
+function myAjax(page, params, cbError, cbSuccess) {
+	try {
+
+		params = $u.hasContent(params) && $u.isPlainObject(params) && !$u.isEmptyObject(params) ? params : {};
+		params.ajax = 1;
+
+		if (!$u.hasContent(page) || !$u.isString(page)) {
+			page = "index.php";
+			params.adkx = 2;
+		}
+
+		if (!$u.hasContent(cbError) || !$u.isFunction(cbError)) {
+			cbError = function (XMLHttpRequest, textStatus, errorThrown) {
+				console.error("ajax: ", [XMLHttpRequest, textStatus, errorThrown]);
+			};
+		}
+
+		if (!$u.hasContent(cbSuccess) || !$u.isFunction(cbSuccess)) {
+			cbSuccess = function (data, textStatus, XMLHttpRequest) {
+				console.log(2, "ajax:", [data, textStatus, XMLHttpRequest]);
+			};
+		}
+
+		$.ajax({
+			url : page,
+			type : 'POST',
+			data : params,
+			error : function (XMLHttpRequest, textStatus, errorThrown) {
+				cbError(XMLHttpRequest, textStatus, errorThrown);
+			},
+
+			success : function (data, textStatus, XMLHttpRequest) {
+				data = "<div>" + data + "</div>";
+				//console.log(2, "ajax", [data, textStatus, XMLHttpRequest]);
+				cbSuccess(data, textStatus, XMLHttpRequest);
+			}
+		});
+
+		return true;
+	} catch (err) {
+		console.error("ERROR in myAjax: " + err.stack);
+		return false;
+	}
+};
+
+function setEssence(storageDivs,guild_id,guild_name) {
+	try {
+		var essences = item.get('essences',defaultEssences);
+		var guild_index = getEssenceIndex(essences,guild_id);
+		if (guild_index<0) {
+			console.log("New guild");
+		} else {	
+			essences[guild_index].guild_name=guild_name;		
+			storageDivs.each(function() {
+				var essenceText = $(this).children().eq(0).text().split(/\W+/);
+				essences[guild_index][essenceText[1].toLowerCase()] = essenceText[6] - essenceText[5];
+				essenceText = null;
+			});
+			console.log("essences de "+guild_name+" : ", essences[guild_index]);
+		}
+		item.set('essences',essences);
+		essence = null;
+		guild_index = null;
+		return true;
+	} catch (err) {
+		console.error("ERROR in scanEssence for "+params.guild_id+" : "+err);
+		return false;
+	}
+};
+		
+function searchEssence() {
+	function onError() {
+		$().alert("Unable to use ajax");
+	}
+
+	function onSuccess(data) {
+		var storageDivs = $("[id^='storage_']", data);
+		var guild_id = $("[id^='guild_name_header']", data).children().eq(0).attr('href').split('=')[1];
+		var guild_name = $("[id^='guild_name_header']", data).children().eq(0).text();
+		setEssence(storageDivs,guild_id,guild_name);
+		essence = null;
+		guild_id = null;
+		guild_name = null;
+	}
+	
+	try {
+		var essencesArray = item.get('essences',defaultEssences);
+		var params = {};
+		for (var i = 0; i < essencesArray.length; i++){
+			params.guild_id = essencesArray[i].guildId;
+			myAjax('guild_conquest_market.php', params, onError, onSuccess);
+		}
+		essencesArray = null;
+		params = null;
+		return true;
+	} catch (err) {
+		console.error("ERROR in testAjax for "+params.guild_id+" : "+err);
+		return false;
+	}
+};
+
+function getEssence(type) {
+	try {
+		var essencesArray = item.get('essences',defaultEssences);
+		var MaxVal = -1;
+		var MaxGuild = '';
+		for (var i = 0; i < essencesArray.length; i++){
+			if (MaxGuild<essencesArray[i][type]) {
+				MaxVal = essencesArray[i][type];
+				MaxGuild = essencesArray[i].guildId;
+			}
+		}
+		ajaxLinkSend('globalContainer', 'guild_conquest_market.php?guild_id='+MaxGuild);
+		essencesArray = null;
+		MaxVal = null;
+		MaxGuild = null;
+		return true;
+	} catch (err) {
+		console.error("ERROR in getEssence : "+err);
+		return false;
+	}
+};
+function getEssenceIndex(array, guild_id) {
+	for (var i = 0; i < array.length; i++){
+		if (array[i].guildId===guild_id) { 
+			return i;
+		}
+	}
+	return -1;
+}
+function diagIOE() {
+    if ($('#main_bntp').length > 0) {
+		var defaultData={};
+        $('#main_bntp').append(_dialogIO);
+        $( "#dialogIO" ).dialog({
+            modal: true,
+			height: 410,
+			width: 660,
+            buttons: {
+                "Export": function() {
+					try {
+						$(this).children('#statsDg')[0].value=JSON.stringify(item.get('essences',defaultEssences), null, '\t');
+						$(this).children('#statsDg')[0].select();
+						console.log('Export succeed.');
+					} catch(e) {
+						console.log('Export failed : ',e);
+					}
+                },
+                "Import": function() {
+					if (!$(this).children('#statsDg')[0].value || $(this).children('#statsDg')[0].value == null || $(this).children('#statsDg')[0].value == "" ) {
+						console.log('Error null value.');						
+						return;
+					}
+					try {
+						item.set('essences',JSON.parse($(this).children('#statsDg')[0].value));
+						$( this ).dialog( "close" );
+						console.log('Import succeed.');
+					} catch(e) {
+						console.log('Import failed : ',e);
+					}
+                },
+                Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+            },
+			open: function( event, ui ) {
+				console.log('Import/Export Dialog opened.');
+			}
+        });
+    }
 }
 
 /******************************************************************************************************************************************************************************
@@ -2183,7 +2864,24 @@ function cabf_filters() {
     /* Normal battle */
     if ($('#blist_pulldown_select').length > 0) {
         console.log('Normal battle');
+		if ($('div[style*="festival_duelchamp_top.jpg"]').length > 0) {
+			console.log('Festival Duel Battle');
+			festivalDuelStats();
+		}
 		battleStats();
+    } 
+	
+	
+    /* Guild Essence */
+    if ($('#storage_1').length > 0) {
+        console.log('Guild Essence');
+		var storageDivs = $("[id^='storage_']");
+		var guild_id = $("[id^='guild_name_header']").children().eq(0).attr('href').split('=')[1];
+		var guild_name = $("[id^='guild_name_header']").children().eq(0).text();
+		setEssence(storageDivs,guild_id,guild_name);
+		essence = null;
+		guild_id = null;
+		guild_name = null;
     }
 	
 	
@@ -2197,6 +2895,7 @@ function cabf_filters() {
 
 function diagIO() {
     if ($('#main_bntp').length > 0) {
+		var defaultData={};
         $('#main_bntp').append(_dialogIO);
         $( "#dialogIO" ).dialog({
             modal: true,
@@ -2238,7 +2937,7 @@ function diagIO() {
 							var target_id=statsToMerge.targets[i].target_id;
 							var indexTarget=getTargetIndex(statsLocal.targets,target_id);
 							if (indexTarget<0) {
-								var newTarget={"target_id":target_id,"victory":0,"defeat":0};
+								var newTarget=defaultData;
 								statsLocal.targets.push(newTarget);
 								indexTarget=getTargetIndex(statsLocal.targets,target_id);
 								newTarget=null;
@@ -2358,6 +3057,37 @@ function sync() {
     }
 }
 
+function diagConnect() {
+    if ($('#main_bntp').length > 0) {
+        $('#main_bntp').append(_dialogConnect);
+        $( "#dialogConnect" ).dialog({
+            modal: true,
+			height: 260,
+			width: 620,
+            buttons: {
+                "Save": function() {
+					try {
+						var key = $(this).children('form')[0];
+						console.log('player_email : ',key[1].value);
+						item.set('player_email',key[1].value);
+						console.log('player_password : ',key[3].value);
+						item.set('player_password',key[3].value);
+						console.log('Save succeed.');
+						$( this ).dialog( "close" );
+					} catch(e) {
+						console.log('Save failed : ',e);
+					}
+				}
+			}
+        });
+    }
+}
+
+/******************************************************************************************************************************************************************************
+*******************************************************************************************************************************************************************************
+*************    INIT *********************************************************************************************************************************************************
+*******************************************************************************************************************************************************************************
+******************************************************************************************************************************************************************************/
 function init() {
     var globalContainer = document.querySelector('#globalContainer');
     
@@ -2403,9 +3133,17 @@ function init() {
         
     }, true);
     
-    GM_registerMenuCommand("CABF (Import/Export)", function() {diagIO();});
+    GM_registerMenuCommand("CABF (Import/Export Stats)", function() {diagIO();});
+    GM_registerMenuCommand("CABF (Import/Export Essences)", function() {diagIOE();});
     GM_registerMenuCommand("CABF (Sync Param)", function() {sync();});
     GM_registerMenuCommand("CABF (Sync Data)", function() {syncData();});
+    GM_registerMenuCommand("CABF (Connect)", function() {diagConnect();});
+    GM_registerMenuCommand("CABF (Search Essence)", function() {searchEssence();});
+    GM_registerMenuCommand("CABF (Damage Essence)", function() {getEssence('damage');});
+    GM_registerMenuCommand("CABF (Attack Essence)", function() {getEssence('attack');});
+    GM_registerMenuCommand("CABF (Defense Essence)", function() {getEssence('defense');});
+    GM_registerMenuCommand("CABF (Health Essence)", function() {getEssence('health');});
+    
     try {
         addCss ( "#cabfEarthFiltered1 {	color: #fff;}");
         addCss ( "#cabfEarthFiltered2 {	color: #fff;}");
@@ -2473,6 +3211,11 @@ function init() {
         addCss ( "#cabfActiveHealthLeft        {color: #fff;text-align:end;}");
         addCss ( "#cabfActiveAverageHealthLeft {color: #fff;text-align:end;}");
 		addCss ( "#cabfActivePercentageHealthLeft {color: #fff;text-align:end;}");
+		  
+        addCss ( "#cabfFestivalDuelBoard {position:fixed;background:#000;padding:5px;color:#fff;margin-top:0px;width:275px;text-align:center;opacity:0.75;top:0px;left:0px;height:100%;overflow:auto;display:block;font-size:11px;}");
+        addCss ( "#cabfFestivalDuelType  {color:rosybrown; font-weight: bold;}");
+        addCss ( "#cabfFarmTarget {color:rosybrown; font-weight: bold;}");
+        addCss ( '.cabfFarmTargetTitle {position: relative !important;left: 11px;top: 3px;float: left;font-size: 12px;height: 15px;padding: 4px !important;color: rgb(255, 255, 255);background-color: rgb(34, 34, 34);border: 1px solid rgb(68, 68, 68);}');
 		
         addCss ( '.GuildNum {	color:white;position:relative;top:-100px;left:35px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');   
         addCss ( '.GuildNumG{	color:green;position:relative;top:-100px;left:35px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');   
@@ -2494,11 +3237,23 @@ GM_addStyle (GM_getResourceText ("jqueryUiCss") );
 
 
 function cabf_connect() {
+    console.log('cabf_connect');
     if ($("input[src*='crusader2_btn_submit.gif']").length > 0) {
         var button = $("input[src*='crusader2_btn_submit.gif']");
+		var player_email=item.get('player_email','');
+		var player_password=item.get('player_password','');
         console.log('Connection');
-        if (document.getElementsByName("player_password")[0].value)
+		if (player_email!=''&&player_password!='') {
+			console.log('Saved Connection');
+			document.getElementsByName("player_email")[0].value=player_email;
+			document.getElementsByName("player_password")[0].value=player_password;
 			button.click();
+		} else {
+			console.log('Normal Connection');
+			var player_password=item.get('player_password','');
+			if (document.getElementsByName("player_password")[0].value)
+				button.click();
+		}
 	} 
 }
 
@@ -2508,3 +3263,4 @@ syncData();
 cabf_connect();
 console.log('init()');
 init();
+FestTimer=window.setTimeout(chainFestNext,5000,0);
