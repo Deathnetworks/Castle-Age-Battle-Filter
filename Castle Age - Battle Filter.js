@@ -12,14 +12,14 @@
 // @require        http://fgnass.github.io/spin.js/spin.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.39
+// @version        1.1.40
 // @copyright      2013+, Jigoku
 // @grant		GM_addStyle
 // @grant		GM_getResourceText 
 // @grant		GM_registerMenuCommand
 // ==/UserScript==
 
-var version = '1.1.39', clickUrl = '', updated = false;
+var version = '1.1.40', clickUrl = '', updated = false;
 
 var defaultStats={"targets":[{"target_id":"0","victory":0,"defeat":0}]};
 var defaultEssences=[{"name": "LES BRANQUES","level": "13","lastCheck": 1432865723408,"attack": -1,"defense": -1,"damage": -1,"health": -1,"guildId": "1796388608_1285087750"}];
@@ -3103,7 +3103,7 @@ function init() {
         }
     }
 	
-    globalContainer.addEventListener('click', function(event) {
+	fcEventClick = function(event) {
         try {
             if(updated)
                 window.location.href = clickUrl;
@@ -3118,20 +3118,28 @@ function init() {
         } catch (e) {
             console.error("Error in globalContainer Click",e);
         }
-    }, true);
+    };
+	if (globalContainer.addEventListener) {                
+        console.log('Event Click For all major browsers, except IE 8 and earlier');
+		globalContainer.addEventListener('click', fcEventClick, true);
+	}
+		
+	// create an observer instance
+	var observer = new MutationObserver(function(mutations) {
+	  mutations.forEach(function(mutation) {
+		//console.log(mutation.type);
+		if (mutation.addedNodes.length>0) {
+			cabf_filters();
+		}			
+	  });    
+	});
+	 
+	// configuration of the observer:
+	var config = { attributes: true, childList: true, characterData: true };
+	 
+	// pass in the target node, as well as the observer options
+	observer.observe(globalContainer, config);
     
-    globalContainer.addEventListener('DOMNodeInserted', function(event) {
-        try {
-            if (event.target.hasOwnProperty('id')) {
-                if(event.target.id == 'main_bn' || event.target.querySelector("#main_bn")) {
-                   setTimeout(function() {cabf_filters();}, 0);
-                }           
-            }
-        } catch (e) {
-            console.error("Error in globalContainer DOMNodeInserted",e);
-        }
-        
-    }, true);
     
     GM_registerMenuCommand("CABF (Import/Export Stats)", function() {diagIO();});
     GM_registerMenuCommand("CABF (Import/Export Essences)", function() {diagIOE();});
