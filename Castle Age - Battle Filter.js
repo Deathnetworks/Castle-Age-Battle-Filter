@@ -2710,6 +2710,7 @@ function setEssence(storageDivs,guild_id,guild_name) {
 };
 		
 function searchEssence() {
+	window.clearTimeout(FestTimer);
 	function onError() {
 		$().alert("Unable to use ajax");
 	}
@@ -2746,8 +2747,8 @@ function getEssence(type) {
 		var MaxVal = -1;
 		var MaxGuild = '';
 		for (var i = 0; i < essencesArray.length; i++){
-			if (MaxGuild<essencesArray[i][type]) {
-				MaxVal = essencesArray[i][type];
+			if (MaxVal<eval(essencesArray[i][type])) {
+				MaxVal = eval(essencesArray[i][type]);
 				MaxGuild = essencesArray[i].guildId;
 			}
 		}
@@ -2755,10 +2756,8 @@ function getEssence(type) {
 		essencesArray = null;
 		MaxVal = null;
 		MaxGuild = null;
-		return true;
 	} catch (err) {
 		console.error("ERROR in getEssence : "+err);
-		return false;
 	}
 };
 function getEssenceIndex(array, guild_id) {
