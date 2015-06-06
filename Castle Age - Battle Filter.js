@@ -12,14 +12,14 @@
 // @require        http://fgnass.github.io/spin.js/spin.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.41
+// @version        1.1.42
 // @copyright      2013+, Jigoku
 // @grant		GM_addStyle
 // @grant		GM_getResourceText 
 // @grant		GM_registerMenuCommand
 // ==/UserScript==
 
-var version = '1.1.41', clickUrl = '', updated = false;
+var version = '1.1.42', clickUrl = '', updated = false;
 
 var defaultStats={"targets":[{"target_id":"0","victory":0,"defeat":0}]};
 var defaultEssences=[{"name": "LES BRANQUES","level": "13","lastCheck": 1432865723408,"attack": -1,"defense": -1,"damage": -1,"health": -1,"guildId": "1796388608_1285087750"}];
@@ -2691,7 +2691,8 @@ function setEssence(storageDivs,guild_id,guild_name) {
 		if (guild_index<0) {
 			console.log("New guild");
 		} else {	
-			essences[guild_index].guild_name=guild_name;		
+			delete essences[guild_index].guild_name
+			essences[guild_index].name=guild_name;		
 			storageDivs.each(function() {
 				var essenceText = $(this).children().eq(0).text().split(/\W+/);
 				essences[guild_index][essenceText[1].toLowerCase()] = essenceText[6] - essenceText[5];
@@ -2797,6 +2798,45 @@ function diagIOE() {
 						console.log('Import succeed.');
 					} catch(e) {
 						console.log('Import failed : ',e);
+					}
+                },
+                "Insert non-existent": function() {
+					if (!$(this).children('#statsDg')[0].value || $(this).children('#statsDg')[0].value == null || $(this).children('#statsDg')[0].value == "" ) {
+						console.log('Error null value.');						
+						return;
+					}
+					try {
+						var essencesToMerge = JSON.parse($(this).children('#statsDg')[0].value),
+							essencesLocal = item.get('essences',defaultEssences),
+							newInserted = 0;
+						
+						for (var i = 0; i < essencesToMerge.length; i++){
+							var guildId=essencesToMerge[i].guildId;
+							var indexEssence=getEssenceIndex(essencesLocal,guildId);
+							if (indexEssence<0) {
+								var newEssence={
+												"name":essencesToMerge[i].guildId,
+												"level": essencesToMerge[i].level,
+												"lastCheck": essencesToMerge[i].lastCheck,
+												"attack": essencesToMerge[i].attack,
+												"defense": essencesToMerge[i].defense,
+												"damage": essencesToMerge[i].damage,
+												"health": essencesToMerge[i].health,
+												"guildId":essencesToMerge[i].guildId
+											};
+								essencesLocal.push(newEssence);
+								newInserted++;
+								newEssence=null;
+							}
+						}
+						item.set('essences',essencesLocal);
+						$( this ).dialog( "close" );
+						console.log('Insert succeed. Total inserted: '+newInserted);
+						essencesToMerge=null;
+						essencesLocal=null;
+						newInserted=null;
+					} catch(e) {
+						console.log('Insert failed : ',e);
 					}
                 },
                 Cancel: function() {
