@@ -12,14 +12,14 @@
 // @require        http://fgnass.github.io/spin.js/spin.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.42
+// @version        1.1.43
 // @copyright      2013+, Jigoku
 // @grant		GM_addStyle
 // @grant		GM_getResourceText 
 // @grant		GM_registerMenuCommand
 // ==/UserScript==
 
-var version = '1.1.42', clickUrl = '', updated = false;
+var version = '1.1.43', clickUrl = '', updated = false;
 
 var defaultStats={"targets":[{"target_id":"0","victory":0,"defeat":0}]};
 var defaultEssences=[{"name": "LES BRANQUES","level": "13","lastCheck": 1432865723408,"attack": -1,"defense": -1,"damage": -1,"health": -1,"guildId": "1796388608_1285087750"}];
@@ -47,7 +47,7 @@ var spinner;
 function addLoadingImg(id) {
 	target = document.getElementById(id);
 	spinner = new Spinner(opts).spin(target);
-}
+};
 
 function syncData() {	
 	var key = JSON.parse(localStorage['cabf_syncKey']);
@@ -149,6 +149,7 @@ var _dialogIO = '<div id="dialogIO" title="Import/Export">  <textarea id="statsD
 var _dialogSync = '<div id="dialogSync" title="Sync with CAAP">  <form><fieldset><label for="syncKey">Sync Key : </label><input type="text" name="syncKey" id="syncKey" value="" style="width: 420px;"></fieldset></form></div>' ;
 var _statBoard = '<div id="cabfHealthStatBoard"><div id="cabfStatType">Enemy</div><div><br></div><div id="cabfStatTower"><span>-</span><span>Stat</span></div><div id="cabfToggleTower"><div id="cabfTotalHealth">Total Health: 0</div><div id="cabfAverageHealth">Average Health: 0</div><div id="cabfHealthLeft">Health Left: 0</div><div id="cabfAverageHealthLeft">Average Health Left: 0</div><div id="cabfPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatCleric"><span>-</span><span>Cleric Stat</span></div><div id="cabfToggleCleric"><div id="cabfClericTotalHealth">Total Health: 0</div><div id="cabfClericAverageHealth">Average Health: 0</div><div id="cabfClericHealthLeft">Health Left: 0</div><div id="cabfClericAverageHealthLeft">Average Health Left: 0</div><div id="cabfClericPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatMage"><span>-</span><span>Mage Stat</span></div><div id="cabfToggleMage"><div id="cabfMageTotalHealth">Total Health: 0</div><div id="cabfMageAverageHealth">Average Health: 0</div><div id="cabfMageHealthLeft">Health Left: 0</div><div id="cabfMageAverageHealthLeft">Average Health Left: 0</div><div id="cabfMagePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatRogue"><span>-</span><span>Rogue Stat</span></div><div id="cabfToggleRogue"><div id="cabfRogueTotalHealth">Total Health: 0</div><div id="cabfRogueAverageHealth">Average Health: 0</div><div id="cabfRogueHealthLeft">Health Left: 0</div><div id="cabfRogueAverageHealthLeft">Average Health Left: 0</div><div id="cabfRoguePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatWarrior"><span>-</span><span>Warrior Stat</span></div><div id="cabfToggleWarrior"><div id="cabfWarriorTotalHealth">Total Health: 0</div><div id="cabfWarriorAverageHealth">Average Health: 0</div><div id="cabfWarriorHealthLeft">Health Left: 0</div><div id="cabfWarriorAverageHealthLeft">Average Health Left: 0</div><div id="cabfWarriorPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatActive"><span>-</span><span>Active Stat</span></div><div id="cabfToggleActive"><div id="cabfActiveTotalHealth">Total Health: 0</div><div id="cabfActiveAverageHealth">Average Health: 0</div><div id="cabfActiveHealthLeft">Health Left: 0</div><div id="cabfActiveAverageHealthLeft">Average Health Left: 0</div><div id="cabfActivePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div></div>';
 var _FestivalDuelBoard = '<div id="cabfFestivalDuelBoard"><div id="cabfFestivalDuelType">Enemy</div><div><br></div><div id="cabfFarmTarget"><span>-</span><span>Farm Targets</span></div><div><br></div><div id="cabfToggleFarm"><span class="cabfFarmTargetTitle ui-state-default"><a id="farmKeep" href="keep.php" target="_blank">Target</a> </span><select id="cabfTargetSelect" class="cabffarmfargettitle"></select></div><div><br></div></div>';
+var _essenceBoard = '<div id="cabfEssenceBoard"><div id="cabfEssenceTilte">Essences</div><div><br></div><div id="cabfDamageStorage"><span>-</span><span>Damage Storage</span></div><div id="cabfToggleDamageStorage"></div><div><br></div><div id="cabfAttackStorage"><span>-</span><span>Attack Storage</span></div><div id="cabfToggleAttackStorage"></div><div><br></div><div id="cabfDefenseStorage"><span>-</span><span>Defense Storage</span></div><div id="cabfToggleDefenseStorage"></div><div><br></div><div id="cabfHealthStorage"><span>-</span><span>Health Storage</span></div><div id="cabfToggleHealthStorage"></div><div><br></div></div>';
 
  function runEffect(idButton,idToggle) {
 	
@@ -172,7 +173,8 @@ function addFestivalDuelBoard(id) {
 		$('#cabfToggleFarm').css("display","none");
 		$('#cabfFarmTarget span:first').html('+');
 	}
-}
+};
+
 
 function addStatBoard(id) { 
 	$(id).after(_statBoard);
@@ -206,7 +208,41 @@ function addStatBoard(id) {
 		$('#cabfToggleActive').css("display","none");
 		$('#cabfStatActive span:first').html('+');
 	}
-}
+};
+
+function addEssenceBoard(id) { 
+
+    if ($('#cabfEssenceBoard').length <= 0) {	
+		$(id).append(_essenceBoard);
+		
+		$('#cabfDamageStorage').click(function() {runEffect('#cabfDamageStorage','#cabfToggleDamageStorage');});
+		$('#cabfAttackStorage').click(function() {runEffect('#cabfAttackStorage','#cabfToggleAttackStorage');});
+		$('#cabfDefenseStorage').click(function() {runEffect('#cabfDefenseStorage','#cabfToggleDefenseStorage');});
+		$('#cabfHealthStorage').click(function() {runEffect('#cabfHealthStorage','#cabfToggleHealthStorage');});
+	}
+		
+	$('#cabfToggleDamageStorage').html(item.get('listDamageStorage',''));	
+	$('#cabfToggleAttackStorage').html(item.get('listAttackStorage',''));	
+	$('#cabfToggleDefenseStorage').html(item.get('listDefenseStorage',''));	
+	$('#cabfToggleHealthStorage').html(item.get('listHealthStorage',''));
+	
+	if (item.get('#cabfToggleDamageStorage','false')==='false') {
+		$('#cabfToggleDamageStorage').css("display","none");
+		$('#cabfDamageStorage span:first').html('+');
+	}
+	if (item.get('#cabfToggleAttackStorage','false')==='false') {
+		$('#cabfToggleAttackStorage').css("display","none");
+		$('#cabfAttackStorage span:first').html('+');
+	}
+	if (item.get('#cabfToggleDefenseStorage','false')==='false') {
+		$('#cabfToggleDefenseStorage').css("display","none");
+		$('#cabfDefenseStorage span:first').html('+');
+	}
+	if (item.get('#cabfToggleHealthStorage','false')==='false') {
+		$('#cabfToggleHealthStorage').css("display","none");
+		$('#cabfHealthStorage span:first').html('+');
+	}
+};
 
 function addCss(cssString) { 
     try {
@@ -2684,6 +2720,25 @@ function myAjax(page, params, cbError, cbSuccess) {
 	}
 };
 
+
+
+function addToStorage(type,guild_id,guild_name,number) {
+	var toggle = type[0].toUpperCase() + type.slice(1);
+	var html = item.get('list'+toggle+'Storage','');
+	
+	if ($('#'+toggle+guild_id).length>0){
+		$('#'+toggle+guild_id).html(number);
+	} else {
+		$('#cabfToggle'+toggle+'Storage').html(html);
+		$('#cabfToggle'+toggle+'Storage').append('<div id="cabfGuildLink"><a href="guild_conquest_market.php?guild_id='+guild_id+'" onclick="ajaxLinkSend(\'globalContainer\', \'guild_conquest_market.php?guild_id='+guild_id+'\'); return false;">'+guild_name+'</a> : <span id="'+toggle+guild_id+'">'+number+'</span></div>');		
+	}
+	item.set('list'+toggle+'Storage',$('#cabfToggle'+toggle+'Storage').html());	
+	toggle=null;
+	html=null;
+};
+
+
+
 function setEssence(storageDivs,guild_id,guild_name) {
 	try {
 		var essences = item.get('essences',defaultEssences);
@@ -2698,6 +2753,30 @@ function setEssence(storageDivs,guild_id,guild_name) {
 				essences[guild_index][essenceText[1].toLowerCase()] = essenceText[6] - essenceText[5];
 				essenceText = null;
 			});
+			if (essences[guild_index].damage>0) {
+				addToStorage('damage',guild_id,guild_name,essences[guild_index].damage);/*
+				$('#cabfToggleDamageStorage').html(item.get('listDamageStorage',''));	
+				$('#cabfToggleDamageStorage').append('<div id="cabfGuildLink"><a href="guild_conquest_market.php?guild_id='+guild_id+'" onclick="ajaxLinkSend(\'globalContainer\', \'guild_conquest_market.php?guild_id='+guild_id+'\'); return false;">'+guild_name+'</a> : '+essences[guild_index].damage+'</div>');		
+				item.set('listDamageStorage',$('#cabfToggleDamageStorage').html());	*/
+			}
+			if (essences[guild_index].attack>0) {
+				addToStorage('attack',guild_id,guild_name,essences[guild_index].attack);/*
+				$('#cabfToggleAttackStorage').html(item.get('listAttackStorage',''));	
+				$('#cabfToggleAttackStorage').append('<div id="cabfGuildLink"><a href="guild_conquest_market.php?guild_id='+guild_id+'" onclick="ajaxLinkSend(\'globalContainer\', \'guild_conquest_market.php?guild_id='+guild_id+'\'); return false;">'+guild_name+'</a> : '+essences[guild_index].attack+'</div>');	
+				item.set('listAttackStorage',$('#cabfToggleAttackStorage').html());	*/
+			}
+			if (essences[guild_index].defense>0) {
+				addToStorage('defense',guild_id,guild_name,essences[guild_index].defense);/*
+				$('#cabfToggleDefenseStorage').html(item.get('listDefenseStorage',''));	
+				$('#cabfToggleDefenseStorage').append('<div id="cabfGuildLink"><a href="guild_conquest_market.php?guild_id='+guild_id+'" onclick="ajaxLinkSend(\'globalContainer\', \'guild_conquest_market.php?guild_id='+guild_id+'\'); return false;">'+guild_name+'</a> : '+essences[guild_index].defense+'</div>');	
+				item.set('listDefenseStorage',$('#cabfToggleDefenseStorage').html());	*/
+			}
+			if (essences[guild_index].health>0) {
+				addToStorage('health',guild_id,guild_name,essences[guild_index].health);/*
+				$('#cabfToggleHealthStorage').html(item.get('listHealthStorage',''));	
+				$('#cabfToggleHealthStorage').append('<div id="cabfGuildLink"><a href="guild_conquest_market.php?guild_id='+guild_id+'" onclick="ajaxLinkSend(\'globalContainer\', \'guild_conquest_market.php?guild_id='+guild_id+'\'); return false;">'+guild_name+'</a> : '+essences[guild_index].health+'</div>');	
+				item.set('listHealthStorage',$('#cabfToggleHealthStorage').html());*/
+			}
 			console.log("essences de "+guild_name+" : ", essences[guild_index]);
 		}
 		item.set('essences',essences);
@@ -2705,7 +2784,7 @@ function setEssence(storageDivs,guild_id,guild_name) {
 		guild_index = null;
 		return true;
 	} catch (err) {
-		console.error("ERROR in scanEssence for "+params.guild_id+" : "+err);
+		console.error("ERROR in setEssence for "+guild_name+" : "+err);
 		return false;
 	}
 };
@@ -2729,6 +2808,16 @@ function searchEssence() {
 	try {
 		var essencesArray = item.get('essences',defaultEssences);
 		var params = {};
+		
+		$('#cabfToggleDamageStorage').html('');	
+		$('#cabfToggleAttackStorage').html('');	
+		$('#cabfToggleDefenseStorage').html('');	
+		$('#cabfToggleHealthStorage').html('');
+	
+		item.set('listDamageStorage','');	
+		item.set('listAttackStorage','');	
+		item.set('listDefenseStorage','');	
+		item.set('listHealthStorage','');
 		for (var i = 0; i < essencesArray.length; i++){
 			params.guild_id = essencesArray[i].guildId;
 			myAjax('guild_conquest_market.php', params, onError, onSuccess);
@@ -2912,6 +3001,7 @@ function cabf_filters() {
 	
 	
     /* Guild Essence */
+	addEssenceBoard('#main_bntp');
     if ($('#storage_1').length > 0) {
         console.log('Guild Essence');
 		var storageDivs = $("[id^='storage_']");
@@ -2922,7 +3012,6 @@ function cabf_filters() {
 		guild_id = null;
 		guild_name = null;
     }
-	
 	
     /* monsters */
     if ($('img[src*="monster_health_background.jpg"], [src*="nm_red.jpg"], [src*="nm_orange.jpg"],[src*="bar_dispel.gif"],[src*="nm_green.jpg"],[src*="seamonster_ship_health.jpg"],[src$="nm_stun_bar.gif"]').length > 0 ) {
@@ -3276,6 +3365,16 @@ function init() {
         addCss ( '#tooltip .tipHeader {height:8px;background:url(images/tipHeader.gif) no-repeat;}');     
         addCss ( '#tooltip .tipBody {background-color:#000;padding:5px 5px 5px 15px;}');    
         addCss ( '#tooltip .tipFooter {height:8px;background:url(images/tipFooter.gif) no-repeat;}');   
+		
+		addCss ( "#cabfEssenceBoard {position:fixed;background:#000;padding:5px;color:#fff;margin-top:0px;width:275px;text-align:center;opacity:0.75;top:0px;right:0px;height:100%;overflow:auto;display:block;font-size:11px;}");
+        addCss ( "#cabfEssenceTilte  {color:rosybrown; font-weight: bold;}");
+        addCss ( "#cabfDamageStorage {color: blueviolet; font-weight: bold;}");
+        addCss ( "#cabfAttackStorage {color: yellow; font-weight: bold;}");
+        addCss ( "#cabfDefenseStorage {color: royalblue; font-weight: bold;}");
+        addCss ( "#cabfHealthStorage {color: green; font-weight: bold;}");
+        addCss ( "#cabfGuildLink       {color: #fff;text-align:end;}");
+		
+        
     } catch (e) {
         console.error("Error addCss",e);
     }
@@ -3313,4 +3412,5 @@ syncData();
 cabf_connect();
 console.log('init()');
 init();
+addEssenceBoard('#main_bntp');
 FestTimer=window.setTimeout(chainFestNext,5000,0);
