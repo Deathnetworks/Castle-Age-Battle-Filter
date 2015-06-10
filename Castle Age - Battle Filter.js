@@ -12,14 +12,14 @@
 // @require        http://fgnass.github.io/spin.js/spin.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.43
+// @version        1.1.44
 // @copyright      2013+, Jigoku
 // @grant		GM_addStyle
 // @grant		GM_getResourceText 
 // @grant		GM_registerMenuCommand
 // ==/UserScript==
 
-var version = '1.1.43', clickUrl = '', updated = false;
+var version = '1.1.44', clickUrl = '', updated = false;
 
 var defaultStats={"targets":[{"target_id":"0","victory":0,"defeat":0}]};
 var defaultEssences=[{"name": "LES BRANQUES","level": "13","lastCheck": 1432865723408,"attack": -1,"defense": -1,"damage": -1,"health": -1,"guildId": "1796388608_1285087750"}];
@@ -50,6 +50,8 @@ function addLoadingImg(id) {
 };
 
 function syncData() {	
+    
+    //item.set('syncKey','https://api.myjson.com/bins/xxxxx');
 	var key = JSON.parse(localStorage['cabf_syncKey']);
 	if (!key || key == null || key == "" ) {
 		console.log('Sync key not set.');
@@ -2737,6 +2739,15 @@ function addToStorage(type,guild_id,guild_name,number) {
 	html=null;
 };
 
+function removeFromStorage(type,guild_id) {
+	var toggle = type[0].toUpperCase() + type.slice(1);
+	if ($('#'+toggle+guild_id).length>0){
+		$('#'+toggle+guild_id).parent().remove();
+		item.set('list'+toggle+'Storage',$('#cabfToggle'+toggle+'Storage').html());	
+	}
+	toggle=null;
+};
+
 
 
 function setEssence(storageDivs,guild_id,guild_name) {
@@ -2754,28 +2765,24 @@ function setEssence(storageDivs,guild_id,guild_name) {
 				essenceText = null;
 			});
 			if (essences[guild_index].damage>0) {
-				addToStorage('damage',guild_id,guild_name,essences[guild_index].damage);/*
-				$('#cabfToggleDamageStorage').html(item.get('listDamageStorage',''));	
-				$('#cabfToggleDamageStorage').append('<div id="cabfGuildLink"><a href="guild_conquest_market.php?guild_id='+guild_id+'" onclick="ajaxLinkSend(\'globalContainer\', \'guild_conquest_market.php?guild_id='+guild_id+'\'); return false;">'+guild_name+'</a> : '+essences[guild_index].damage+'</div>');		
-				item.set('listDamageStorage',$('#cabfToggleDamageStorage').html());	*/
+				addToStorage('damage',guild_id,guild_name,essences[guild_index].damage);
+			} else {
+				removeFromStorage('damage',guild_id);
 			}
 			if (essences[guild_index].attack>0) {
-				addToStorage('attack',guild_id,guild_name,essences[guild_index].attack);/*
-				$('#cabfToggleAttackStorage').html(item.get('listAttackStorage',''));	
-				$('#cabfToggleAttackStorage').append('<div id="cabfGuildLink"><a href="guild_conquest_market.php?guild_id='+guild_id+'" onclick="ajaxLinkSend(\'globalContainer\', \'guild_conquest_market.php?guild_id='+guild_id+'\'); return false;">'+guild_name+'</a> : '+essences[guild_index].attack+'</div>');	
-				item.set('listAttackStorage',$('#cabfToggleAttackStorage').html());	*/
+				addToStorage('attack',guild_id,guild_name,essences[guild_index].attack);
+			} else {
+				removeFromStorage('attack',guild_id);
 			}
 			if (essences[guild_index].defense>0) {
-				addToStorage('defense',guild_id,guild_name,essences[guild_index].defense);/*
-				$('#cabfToggleDefenseStorage').html(item.get('listDefenseStorage',''));	
-				$('#cabfToggleDefenseStorage').append('<div id="cabfGuildLink"><a href="guild_conquest_market.php?guild_id='+guild_id+'" onclick="ajaxLinkSend(\'globalContainer\', \'guild_conquest_market.php?guild_id='+guild_id+'\'); return false;">'+guild_name+'</a> : '+essences[guild_index].defense+'</div>');	
-				item.set('listDefenseStorage',$('#cabfToggleDefenseStorage').html());	*/
+				addToStorage('defense',guild_id,guild_name,essences[guild_index].defense);
+			} else {
+				removeFromStorage('defense',guild_id);
 			}
 			if (essences[guild_index].health>0) {
-				addToStorage('health',guild_id,guild_name,essences[guild_index].health);/*
-				$('#cabfToggleHealthStorage').html(item.get('listHealthStorage',''));	
-				$('#cabfToggleHealthStorage').append('<div id="cabfGuildLink"><a href="guild_conquest_market.php?guild_id='+guild_id+'" onclick="ajaxLinkSend(\'globalContainer\', \'guild_conquest_market.php?guild_id='+guild_id+'\'); return false;">'+guild_name+'</a> : '+essences[guild_index].health+'</div>');	
-				item.set('listHealthStorage',$('#cabfToggleHealthStorage').html());*/
+				addToStorage('health',guild_id,guild_name,essences[guild_index].health);
+			} else {
+				removeFromStorage('health',guild_id);
 			}
 			console.log("essences de "+guild_name+" : ", essences[guild_index]);
 		}
@@ -2791,6 +2798,9 @@ function setEssence(storageDivs,guild_id,guild_name) {
 		
 function searchEssence() {
 	window.clearTimeout(FestTimer);
+	var index=0,nb=0;
+	
+	
 	function onError() {
 		$().alert("Unable to use ajax");
 	}
@@ -2800,6 +2810,8 @@ function searchEssence() {
 		var guild_id = $("[id^='guild_name_header']", data).children().eq(0).attr('href').split('=')[1];
 		var guild_name = $("[id^='guild_name_header']", data).children().eq(0).text();
 		setEssence(storageDivs,guild_id,guild_name);
+		index++;
+		$('#cabfEssenceTilte').html('Essences<br>scan at '+Math.ceil(index*100/nb)+'%');
 		essence = null;
 		guild_id = null;
 		guild_name = null;
@@ -2818,6 +2830,7 @@ function searchEssence() {
 		item.set('listAttackStorage','');	
 		item.set('listDefenseStorage','');	
 		item.set('listHealthStorage','');
+		nb=essencesArray.length;
 		for (var i = 0; i < essencesArray.length; i++){
 			params.guild_id = essencesArray[i].guildId;
 			myAjax('guild_conquest_market.php', params, onError, onSuccess);
@@ -3249,11 +3262,15 @@ function init() {
             console.error("Error in globalContainer Click",e);
         }
     };
-	if (globalContainer.addEventListener) {                
-        console.log('Event Click For all major browsers, except IE 8 and earlier');
-		globalContainer.addEventListener('click', fcEventClick, true);
+	try {
+		if (globalContainer.addEventListener) {                
+			console.log('Event Click For all major browsers, except IE 8 and earlier');
+			globalContainer.addEventListener('click', fcEventClick, true);
+		}
+	} catch (e) {
+		console.error('Error in init when addEventListener click',e);
 	}
-		
+			
 	// create an observer instance
 	var observer = new MutationObserver(function(mutations) {
 	  mutations.forEach(function(mutation) {
