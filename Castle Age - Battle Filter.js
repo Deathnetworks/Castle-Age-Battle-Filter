@@ -12,14 +12,14 @@
 // @require        http://fgnass.github.io/spin.js/spin.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.44
+// @version        1.1.45
 // @copyright      2013+, Jigoku
 // @grant		GM_addStyle
 // @grant		GM_getResourceText 
 // @grant		GM_registerMenuCommand
 // ==/UserScript==
 
-var version = '1.1.44', clickUrl = '', updated = false;
+var version = '1.1.45', clickUrl = '', updated = false;
 
 var defaultStats={"targets":[{"target_id":"0","victory":0,"defeat":0}]};
 var defaultEssences=[{"name": "LES BRANQUES","level": "13","lastCheck": 1432865723408,"attack": -1,"defense": -1,"damage": -1,"health": -1,"guildId": "1796388608_1285087750"}];
@@ -2404,28 +2404,30 @@ function chainFestId(id) {
 	try {
 		console.log("chainFestId",id);
 		var _button,ready=false;
-		if (LostIds.lastIndexOf(id)<0
-			&&guildIDs.lastIndexOf(id)<0
-			&&DeadIds.lastIndexOf(id)<0) {
-			$('#battleList>div').each(function(_i,_e){
-				if (!ready) {
-					var temp_id=$("input[name='target_id']",_e).attr("value");
-					if (id==temp_id) {
-						var _text = $('div>div[style*="padding: 33px 0 0 0px;"]',_e).text().trim();
-						var _rank = /Rank (\d+)/.exec(_text)[1];
-						if (eval(_rank)>=chainRankMin){
-							_button=$("input[src*='festival_duelchamp_challenge_btn.gif']",_e);
-							if (_button.length>0) {
-								chainId=temp_id;
-								ready=true;
+		if (id) {
+			if (LostIds.lastIndexOf(id)<0
+				&&guildIDs.lastIndexOf(id)<0
+				&&DeadIds.lastIndexOf(id)<0) {
+				$('#battleList>div').each(function(_i,_e){
+					if (!ready) {
+						var temp_id=$("input[name='target_id']",_e).attr("value");
+						if (id==temp_id) {
+							var _text = $('div>div[style*="padding: 33px 0 0 0px;"]',_e).text().trim();
+							var _rank = /Rank (\d+)/.exec(_text)[1];
+							if (eval(_rank)>=chainRankMin){
+								_button=$("input[src*='festival_duelchamp_challenge_btn.gif']",_e);
+								if (_button.length>0) {
+									chainId=temp_id;
+									ready=true;
+								}
 							}
 						}
 					}
-				}
-			});
-		} else {
-			var _list = (LostIds.lastIndexOf(id)>=0? "LostIds" : (guildIDs.lastIndexOf(id)>=0? "guildIDs" : "LostIds or guildIDs" ));
-			console.log("FarmIds "+id+" is in "+_list+"! So, don't chain it.");			
+				});
+			} else {
+				var _list = (LostIds.lastIndexOf(id)>=0? "LostIds" : (guildIDs.lastIndexOf(id)>=0? "guildIDs" : "LostIds or guildIDs" ));
+				console.log("FarmIds "+id+" is in "+_list+"! So, don't chain it.");			
+			}
 		}
 		if (ready){
 			_button.click();
@@ -2443,26 +2445,28 @@ function chainFestNext(id) {
 	try {
 		console.log("chainFestNext",id);
 		var _button,ready=false;
-		$('#battleList>div').each(function(_i,_e){
-			if (!ready) {
-				var temp_id=$("input[name='target_id']",_e).attr("value");
-				if (id!=temp_id
-					&&LostIds.lastIndexOf(temp_id)<0
-					&&guildIDs.lastIndexOf(temp_id)<0
-					&&DeadIds.lastIndexOf(temp_id)<0) {
-					var _text = $('div>div[style*="padding: 33px 0 0 0px;"]',_e).text().trim();
-					var _rank = /Rank (\d+)/.exec(_text)[1];
-					if (eval(_rank)>=chainRankMin){
-						_button=$("input[src*='festival_duelchamp_challenge_btn.gif']",_e);
-						chainId=temp_id;
-						ready=true;
+		if (id) {
+			$('#battleList>div').each(function(_i,_e){
+				if (!ready) {
+					var temp_id=$("input[name='target_id']",_e).attr("value");
+					if (id!=temp_id
+						&&LostIds.lastIndexOf(temp_id)<0
+						&&guildIDs.lastIndexOf(temp_id)<0
+						&&DeadIds.lastIndexOf(temp_id)<0) {
+						var _text = $('div>div[style*="padding: 33px 0 0 0px;"]',_e).text().trim();
+						var _rank = /Rank (\d+)/.exec(_text)[1];
+						if (eval(_rank)>=chainRankMin){
+							_button=$("input[src*='festival_duelchamp_challenge_btn.gif']",_e);
+							chainId=temp_id;
+							ready=true;
+						}
+					} else {
+						var _list = (LostIds.lastIndexOf(temp_id)>=0? "LostIds" : (guildIDs.lastIndexOf(temp_id)>=0? "guildIDs" : "LostIds or guildIDs" ));
+						console.log("FarmIds "+temp_id+" is in "+_list+"! So, don't chain it.");	
 					}
-				} else {
-					var _list = (LostIds.lastIndexOf(temp_id)>=0? "LostIds" : (guildIDs.lastIndexOf(temp_id)>=0? "guildIDs" : "LostIds or guildIDs" ));
-					console.log("FarmIds "+temp_id+" is in "+_list+"! So, don't chain it.");	
 				}
-			}
-		});
+			});
+		}
 		if (ready) {
 			_button.click();
 		} else { 
@@ -3274,11 +3278,14 @@ function init() {
 	// create an observer instance
 	var observer = new MutationObserver(function(mutations) {
 	  mutations.forEach(function(mutation) {
-		console.log(mutation);
-		if (mutation.addedNodes.length>0 && clicked) {
-			cabf_filters();
-            clicked = false;
-		}			
+		if (mutation.addedNodes.length>0) {
+			if (mutation.addedNodes[0].className=="spinner") {
+				console.log('spinner',spinner);
+			} else {
+				console.log('mutation',mutation);
+				cabf_filters();
+			}
+		}		
 	  });    
 	});
 	 
