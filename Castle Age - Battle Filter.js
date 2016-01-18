@@ -3,7 +3,6 @@
 // @namespace      http://www.facebook.com/
 // @description    This script assists with filtering battles.
 // @include        https://apps.facebook.com/castle_age/*
-// @include        https://web3.castleagegame.com/castle_ws/*
 // @include        https://web4.castleagegame.com/castle_ws/*
 // @downloadURL    https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/Castle%20Age%20-%20Battle%20Filter.js
 // @require        http://code.jquery.com/jquery-1.9.1.js
@@ -12,11 +11,13 @@
 // @require        http://fgnass.github.io/spin.js/spin.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.45
+// @version        1.1.46
 // @copyright      2013+, Jigoku
 // @grant		GM_addStyle
 // @grant		GM_getResourceText 
 // @grant		GM_registerMenuCommand
+// @grant       GM_getValue
+// @grant       GM_setValue
 // ==/UserScript==
 
 var version = '1.1.45', clickUrl = '', updated = false;
@@ -146,7 +147,15 @@ var item = {
     }
 };
 
+	
 var _dialogConnect = '<div id="dialogConnect" title="Connect to CAAP">  <form><fieldset><label for="player_email">E-Mail : </label><input type="text" name="player_email" id="player_email" value="" style="width: 420px;"></fieldset><div><br></div><fieldset><label for="player_password">Password : </label><input type="password" name="player_password" id="player_password" value="" style="width: 420px;"></fieldset></form></div>' ;
+var _dialogCraft = '<div id="dialogCraft" title="Craft Alchemy">  \
+	<form>\
+	<fieldset>\
+	<label for="name">Select alchemy</label><select name="selectAlchemy" id="selectAlchemy"></select>\
+	</fieldset>\
+	</form>\
+</div>' ;
 var _dialogIO = '<div id="dialogIO" title="Import/Export">  <textarea id="statsDg" style="margin: 2px; height: 250px; width: 600px;"></textarea></div>' ;
 var _dialogSync = '<div id="dialogSync" title="Sync with CAAP">  <form><fieldset><label for="syncKey">Sync Key : </label><input type="text" name="syncKey" id="syncKey" value="" style="width: 420px;"></fieldset></form></div>' ;
 var _statBoard = '<div id="cabfHealthStatBoard"><div id="cabfStatType">Enemy</div><div><br></div><div id="cabfStatTower"><span>-</span><span>Stat</span></div><div id="cabfToggleTower"><div id="cabfTotalHealth">Total Health: 0</div><div id="cabfAverageHealth">Average Health: 0</div><div id="cabfHealthLeft">Health Left: 0</div><div id="cabfAverageHealthLeft">Average Health Left: 0</div><div id="cabfPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatCleric"><span>-</span><span>Cleric Stat</span></div><div id="cabfToggleCleric"><div id="cabfClericTotalHealth">Total Health: 0</div><div id="cabfClericAverageHealth">Average Health: 0</div><div id="cabfClericHealthLeft">Health Left: 0</div><div id="cabfClericAverageHealthLeft">Average Health Left: 0</div><div id="cabfClericPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatMage"><span>-</span><span>Mage Stat</span></div><div id="cabfToggleMage"><div id="cabfMageTotalHealth">Total Health: 0</div><div id="cabfMageAverageHealth">Average Health: 0</div><div id="cabfMageHealthLeft">Health Left: 0</div><div id="cabfMageAverageHealthLeft">Average Health Left: 0</div><div id="cabfMagePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatRogue"><span>-</span><span>Rogue Stat</span></div><div id="cabfToggleRogue"><div id="cabfRogueTotalHealth">Total Health: 0</div><div id="cabfRogueAverageHealth">Average Health: 0</div><div id="cabfRogueHealthLeft">Health Left: 0</div><div id="cabfRogueAverageHealthLeft">Average Health Left: 0</div><div id="cabfRoguePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatWarrior"><span>-</span><span>Warrior Stat</span></div><div id="cabfToggleWarrior"><div id="cabfWarriorTotalHealth">Total Health: 0</div><div id="cabfWarriorAverageHealth">Average Health: 0</div><div id="cabfWarriorHealthLeft">Health Left: 0</div><div id="cabfWarriorAverageHealthLeft">Average Health Left: 0</div><div id="cabfWarriorPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatActive"><span>-</span><span>Active Stat</span></div><div id="cabfToggleActive"><div id="cabfActiveTotalHealth">Total Health: 0</div><div id="cabfActiveAverageHealth">Average Health: 0</div><div id="cabfActiveHealthLeft">Health Left: 0</div><div id="cabfActiveAverageHealthLeft">Average Health Left: 0</div><div id="cabfActivePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div></div>';
@@ -2968,6 +2977,14 @@ function cabf_filters() {
 	
 	$("#cabfHealthActionEarth").hide();
 	$("#cabfConquestEarthFilterContainer").hide();
+    
+	/* Selection par défaut de la dernière valeur d'options */
+    $("select[name='amount']").each(function(_i, _e) {
+		value=$('option:last-child',_e).text();
+        $(_e).val(value);
+    });
+    
+    
     /* Guild battle or 10vs10 battle*/
     if ($('#enemy_guild_tab,#your_guild_tab').length > 0) {
     
@@ -2989,11 +3006,11 @@ function cabf_filters() {
         cabf_festivalbattlefilter();
     } else    
     /* Earth land conquest battle */
-    if ($('#tower_1,#tower_2,#tower_3,#tower_4').length > 0) {
+    /*if ($('#tower_1,#tower_2,#tower_3,#tower_4').length > 0) {
         console.log('Earth land conquest battle');
 		battleStats();
         cabf_conquestearthfilter();
-    } else    
+    } else  */  
     /* Mist land conquest battle */
     if ($('#your_guild_member_list_1').length > 0) {
         console.log('Mist land conquest battle');
@@ -3016,6 +3033,12 @@ function cabf_filters() {
 		battleStats();
     } 
 	
+    /* Alchemy */
+    if ($('div[style*="alchfb_top.jpg"]').length > 0) {
+		if (item.get('crafting',false)) {
+			Craft(item.get('craftChoosen',craftList.LAVA_ORB));
+		}
+    } 
 	
     /* Guild Essence */
 	addEssenceBoard('#main_bntp');
@@ -3222,11 +3245,106 @@ function diagConnect() {
 					} catch(e) {
 						console.log('Save failed : ',e);
 					}
+				},
+                Cancel: function() {
+					$( this ).dialog( "close" );
 				}
 			}
         });
     }
 }
+
+/******************************************************************************************************************************************************************************
+*******************************************************************************************************************************************************************************
+*************    ALCHEMY ******************************************************************************************************************************************************
+*******************************************************************************************************************************************************************************
+******************************************************************************************************************************************************************************/
+var craftList = {
+	
+	AIR_ORB: {
+		name:"AIR ORB",
+		alchemy_id:161
+		},	
+	LAVA_ORB: {
+		name:"LAVA ORB",
+		alchemy_id:190
+		},	
+	ICE_ORB: {
+		name:"ICE ORB",
+		alchemy_id:227
+		},
+	EARTH_ORB: {
+		name:"EARTH ORB",
+		alchemy_id:233
+		},
+	SERPENTINE_SHIELD: {
+		name:"SERPENTINE SHIELD",
+		alchemy_id:269
+		},
+	SHIELD_OF_DANTE: {
+		name:"SHIELD OF DANTE",
+		alchemy_id:217
+		}
+};
+
+function diagCraft() {
+    if ($('#main_bntp').length > 0) {
+		if ($('#dialogCraft').length == 0) {
+			$('#main_bntp').append(_dialogCraft);
+		}
+        $( "#dialogCraft" ).dialog({
+            modal: true,
+			height: 260,
+			width: 620,
+            buttons: {
+                "Craft": function() {
+					try {
+						var alchemy = $( "#selectAlchemy" );
+						craftChoosen=craftList[alchemy.val()];
+						console.log(craftChoosen.name+" is the alchemy choosen...",craftChoosen);  
+						item.set('craftChoosen',craftChoosen);
+						item.set('crafting',true);
+						$( this ).dialog( "close" );
+						Craft(craftChoosen);
+					} catch(e) {
+						console.log('Start Craft failed : ',e);
+					}
+				},
+                Cancel: function() {
+					item.set('crafting',false);
+					item.set('craftingAll',false);
+					$( this ).dialog( "close" );
+				}
+			},
+			create: function( event, ui ) {
+				$.each(craftList, function(name, alchemy) {
+						console.log("#selectAlchemy",name,alchemy,$('#selectAlchemy'));  
+						$('#selectAlchemy').append( $('<option></option>').val(name).html(alchemy.name) );	
+						if (item.get('craftChoosen',craftList.LAVA_ORB).alchemy_id==alchemy.alchemy_id) {
+							$('#selectAlchemy').val(name);
+						}	
+					});	
+			}
+        });
+    }
+}
+
+function Craft(craftChoosen){
+	console.log("Craft:",craftChoosen); 
+    try {
+        var _alchemy=$('#doQst_'+craftChoosen.alchemy_id);    
+        if (_alchemy.length>0) {	
+			console.log("Craft clik:",$('div',_alchemy)); 
+			$('input[src*="alchfb__btn_createon.gif"]',_alchemy).click();
+		} else {
+			console.log("No more "+craftChoosen.name+" to Craft"); 
+			item.set('crafting',false);
+		}
+    } catch (e) {
+        console.error("Error checkCompleteCrew",e);        
+	}
+	
+};
 
 /******************************************************************************************************************************************************************************
 *******************************************************************************************************************************************************************************
@@ -3301,6 +3419,7 @@ function init() {
     GM_registerMenuCommand("CABF (Sync Param)", function() {sync();});
     GM_registerMenuCommand("CABF (Sync Data)", function() {syncData();});
     GM_registerMenuCommand("CABF (Connect)", function() {diagConnect();});
+    GM_registerMenuCommand("CABF (Craft)", function() {diagCraft();});
     GM_registerMenuCommand("CABF (Search Essence)", function() {searchEssence();});
     GM_registerMenuCommand("CABF (Damage Essence)", function() {getEssence('damage');});
     GM_registerMenuCommand("CABF (Attack Essence)", function() {getEssence('attack');});
@@ -3438,3 +3557,4 @@ console.log('init()');
 init();
 addEssenceBoard('#main_bntp');
 FestTimer=window.setTimeout(chainFestNext,5000,0);
+
