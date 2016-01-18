@@ -11,7 +11,7 @@
 // @require        http://fgnass.github.io/spin.js/spin.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.46
+// @version        1.1.47
 // @copyright      2013+, Jigoku
 // @grant		GM_addStyle
 // @grant		GM_getResourceText 
@@ -3284,6 +3284,10 @@ var craftList = {
 	SHIELD_OF_DANTE: {
 		name:"SHIELD OF DANTE",
 		alchemy_id:217
+		},
+	HERO_CRYSTAL: {
+		name:"HERO CRYSTAL",
+		alchemy_id:8
 		}
 };
 
