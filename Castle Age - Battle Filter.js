@@ -11,7 +11,7 @@
 // @require        http://fgnass.github.io/spin.js/spin.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.47
+// @version        1.1.48
 // @copyright      2013+, Jigoku
 // @grant		GM_addStyle
 // @grant		GM_getResourceText 
@@ -20,7 +20,7 @@
 // @grant       GM_setValue
 // ==/UserScript==
 
-var version = '1.1.45', clickUrl = '', updated = false;
+var version = '1.1.48', clickUrl = '', updated = false;
 
 var defaultStats={"targets":[{"target_id":"0","victory":0,"defeat":0}]};
 var defaultEssences=[{"name": "LES BRANQUES","level": "13","lastCheck": 1432865723408,"attack": -1,"defense": -1,"damage": -1,"health": -1,"guildId": "1796388608_1285087750"}];
@@ -3343,6 +3343,10 @@ function Craft(craftChoosen){
 		} else {
 			console.log("No more "+craftChoosen.name+" to Craft"); 
 			item.set('crafting',false);
+			var back = confirm("No more "+craftChoosen.name+" to Craft. Do you want craft another?");
+			if(back) {
+				diagCraft();
+			}
 		}
     } catch (e) {
         console.error("Error checkCompleteCrew",e);        
