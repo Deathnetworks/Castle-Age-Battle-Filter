@@ -11,7 +11,7 @@
 // @require        http://fgnass.github.io/spin.js/spin.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.48
+// @version        1.1.49
 // @copyright      2013+, Jigoku
 // @grant		GM_addStyle
 // @grant		GM_getResourceText 
@@ -498,254 +498,288 @@ function cabf_conquestmistfilter() {
 function cabf_conquestearthfilter() {
     
     try {
-        
-        //var     _tower = parseInt(/\d+/.exec($('div[class="tower_tab"][style*="display:block"]').attr("id")), 10);
-		var _towers = { 1:"Attack Tower",2:"Defense Tower",3:"Damage Tower",4:"Health Tower"};
-		var     _tower = 1;
-		if ($("#cabfHealthActionEarth").length>0) {
-			$("#cabfHealthActionEarth").show();
-		} else {
-			$('#conquest_report').after('<div id="cabfHealthActionEarth"><div>Attack Tower</div><div id="cabfEarthFiltered1">Filtered: 0</div><div id="cabfEarthAction1">Health/Action: 0</div><div><br></div><div>Defense Tower</div><div id="cabfEarthFiltered2">Filtered: 0</div><div id="cabfEarthAction2">Health/Action: 0</div><div><br></div><div>Damage Tower</div><div id="cabfEarthFiltered3">Filtered: 0</div><div id="cabfEarthAction3">Health/Action: 0</div><div><br></div><div>Health Tower</div><div id="cabfEarthFiltered4">Filtered: 0</div><div id="cabfEarthAction4">Health/Action: 0</div></div>');
-		}
-		
-		for (var _x in _towers) {
-			console.log("_tower",_x);
-			
-			var _defenderHealth = 0, _actions = parseInt(/\d+/.exec($('#app_body div[id="actions_left_'+_x+'"]:contains("ACTIONS LEFT:"):last').text()), 10);
+		window.setTimeout(function() {
 			// Saved filter settings
 			var _storedClass = item.get('cabfPageConquestBattleClass', 'All');
 			var _storedStatus = item.get('cabfPageConquestBattleStatus', 'All');
 			var _storedPoints = item.get('cabfPageConquestBattlePoints', 'All');
 			
-			console.log("_actions",_actions);
-            if ($('#tower_'+_x+' > #crystal_'+_x).length>0) {
-                _defenderHealth = 0;            
-            } else if (!(_actions>0)) {
-                _defenderHealth = 0;            
-            } else {
-				var _nb=0;
-                $('#tower_'+_x+' > div > div').each(function(_i, _e) {
-                    var _text = $(_e).text().trim(), _health, _maxHealth, _fullhealth,winStat = '';
-                    if (_text) {
-						_nb++;
-						// enemy full health
-						_health = /(\d+)\//.exec(_text)[1];
-						_maxHealth = /\/(\d+)/.exec(_text)[1];
-						if ((_maxHealth - _health) === 0) {
-							_fullhealth = true;
-						} else {
-							_fullhealth = false;
-						}
-						_defenderHealth += parseInt(/(\d+)(?:\/)/.exec($(this).text())[1], 10);
-						$(_e, 'div > div').append('<div style="clear:both;"></div>');
-						if ($('input[name="target_id"]',_e).length>0) {
-							var target_id=$('input[name="target_id"]',_e).attr("value");
-							winStat=getTargetStat(target_id);
-							addTargetTip(_e);
-							target_id=null;
-						}
-						if (_fullhealth) {
-							$(_e, 'div > div').append('<span class="GuildNumG">' + _nb + '</span>'+ '<br>' + winStat);
-						} else {
-							$(_e, 'div > div').append('<span class="GuildNumR">' + _nb + '</span>'+ '<br>' + winStat);
-						}
-                    }
-					_text=null;
-					_health=null;
-					_maxHealth=null;
-					winStat=null;
-                });
-            }
-            if (_actions > 0) {
-                $('#cabfEarthAction'+_x).html('Health/Action: ' + (_defenderHealth / _actions).toFixed(0));
-            } else {
-                $('#cabfEarthAction'+_x).html('Health/Action: #');
-            } 
-			_actions=null;
-        }
-		// gate filter
-		function filterGate() {
-			var _myLevel = $('a[href*="keep.php"] > div[style="color:#ffffff"]').text().match(/\d+/);
-			var myLevel = Number(_myLevel[0]);
-			for (var _x in _towers) {
-				var _count = 0;
-                if ($('#tower_'+_x+' > #crystal_'+_x).length>0) {
-                    _count = 0;            
-                } else {
-                    $('#tower_'+_x+' > div > div').each(function(_i, _e) {
-                        var _class = new RegExp($('#cabfGateClassFilter').val());
-                        var _state = new RegExp($('#cabfGateStatusFilter').val());
-                        var _points = $('#cabfGatePointsFilter').val();
-                        var _text = $(_e).text().trim(), _health, _maxHealth, _fullhealth, _eClass;
-                        
-                        // enemy class
-                        _eClass = $(_e).find('img[title="Cleric"], img[title="Mage"], img[title="Warrior"], img[title="Rogue"]').attr("title");
-                        if (!_eClass) return;
-                        // enemy full health
-                        _health = /(\d+)\//.exec(_text)[1];
-                        _maxHealth = /\/(\d+)/.exec(_text)[1];
-                        if ((_maxHealth - _health) === 0) {
-                            _fullhealth = true;
-                        } else {
-                            _fullhealth = false;
-                        }
-                        
-                        if (_class.test(_eClass) && (_state.test(_text) || (_state.test('FullHealth') && _fullhealth))) {
-                            if (_points !== 'All') {
-                                if (/Level: \d+/.test(_text)) {
-                                    var targetLevel = parseInt(/(?:Level: )(\d+)/g.exec(_text)[1]);
-                                    var _showTarget = false;
-                                    switch (_points) {
-                                        case '50':
-                                            if (targetLevel > 900) {
-                                                _showTarget = true;
-                                            }
-                                            break;
-                                        case '40':
-                                            if ((targetLevel > 600) && (targetLevel <= 900)) {
-                                                _showTarget = true;
-                                            }
-                                            break;
-                                        case '30':
-                                            if ((targetLevel > 300) && (targetLevel <= 600)) {
-                                                _showTarget = true;
-                                            }
-                                            break;
-                                        case '20':
-                                            if ((targetLevel > 100) && (targetLevel <= 300)) {
-                                                _showTarget = true;
-                                            }
-                                            break;
-                                        case '10':
-                                            if (targetLevel <= 100) {
-                                                _showTarget = true;
-                                            }
-                                            break;
-                                        default:
-                                            _showTarget = true;
-                                    }
-                                    if (_showTarget) {
-                                        $(_e).show();
-                                        _count += 1;
-                                    } else {
-                                        $(_e).hide();
-                                    }
-									targetLevel=null;
-                                } else {
-                                    console.log('Error in points filter!');
-                                    $(_e).show();
-                                    _count += 1;
-                                }
-                            } else {
-                                $(_e).show();
-                                _count += 1;
-                            }
-                        } else {
-                            $(_e).hide();
-                        }
-						_class=null;
-						_state=null;
-						_points=null;
-						_text=null;
-						_eClass=null;
-						_health=null;
-						_maxHealth=null;
-                    });
-                }
-				$('#cabfEarthFiltered'+_x).html('Filtered: ' + _count);
-				//$('#app_body div[id="cabfHealthActionEarth"]:last').html($('#app_body div[id="cabfHealthActionEarth"]:last').html().replace(/.*Health\/Action:/, 'Health/Action:').replace('Health/Action:', 'Filtered: ' + _count + '<br/>Health/Action:'));
+			//var     _tower = parseInt(/\d+/.exec($('div[class="tower_tab"][style*="display:block"]').attr("id")), 10);
+			var _towers = { 1:"Attack Tower",2:"Defense Tower",3:"Damage Tower",4:"Health Tower"};
+			var     _tower = 1;
+			var     _burnEarthToken = item.get('cabfBurnEarthToken', false);
+			if ($("#cabfHealthActionEarth").length>0) {
+				$("#cabfHealthActionEarth").show();
+			} else {
+				$('#conquest_report').after('<div id="cabfHealthActionEarth"><div>Attack Tower</div><div id="cabfEarthFiltered1">Filtered: 0</div><div id="cabfEarthAction1">Health/Action: 0</div><div><br></div><div>Defense Tower</div><div id="cabfEarthFiltered2">Filtered: 0</div><div id="cabfEarthAction2">Health/Action: 0</div><div><br></div><div>Damage Tower</div><div id="cabfEarthFiltered3">Filtered: 0</div><div id="cabfEarthAction3">Health/Action: 0</div><div><br></div><div>Health Tower</div><div id="cabfEarthFiltered4">Filtered: 0</div><div id="cabfEarthAction4">Health/Action: 0</div><div>__________</div><div>Burn Token : <input type="checkbox" id="burnearthtoken" ></div></div>');
 			}
-			_myLevel=null;
-			myLevel=null;
-		}
+			$('#burnearthtoken').on('change', function() { 
+				item.set('cabfBurnEarthToken', $(this).is(":checked"));
+				_burnEarthToken=$(this).is(":checked");
+			});
+			$('#burnearthtoken').prop('checked', _burnEarthToken);
 		
-        // class filter
-        var filterClass = {
-            'All' : '\.',
-            'Cleric' : 'Cleric',
-            'Mage' : 'Mage',
-            'Rogue' : 'Rogue',
-            'Warrior' : 'Warrior'
-        }, filterStatus = {
-            'All' : '\.',
-            'Full health' : 'FullHealth',
-            'Got health' : '[^0]\/',
-            'Healthy' : 'Healthy',
-            'Good' : 'Good',
-            'Fair' : 'Fair',
-            'Weakened' : 'Weakened',
-            'Stunned' : 'Stunned'
-        }, filterPoints = {
-            'All' : 'All',
-            '50' : '50',
-            '40' : '40',
-            '30' : '30',
-            '20' : '20',
-            '10' : '10'
-        };
-        $('body > ul.ui-selectmenu-menu').remove();
-        
-		if ($("#cabfConquestEarthFilterContainer").length>0) {
-			$("#cabfConquestEarthFilterContainer").show();
-		} else {
-			$('#conquest_report').after('<div id="cabfConquestEarthFilterContainer"><div id="cabfConquestEarthFilter" class="ui-state-default"></div></div>');
-			var _cCBF = $('#cabfConquestEarthFilter');
-			// Battle activity points filter
-			_cCBF.prepend('<span class="cabfGateFilterTitle ui-state-default"> Points </span><select id="cabfGatePointsFilter" class="cabfgatefiltertitle">');
-			_sel = $('#cabfGatePointsFilter');
-			$.each(filterPoints, function(_i, _e) {
-				_sel.append('<option value="' + _e + '" ' + (_storedPoints == _i ? 'selected = "selected"' : '') + ' >' + _i + '</option>');
-			});
-			_sel.change(function() {
-				_storedPoints = $(this).find("option:selected").text();
-				item.set('cabfPageConquestBattlePoints', _storedPoints);
+			// update Stat Gate
+			function updateStatGate() {
+				for (var _x in _towers) {
+					console.log("_tower",_x);
+					
+					var _defenderHealth = 0, _actions = parseInt(/\d+/.exec($('#app_body div[id="actions_left_'+_x+'"]:contains("ACTIONS LEFT:"):last').text()), 10);
+					
+					console.log("_actions",_actions);
+					if ($('#tower_'+_x+' > #crystal_'+_x).length>0) {
+						_defenderHealth = 0;            
+					} else if (!(_actions>0)) {
+						_defenderHealth = 0;            
+					} else {
+						var _nb=0;
+						$('#tower_'+_x+' > div > div').each(function(_i, _e) {
+							var _text = $(_e).text().trim(), _health, _maxHealth, _fullhealth,winStat = '';
+							if (_text) {
+								_nb++;
+								// enemy full health
+								_health = /(\d+)\//.exec(_text)[1];
+								_maxHealth = /\/(\d+)/.exec(_text)[1];
+								if ((_maxHealth - _health) === 0) {
+									_fullhealth = true;
+								} else {
+									_fullhealth = false;
+								}
+								_defenderHealth += parseInt(/(\d+)(?:\/)/.exec($(this).text())[1], 10);
+								$(_e, 'div > div').append('<div style="clear:both;"></div>');
+								if ($('input[name="target_id"]',_e).length>0) {
+									var target_id=$('input[name="target_id"]',_e).attr("value");
+									winStat=getTargetStat(target_id);
+									addTargetTip(_e);
+									target_id=null;
+								}
+								if (_fullhealth) {
+									$(_e, 'div > div').append('<span class="GuildNumG">' + _nb + '</span>'+ '<br>' + winStat);
+								} else {
+									$(_e, 'div > div').append('<span class="GuildNumR">' + _nb + '</span>'+ '<br>' + winStat);
+								}
+							}
+							_text=null;
+							_health=null;
+							_maxHealth=null;
+							winStat=null;
+						});
+					}
+					if (_actions > 0) {
+						$('#cabfEarthAction'+_x).html('Health/Action: ' + (_defenderHealth / _actions).toFixed(0));
+					} else {
+						$('#cabfEarthAction'+_x).html('Health/Action: #');
+					} 
+					_actions=null;
+				}
+			}
+			// gate filter
+			function filterGate() {
+				var _myLevel = $('a[href*="keep.php"] > div[style="color:#ffffff"]').text().match(/\d+/);
+				var myLevel = Number(_myLevel[0]);
+				for (var _x in _towers) {
+					console.log("filterGate _tower",_x);
+					var _count = 0;
+					if ($('#tower_'+_x+' > #crystal_'+_x).length>0) {
+						_count = 0;            
+					} else {
+						$('#tower_'+_x+' > div > div').each(function(_i, _e) {
+							var _class = new RegExp($('#cabfGateClassFilter').val());
+							var _state = new RegExp($('#cabfGateStatusFilter').val());
+							var _points = $('#cabfGatePointsFilter').val();
+							var _text = $(_e).text().trim(), _health, _maxHealth, _fullhealth, _eClass;
+							
+							// enemy class
+							_eClass = $(_e).find('img[title="Cleric"], img[title="Mage"], img[title="Warrior"], img[title="Rogue"]').attr("title");
+							if (!_eClass) return;
+							// enemy full health
+							_health = /(\d+)\//.exec(_text)[1];
+							_maxHealth = /\/(\d+)/.exec(_text)[1];
+							if ((_maxHealth - _health) === 0) {
+								_fullhealth = true;
+							} else {
+								_fullhealth = false;
+							}
+							
+							if (_class.test(_eClass) && (_state.test(_text) || (_state.test('FullHealth') && _fullhealth))) {
+								if (_points !== 'All') {
+									if (/Level: \d+/.test(_text)) {
+										var targetLevel = parseInt(/(?:Level: )(\d+)/g.exec(_text)[1]);
+										var _showTarget = false;
+										switch (_points) {
+											case '50':
+												if (targetLevel > 900) {
+													_showTarget = true;
+												}
+												break;
+											case '40':
+												if ((targetLevel > 600) && (targetLevel <= 900)) {
+													_showTarget = true;
+												}
+												break;
+											case '30':
+												if ((targetLevel > 300) && (targetLevel <= 600)) {
+													_showTarget = true;
+												}
+												break;
+											case '20':
+												if ((targetLevel > 100) && (targetLevel <= 300)) {
+													_showTarget = true;
+												}
+												break;
+											case '10':
+												if (targetLevel <= 100) {
+													_showTarget = true;
+												}
+												break;
+											default:
+												_showTarget = true;
+										}
+										if (_showTarget) {
+											$(_e).show();
+											_count += 1;
+										} else {
+											$(_e).hide();
+										}
+										targetLevel=null;
+									} else {
+										console.log('Error in points filter!');
+										$(_e).show();
+										_count += 1;
+									}
+								} else {
+									$(_e).show();
+									_count += 1;
+								}
+							} else {
+								$(_e).hide();
+							}
+							_class=null;
+							_state=null;
+							_points=null;
+							_text=null;
+							_eClass=null;
+							_health=null;
+							_maxHealth=null;
+						});
+					}
+					$('#cabfEarthFiltered'+_x).html('Filtered: ' + _count);
+					//$('#app_body div[id="cabfHealthActionEarth"]:last').html($('#app_body div[id="cabfHealthActionEarth"]:last').html().replace(/.*Health\/Action:/, 'Health/Action:').replace('Health/Action:', 'Filtered: ' + _count + '<br/>Health/Action:'));
+				}
+				_myLevel=null;
+				myLevel=null;
+			}
+			
+			// class filter
+			var filterClass = {
+				'All' : '\.',
+				'Cleric' : 'Cleric',
+				'Mage' : 'Mage',
+				'Rogue' : 'Rogue',
+				'Warrior' : 'Warrior'
+			}, filterStatus = {
+				'All' : '\.',
+				'Full health' : 'FullHealth',
+				'Got health' : '[^0]\/',
+				'Healthy' : 'Healthy',
+				'Good' : 'Good',
+				'Fair' : 'Fair',
+				'Weakened' : 'Weakened',
+				'Stunned' : 'Stunned'
+			}, filterPoints = {
+				'All' : 'All',
+				'50' : '50',
+				'40' : '40',
+				'30' : '30',
+				'20' : '20',
+				'10' : '10'
+			};
+			$('body > ul.ui-selectmenu-menu').remove();
+			
+			if ($("#cabfConquestEarthFilterContainer").length>0) {
+				$("#cabfConquestEarthFilterContainer").show();
+			} else {
+				$('#conquest_report').after('<div id="cabfConquestEarthFilterContainer"><div id="cabfConquestEarthFilter" class="ui-state-default"></div></div>');
+				var _cCBF = $('#cabfConquestEarthFilter');
+				// Battle activity points filter
+				_cCBF.prepend('<span class="cabfGateFilterTitle ui-state-default"> Points </span><select id="cabfGatePointsFilter" class="cabfgatefiltertitle">');
+				_sel = $('#cabfGatePointsFilter');
+				$.each(filterPoints, function(_i, _e) {
+					_sel.append('<option value="' + _e + '" ' + (_storedPoints == _i ? 'selected = "selected"' : '') + ' >' + _i + '</option>');
+				});
+				_sel.change(function() {
+					_storedPoints = $(this).find("option:selected").text();
+					item.set('cabfPageConquestBattlePoints', _storedPoints);
+					filterGate();
+				});
+				// status filter
+				_cCBF.prepend('<span class="cabfGateFilterTitle ui-state-default"> Status </span><select id="cabfGateStatusFilter" class="cabfgatefiltertitle">');
+				_sel = $('#cabfGateStatusFilter');
+				$.each(filterStatus, function(_i, _e) {
+					_sel.append('<option value="' + _e + '" ' + (_storedStatus == _i ? 'selected = "selected"' : '') + ' >' + _i + '</option>');
+				});
+				_sel.change(function() {
+					_storedStatus = $(this).find("option:selected").text();
+					item.set('cabfPageConquestBattleStatus', _storedStatus);
+					filterGate();
+				});
+				// Class filter
+				_cCBF.prepend('<span class="cabfGateFilterTitle ui-state-default"> Class </span><select id="cabfGateClassFilter" class="cabfgatefiltertitle">');
+				_sel = $('#cabfGateClassFilter');
+				$.each(filterClass, function(_i, _e) {
+					_sel.append('<option value="' + _e + '" ' + (_storedClass == _i ? 'selected = "selected"' : '') + ' >' + _i + '</option>');
+				});
+				_sel.change(function() {
+					_storedClass = $(this).find("option:selected").text();
+					item.set('cabfPageConquestBattleClass', _storedClass);
+					filterGate();
+				});
+				// Clear filters
+				_cCBF.prepend($('<button>Clear filters</button>').button().css({
+					'position' : 'relative !important',
+					'left' : 9,
+					'top' : 3,
+					'fontSize' : 12,
+					'height' : 25,
+					'borderRadius' : 0,
+					'float' : 'left'
+				}).click(function() {
+					$('span.ui-selectmenu-status').text('All');
+					$('#cabfGateClassFilter, #cabfGateStatusFilter, #cabfGatePointsFilter').val('All');
+					_storedClass = _storedStatus = _storedPoints = 'All';
+					item.set('cabfPageConquestBattleClass', 'All');
+					item.set('cabfPageConquestBattleStatus', 'All');
+					item.set('cabfPageConquestBattlePoints', 'All');
+					filterGate();
+				}));
+			}
+			if (_burnEarthToken) {
+				var _e=$('#results_main_wrapper');
+				if (_e.length>0) {
+					var _credits=/GUARDIAN PATH CREDIT: YES/.exec(_e.text());
+					if (_credits!==null){
+						var _eButton = $(_e).find('input[src*="war_healagainbtn"], input[src*="war_duelagainbtn2"]');
+						if (_eButton.length>0) {
+							window.setTimeout(function() {
+								_eButton.click();
+							}, 1000);
+						} else {
+							updateStatGate();
+							filterGate();
+						}
+					} else {
+						updateStatGate();
+						filterGate();
+					}
+				} else {
+					updateStatGate();
+					filterGate();
+				}
+			} else {
+				updateStatGate();
 				filterGate();
-			});
-			// status filter
-			_cCBF.prepend('<span class="cabfGateFilterTitle ui-state-default"> Status </span><select id="cabfGateStatusFilter" class="cabfgatefiltertitle">');
-			_sel = $('#cabfGateStatusFilter');
-			$.each(filterStatus, function(_i, _e) {
-				_sel.append('<option value="' + _e + '" ' + (_storedStatus == _i ? 'selected = "selected"' : '') + ' >' + _i + '</option>');
-			});
-			_sel.change(function() {
-				_storedStatus = $(this).find("option:selected").text();
-				item.set('cabfPageConquestBattleStatus', _storedStatus);
-				filterGate();
-			});
-			// Class filter
-			_cCBF.prepend('<span class="cabfGateFilterTitle ui-state-default"> Class </span><select id="cabfGateClassFilter" class="cabfgatefiltertitle">');
-			_sel = $('#cabfGateClassFilter');
-			$.each(filterClass, function(_i, _e) {
-				_sel.append('<option value="' + _e + '" ' + (_storedClass == _i ? 'selected = "selected"' : '') + ' >' + _i + '</option>');
-			});
-			_sel.change(function() {
-				_storedClass = $(this).find("option:selected").text();
-				item.set('cabfPageConquestBattleClass', _storedClass);
-				filterGate();
-			});
-			// Clear filters
-			_cCBF.prepend($('<button>Clear filters</button>').button().css({
-				'position' : 'relative !important',
-				'left' : 9,
-				'top' : 3,
-				'fontSize' : 12,
-				'height' : 25,
-				'borderRadius' : 0,
-				'float' : 'left'
-			}).click(function() {
-				$('span.ui-selectmenu-status').text('All');
-				$('#cabfGateClassFilter, #cabfGateStatusFilter, #cabfGatePointsFilter').val('All');
-				_storedClass = _storedStatus = _storedPoints = 'All';
-				item.set('cabfPageConquestBattleClass', 'All');
-				item.set('cabfPageConquestBattleStatus', 'All');
-				item.set('cabfPageConquestBattlePoints', 'All');
-				filterGate();
-			}));
-		}
-        window.setTimeout(function() {
-            filterGate();
-        }, 10);
-		_towers=null;
+			}
+		}, 10);
     } catch (e) {
         console.error("Error in cabf_conquestearthfilter",e);
     }
@@ -3006,11 +3040,11 @@ function cabf_filters() {
         cabf_festivalbattlefilter();
     } else    
     /* Earth land conquest battle */
-    /*if ($('#tower_1,#tower_2,#tower_3,#tower_4').length > 0) {
+    if ($('#tower_1,#tower_2,#tower_3,#tower_4').length > 0) {
         console.log('Earth land conquest battle');
-		battleStats();
+		/*battleStats();*/
         cabf_conquestearthfilter();
-    } else  */  
+    } else  
     /* Mist land conquest battle */
     if ($('#your_guild_member_list_1').length > 0) {
         console.log('Mist land conquest battle');
