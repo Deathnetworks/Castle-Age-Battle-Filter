@@ -11,7 +11,7 @@
 // @require        http://fgnass.github.io/spin.js/spin.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.51
+// @version        1.1.52
 // @copyright      2013+, Jigoku
 // @grant  GM_addStyle
 // @grant  GM_getResourceText
@@ -3441,31 +3441,43 @@ var craftList = {
 
     AIR_ORB : {
         name : "AIR ORB",
-        alchemy_id : 161
+        alchemy_id : 165
     },
     LAVA_ORB : {
         name : "LAVA ORB",
-        alchemy_id : 190
+        alchemy_id : 194
     },
     ICE_ORB : {
         name : "ICE ORB",
-        alchemy_id : 227
+        alchemy_id : 231
     },
     EARTH_ORB : {
         name : "EARTH ORB",
-        alchemy_id : 233
+        alchemy_id : 237
     },
     SERPENTINE_SHIELD : {
         name : "SERPENTINE SHIELD",
-        alchemy_id : 269
+        alchemy_id : 273
     },
     SHIELD_OF_DANTE : {
         name : "SHIELD OF DANTE",
-        alchemy_id : 217
+        alchemy_id : 221
     },
     HERO_CRYSTAL : {
         name : "HERO CRYSTAL",
-        alchemy_id : 8
+        alchemy_id : 14
+    },
+    AGGRESSIVE_HERO_POTION : {
+        name : "AGGRESSIVE HERO POTION",
+        alchemy_id : 45
+    },
+    DEFENSIVE_HERO_POTION : {
+        name : "DEFENSIVE HERO POTION",
+        alchemy_id : 46
+    },
+    BALANCED_HERO_POTION : {
+        name : "HERO CRYSTAL",
+        alchemy_id : 47
     }
 };
 
