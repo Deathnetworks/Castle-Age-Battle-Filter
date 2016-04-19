@@ -3476,7 +3476,7 @@ var craftList = {
         alchemy_id : 46
     },
     BALANCED_HERO_POTION : {
-        name : "HERO CRYSTAL",
+        name : "BALANCED HERO POTION",
         alchemy_id : 47
     }
 };
