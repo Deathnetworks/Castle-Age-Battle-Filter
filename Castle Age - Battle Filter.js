@@ -11,7 +11,7 @@
 // @require        http://fgnass.github.io/spin.js/spin.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.52
+// @version        1.1.53
 // @copyright      2013+, Jigoku
 // @grant  GM_addStyle
 // @grant  GM_getResourceText
@@ -181,6 +181,7 @@ var _dialogIO = '<div id="dialogIO" title="Import/Export">  <textarea id="statsD
 var _dialogSync = '<div id="dialogSync" title="Sync with CAAP">  <form><fieldset><label for="syncKey">Sync Key : </label><input type="text" name="syncKey" id="syncKey" value="" style="width: 420px;"></fieldset></form></div>';
 var _statBoard = '<div id="cabfHealthStatBoard"><div id="cabfStatType">Enemy</div><div><br></div><div id="cabfStatTower"><span>-</span><span>Stat</span></div><div id="cabfToggleTower"><div id="cabfTotalHealth">Total Health: 0</div><div id="cabfAverageHealth">Average Health: 0</div><div id="cabfHealthLeft">Health Left: 0</div><div id="cabfAverageHealthLeft">Average Health Left: 0</div><div id="cabfPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatCleric"><span>-</span><span>Cleric Stat</span></div><div id="cabfToggleCleric"><div id="cabfClericTotalHealth">Total Health: 0</div><div id="cabfClericAverageHealth">Average Health: 0</div><div id="cabfClericHealthLeft">Health Left: 0</div><div id="cabfClericAverageHealthLeft">Average Health Left: 0</div><div id="cabfClericPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatMage"><span>-</span><span>Mage Stat</span></div><div id="cabfToggleMage"><div id="cabfMageTotalHealth">Total Health: 0</div><div id="cabfMageAverageHealth">Average Health: 0</div><div id="cabfMageHealthLeft">Health Left: 0</div><div id="cabfMageAverageHealthLeft">Average Health Left: 0</div><div id="cabfMagePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatRogue"><span>-</span><span>Rogue Stat</span></div><div id="cabfToggleRogue"><div id="cabfRogueTotalHealth">Total Health: 0</div><div id="cabfRogueAverageHealth">Average Health: 0</div><div id="cabfRogueHealthLeft">Health Left: 0</div><div id="cabfRogueAverageHealthLeft">Average Health Left: 0</div><div id="cabfRoguePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatWarrior"><span>-</span><span>Warrior Stat</span></div><div id="cabfToggleWarrior"><div id="cabfWarriorTotalHealth">Total Health: 0</div><div id="cabfWarriorAverageHealth">Average Health: 0</div><div id="cabfWarriorHealthLeft">Health Left: 0</div><div id="cabfWarriorAverageHealthLeft">Average Health Left: 0</div><div id="cabfWarriorPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatActive"><span>-</span><span>Active Stat</span></div><div id="cabfToggleActive"><div id="cabfActiveTotalHealth">Total Health: 0</div><div id="cabfActiveAverageHealth">Average Health: 0</div><div id="cabfActiveHealthLeft">Health Left: 0</div><div id="cabfActiveAverageHealthLeft">Average Health Left: 0</div><div id="cabfActivePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div></div>';
 var _FestivalDuelBoard = '<div id="cabfFestivalDuelBoard"><div id="cabfFestivalDuelType">Enemy</div><div><br></div><div id="cabfFarmTarget"><span>-</span><span>Farm Targets</span></div><div><br></div><div id="cabfToggleFarm"><span class="cabfFarmTargetTitle ui-state-default"><a id="farmKeep" href="keep.php" target="_blank">Target</a> </span><select id="cabfTargetSelect" class="cabffarmfargettitle"></select></div><div><br></div></div>';
+var _NormalDuelBoard = '<div id="cabfNormalDuelBoard"><div id="cabfNormalDuelType">Enemy</div><div><br></div><div id="cabfFarmTarget"><span>-</span><span>Farm Targets</span></div><div><br></div><div id="cabfToggleFarm"></div><div><br></div></div>';
 var _essenceBoard = '<div id="cabfEssenceBoard"><div id="cabfEssenceTilte">Essences</div><div><br></div><div id="cabfDamageStorage"><span>-</span><span>Damage Storage</span></div><div id="cabfToggleDamageStorage"></div><div><br></div><div id="cabfAttackStorage"><span>-</span><span>Attack Storage</span></div><div id="cabfToggleAttackStorage"></div><div><br></div><div id="cabfDefenseStorage"><span>-</span><span>Defense Storage</span></div><div id="cabfToggleDefenseStorage"></div><div><br></div><div id="cabfHealthStorage"><span>-</span><span>Health Storage</span></div><div id="cabfToggleHealthStorage"></div><div><br></div></div>';
 
 function runEffect(idButton, idToggle) {
@@ -203,6 +204,14 @@ function addFestivalDuelBoard(id) {
     $('#cabfFarmTarget').click(function () {
         runEffect('#cabfFarmTarget', '#cabfToggleFarm');
     });
+    if (item.get('#cabfToggleFarm', 'false') === 'false') {
+        $('#cabfToggleFarm').css("display", "none");
+        $('#cabfFarmTarget span:first').html('+');
+    }
+}
+
+function addNormalDuelBoard(id) {
+    $(id).after(_NormalDuelBoard);
     if (item.get('#cabfToggleFarm', 'false') === 'false') {
         $('#cabfToggleFarm').css("display", "none");
         $('#cabfFarmTarget span:first').html('+');
@@ -2331,11 +2340,15 @@ function battleStats() {
                 new_data = true;
                 newTarget = null;
             }
-            if ($('#results_main_wrapper>div:contains("VICTORY")').length > 0) {
+            if ($('#results_main_wrapper>div:contains("VICTORY")').length > 0
+                 || $('#results_main_wrapper>div[style*="conqduel_victory2.jpg"]').length > 0) {
                 console.log("VICTORY");
                 stats.targets[indexTarget].victory++;
                 new_data = true;
-            } else if ($('#results_main_wrapper>div:contains("DEFEAT")').length > 0) {
+                window.clearTimeout(NormalTimer);
+                NormalTimer = window.setTimeout(farmNormalBattle, 1000, target_id);
+            } else if ($('#results_main_wrapper>div:contains("DEFEAT")').length > 0
+                 || $('#results_main_wrapper>div[style*="conqduel_defeat2.jpg"]').length > 0) {
                 console.log("DEFEAT");
                 stats.targets[indexTarget].defeat++;
                 new_data = true;
@@ -2675,11 +2688,13 @@ function reloadFest() {
     }
     chainId = 0;
     window.clearTimeout(FestTimer);
-    _button = $("img[src*='festival_duelchamp_question.gif']");
-    _button.parent().attr("href", "festival_duel_battle.php");
-    _button.parent().attr("onclick", "ajaxLinkSend('globalContainer', 'festival_duel_battle.php'); return false;");
-    _button.parent().html('<img height="41" width="157" src="https://castleagegame1-a.akamaihd.net/graphics/festival_duelchampion/festival_duelchamp_enter.gif" class="imgButton">');
-    FestTimer = window.setTimeout(clickReloadFest, xDelayHealth * 5000);
+    if (item.get('FestTimer', false)) {
+        _button = $("img[src*='festival_duelchamp_question.gif']");
+        _button.parent().attr("href", "festival_duel_battle.php");
+        _button.parent().attr("onclick", "ajaxLinkSend('globalContainer', 'festival_duel_battle.php'); return false;");
+        _button.parent().html('<img height="41" width="157" src="https://castleagegame1-a.akamaihd.net/graphics/festival_duelchampion/festival_duelchamp_enter.gif" class="imgButton">');
+        FestTimer = window.setTimeout(clickReloadFest, xDelayHealth * 5000);
+    }
 }
 function clickReloadFest() {
     var _button;
@@ -2763,9 +2778,11 @@ function festivalDuelStats() {
     $('#StopButton').button();
     $('#StopButton').click(function () {
         window.clearTimeout(FestTimer);
+        item.set('FestTimer', false);
     });
     $('#StartButton').button();
     $('#StartButton').click(function () {
+        item.set('FestTimer', true);
         window.clearTimeout(FestTimer);
         FestTimer = window.setTimeout(chainFest, 5000);
     });
@@ -2860,6 +2877,54 @@ function eliminateDuplicates(arr) {
         out.push(i);
     }
     return out;
+}
+
+/******************************************************************************************************************************************************************************
+ *******************************************************************************************************************************************************************************
+ *************    NORMAL DUEL ***********************************************************************************************************************************************
+ *******************************************************************************************************************************************************************************
+ ******************************************************************************************************************************************************************************/
+var NormalTimer;
+
+function farmNormalBattle(id) {
+    try {
+        console.log("farmNormalBattle", id);
+        var _button;
+        _button = $("input[src*='war_duelagainbtn2.gif']");
+        if (_button.length > 0) {
+            _button.click();
+        } else {
+            window.clearTimeout(NormalTimer);
+        }
+    } catch (e) {
+        console.log("Error: farmNormalBattle", e);
+        window.clearTimeout(NormalTimer);
+    }
+}
+
+function normalDuelStats() {
+    var _sel = $('#battleList');
+    addNormalDuelBoard('#battleList');
+    _sel = $('#cabfToggleFarm');
+    _sel.html('<div>Farm: <input type="checkbox" id="normalFarmCheck"></input>');
+    try {
+        if (item.get('#normalFarmCheck', 'false') == 'true') {
+            $('#normalFarmCheck')[0].checked = true;
+        } else {
+            $('#normalFarmCheck')[0].checked = false;
+        }
+        $('#normalFarmCheck').change(function () {
+            if (this.checked) {
+                item.set('#normalFarmCheck', 'true');
+            } else {
+                item.set('#normalFarmCheck', 'false');
+            }
+            console.log("#normalFarmCheck", item.get('#normalFarmCheck', 'false'));
+        });
+    } catch (e) {
+        item.set('#normalFarmCheck', 'false');
+        console.error(e);
+    }
 }
 
 /******************************************************************************************************************************************************************************
@@ -3171,31 +3236,31 @@ function cabf_filters() {
             battleStats();
             cabf_tenbattlefilter();
         }
-    } else
+    } else {
         /* Festival battle */
         if ($('#enemy_team_tab').length > 0 || $('#your_team_tab').length > 0) {
             console.log('Festival battle');
             battleStats();
             cabf_festivalbattlefilter();
-        } else
+        } else {
             /* Earth land conquest battle */
             if ($('#tower_1,#tower_2,#tower_3,#tower_4').length > 0) {
                 console.log('Earth land conquest battle');
                 /*battleStats();*/
                 cabf_conquestearthfilter();
-            } else
+            } else {
                 /* Mist land conquest battle */
                 if ($('#your_guild_member_list_1').length > 0) {
                     console.log('Mist land conquest battle');
                     battleStats();
                     cabf_conquestmistfilter();
-                } else
+                } else {
                     /* Arena battle */
                     if ($('#arena_mid').length > 0) {
                         console.log('Arena battle');
                         battleStats();
                         cabf_arenabattlefilter();
-                    } else
+                    } else {
                         /* Normal battle */
                         if ($('#blist_pulldown_select').length > 0) {
                             console.log('Normal battle');
@@ -3203,8 +3268,17 @@ function cabf_filters() {
                                 console.log('Festival Duel Battle');
                                 festivalDuelStats();
                             }
+                            if ($('div[style*="battle_top1.jpg"]').length > 0) {
+                                console.log('Normal Duel Battle');
+                                normalDuelStats();
+                            }
                             battleStats();
                         }
+                    }
+                }
+            }
+        }
+    }
 
     /* Alchemy */
     if ($('div[style*="alchfb_top.jpg"]').length > 0) {
@@ -3719,6 +3793,8 @@ function init() {
         addCss("#cabfFestivalDuelType  {color:rosybrown; font-weight: bold;}");
         addCss("#cabfFarmTarget {color:rosybrown; font-weight: bold;}");
         addCss('.cabfFarmTargetTitle {position: relative !important;left: 11px;top: 3px;float: left;font-size: 12px;height: 15px;padding: 4px !important;color: rgb(255, 255, 255);background-color: rgb(34, 34, 34);border: 1px solid rgb(68, 68, 68);}');
+
+        addCss("#cabfNormalDuelBoard {position:fixed;background:#000;padding:5px;color:#fff;margin-top:0px;width:275px;text-align:center;opacity:0.75;top:0px;left:0px;height:100%;overflow:auto;display:block;font-size:11px;}");
 
         addCss('.GuildNum { color:white;position:relative;top:-100px;left:35px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');
         addCss('.GuildNumG{ color:green;position:relative;top:-100px;left:35px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');
