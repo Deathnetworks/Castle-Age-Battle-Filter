@@ -11,7 +11,7 @@
 // @require        http://fgnass.github.io/spin.js/spin.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.53
+// @version        1.1.54
 // @copyright      2013+, Jigoku
 // @grant  GM_addStyle
 // @grant  GM_getResourceText
@@ -181,7 +181,8 @@ var _dialogIO = '<div id="dialogIO" title="Import/Export">  <textarea id="statsD
 var _dialogSync = '<div id="dialogSync" title="Sync with CAAP">  <form><fieldset><label for="syncKey">Sync Key : </label><input type="text" name="syncKey" id="syncKey" value="" style="width: 420px;"></fieldset></form></div>';
 var _statBoard = '<div id="cabfHealthStatBoard"><div id="cabfStatType">Enemy</div><div><br></div><div id="cabfStatTower"><span>-</span><span>Stat</span></div><div id="cabfToggleTower"><div id="cabfTotalHealth">Total Health: 0</div><div id="cabfAverageHealth">Average Health: 0</div><div id="cabfHealthLeft">Health Left: 0</div><div id="cabfAverageHealthLeft">Average Health Left: 0</div><div id="cabfPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatCleric"><span>-</span><span>Cleric Stat</span></div><div id="cabfToggleCleric"><div id="cabfClericTotalHealth">Total Health: 0</div><div id="cabfClericAverageHealth">Average Health: 0</div><div id="cabfClericHealthLeft">Health Left: 0</div><div id="cabfClericAverageHealthLeft">Average Health Left: 0</div><div id="cabfClericPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatMage"><span>-</span><span>Mage Stat</span></div><div id="cabfToggleMage"><div id="cabfMageTotalHealth">Total Health: 0</div><div id="cabfMageAverageHealth">Average Health: 0</div><div id="cabfMageHealthLeft">Health Left: 0</div><div id="cabfMageAverageHealthLeft">Average Health Left: 0</div><div id="cabfMagePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatRogue"><span>-</span><span>Rogue Stat</span></div><div id="cabfToggleRogue"><div id="cabfRogueTotalHealth">Total Health: 0</div><div id="cabfRogueAverageHealth">Average Health: 0</div><div id="cabfRogueHealthLeft">Health Left: 0</div><div id="cabfRogueAverageHealthLeft">Average Health Left: 0</div><div id="cabfRoguePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatWarrior"><span>-</span><span>Warrior Stat</span></div><div id="cabfToggleWarrior"><div id="cabfWarriorTotalHealth">Total Health: 0</div><div id="cabfWarriorAverageHealth">Average Health: 0</div><div id="cabfWarriorHealthLeft">Health Left: 0</div><div id="cabfWarriorAverageHealthLeft">Average Health Left: 0</div><div id="cabfWarriorPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatActive"><span>-</span><span>Active Stat</span></div><div id="cabfToggleActive"><div id="cabfActiveTotalHealth">Total Health: 0</div><div id="cabfActiveAverageHealth">Average Health: 0</div><div id="cabfActiveHealthLeft">Health Left: 0</div><div id="cabfActiveAverageHealthLeft">Average Health Left: 0</div><div id="cabfActivePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div></div>';
 var _FestivalDuelBoard = '<div id="cabfFestivalDuelBoard"><div id="cabfFestivalDuelType">Enemy</div><div><br></div><div id="cabfFarmTarget"><span>-</span><span>Farm Targets</span></div><div><br></div><div id="cabfToggleFarm"><span class="cabfFarmTargetTitle ui-state-default"><a id="farmKeep" href="keep.php" target="_blank">Target</a> </span><select id="cabfTargetSelect" class="cabffarmfargettitle"></select></div><div><br></div></div>';
-var _NormalDuelBoard = '<div id="cabfNormalDuelBoard"><div id="cabfNormalDuelType">Enemy</div><div><br></div><div id="cabfFarmTarget"><span>-</span><span>Farm Targets</span></div><div><br></div><div id="cabfToggleFarm"></div><div><br></div></div>';
+var _NormalDuelBoard = '<div id="cabfNormalDuelBoard"><div id="cabfNormalDuelType">Enemy</div><div><br></div><div id="cabfCollapseNormal"><span>-</span><span>Farm Targets</span></div><div><br></div><div id="cabfToggleNormal"></div><div><br></div></div>';
+var _QuestDuelBoard = '<div id="cabfQuestBoard"><div id="cabfQuestDuelType">Quests</div><div><br></div><div id="cabfCollapseQuest"><span>-</span><span>Farm Quest</span></div><div><br></div><div id="cabfToggleQuest"></div><div><br></div></div>';
 var _essenceBoard = '<div id="cabfEssenceBoard"><div id="cabfEssenceTilte">Essences</div><div><br></div><div id="cabfDamageStorage"><span>-</span><span>Damage Storage</span></div><div id="cabfToggleDamageStorage"></div><div><br></div><div id="cabfAttackStorage"><span>-</span><span>Attack Storage</span></div><div id="cabfToggleAttackStorage"></div><div><br></div><div id="cabfDefenseStorage"><span>-</span><span>Defense Storage</span></div><div id="cabfToggleDefenseStorage"></div><div><br></div><div id="cabfHealthStorage"><span>-</span><span>Health Storage</span></div><div id="cabfToggleHealthStorage"></div><div><br></div></div>';
 
 function runEffect(idButton, idToggle) {
@@ -212,9 +213,23 @@ function addFestivalDuelBoard(id) {
 
 function addNormalDuelBoard(id) {
     $(id).after(_NormalDuelBoard);
-    if (item.get('#cabfToggleFarm', 'false') === 'false') {
-        $('#cabfToggleFarm').css("display", "none");
-        $('#cabfFarmTarget span:first').html('+');
+    $('#cabfCollapseNormal').click(function () {
+        runEffect('#cabfCollapseNormal', '#cabfToggleNormal');
+    });
+    if (item.get('#cabfToggleNormal', 'false') === 'false') {
+        $('#cabfToggleNormal').css("display", "none");
+        $('#cabfCollapseNormal span:first').html('+');
+    }
+}
+
+function addQuestDuelBoard(id) {
+    $(id).after(_QuestDuelBoard);
+    $('#cabfCollapseQuest').click(function () {
+        runEffect('#cabfCollapseQuest', '#cabfToggleQuest');
+    });
+    if (item.get('#cabfToggleQuest', 'false') === 'false') {
+        $('#cabfToggleQuest').css("display", "none");
+        $('#cabfCollapseQuest span:first').html('+');
     }
 }
 
@@ -2888,11 +2903,15 @@ var NormalTimer;
 
 function farmNormalBattle(id) {
     try {
-        console.log("farmNormalBattle", id);
-        var _button;
-        _button = $("input[src*='war_duelagainbtn2.gif']");
-        if (_button.length > 0) {
-            _button.click();
+        if (item.get('#normalFarmCheck', 'false') == 'true') {
+            console.log("farmNormalBattle", id);
+            var _button;
+            _button = $("input[src*='war_duelagainbtn2.gif']");
+            if (_button.length > 0) {
+                _button.click();
+            } else {
+                window.clearTimeout(NormalTimer);
+            }
         } else {
             window.clearTimeout(NormalTimer);
         }
@@ -2905,7 +2924,7 @@ function farmNormalBattle(id) {
 function normalDuelStats() {
     var _sel = $('#battleList');
     addNormalDuelBoard('#battleList');
-    _sel = $('#cabfToggleFarm');
+    _sel = $('#cabfToggleNormal');
     _sel.html('<div>Farm: <input type="checkbox" id="normalFarmCheck"></input>');
     try {
         if (item.get('#normalFarmCheck', 'false') == 'true') {
@@ -2923,6 +2942,75 @@ function normalDuelStats() {
         });
     } catch (e) {
         item.set('#normalFarmCheck', 'false');
+        console.error(e);
+    }
+}
+
+/******************************************************************************************************************************************************************************
+ *******************************************************************************************************************************************************************************
+ *************    QUEST ***********************************************************************************************************************************************
+ *******************************************************************************************************************************************************************************
+ ******************************************************************************************************************************************************************************/
+var QuestTimer;
+
+function farmQuestClick() {
+    try {
+        if (item.get('#questFarmCheck', 'false') == 'true') {
+            console.log("farmQuestClick");
+            var _button;
+            _button = $("input[src*='quest_questagain2_btn.gif']");
+            if (_button.length > 0) {
+                _button.click();
+            } else {
+                _button = $("input[src*='quest_questagain_btn.gif']");
+                if (_button.length > 0) {
+                    var _levelDiv = $('div[style*="nt_topbar2"]');
+                    if (_levelDiv.length > 0) {
+                        var _levelText = _levelDiv.text().trim();
+                        var _level = parseInt(/(?:Level\ )(\d+)/g.exec(_levelText)[1]);
+                        console.log("farmQuestClick Level=", _level);
+                        if (_level < 4) {
+                            _button.click();
+                        } else {
+                            window.clearTimeout(QuestTimer);
+                        }
+                    } else {
+                        window.clearTimeout(QuestTimer);
+                    }
+                } else {
+                    window.clearTimeout(QuestTimer);
+                }
+            }
+        } else {
+            window.clearTimeout(QuestTimer);
+        }
+    } catch (e) {
+        console.log("Error: farmQuestClick", e);
+        window.clearTimeout(QuestTimer);
+    }
+}
+
+function questFarm() {
+    try {
+        var _sel = $('#results_main_wrapper');
+        addQuestDuelBoard('#results_main_wrapper');
+        _sel = $('#cabfToggleQuest');
+        _sel.html('<div>Farm: <input type="checkbox" id="questFarmCheck"></input>');
+        if (item.get('#questFarmCheck', 'false') == 'true') {
+            $('#questFarmCheck')[0].checked = true;
+        } else {
+            $('#questFarmCheck')[0].checked = false;
+        }
+        $('#questFarmCheck').change(function () {
+            if (this.checked) {
+                item.set('#questFarmCheck', 'true');
+            } else {
+                item.set('#questFarmCheck', 'false');
+            }
+            console.log("#questFarmCheck", item.get('#questFarmCheck', 'false'));
+        });
+    } catch (e) {
+        item.set('#questFarmCheck', 'false');
         console.error(e);
     }
 }
@@ -3284,6 +3372,17 @@ function cabf_filters() {
     if ($('div[style*="alchfb_top.jpg"]').length > 0) {
         if (item.get('crafting', false)) {
             Craft(item.get('craftChoosen', craftList.LAVA_ORB));
+        }
+    }
+
+    /* Quest */
+    if ($('div[class*="quests_background"]').length > 0) {
+        console.log('Quest');
+        questFarm();
+
+        window.clearTimeout(QuestTimer);
+        if (item.get('#questFarmCheck', 'false') == 'true') {
+            NormalTimer = window.setTimeout(farmQuestClick, 1000);
         }
     }
 
@@ -3795,6 +3894,8 @@ function init() {
         addCss('.cabfFarmTargetTitle {position: relative !important;left: 11px;top: 3px;float: left;font-size: 12px;height: 15px;padding: 4px !important;color: rgb(255, 255, 255);background-color: rgb(34, 34, 34);border: 1px solid rgb(68, 68, 68);}');
 
         addCss("#cabfNormalDuelBoard {position:fixed;background:#000;padding:5px;color:#fff;margin-top:0px;width:275px;text-align:center;opacity:0.75;top:0px;left:0px;height:100%;overflow:auto;display:block;font-size:11px;}");
+
+        addCss("#cabfQuestBoard {position:fixed;background:#000;padding:5px;color:#fff;margin-top:0px;width:275px;text-align:center;opacity:0.75;top:0px;left:0px;height:100%;overflow:auto;display:block;font-size:11px;}");
 
         addCss('.GuildNum { color:white;position:relative;top:-100px;left:35px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');
         addCss('.GuildNumG{ color:green;position:relative;top:-100px;left:35px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');
