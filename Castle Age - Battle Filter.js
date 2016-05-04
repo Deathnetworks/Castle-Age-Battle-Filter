@@ -11,7 +11,7 @@
 // @require        http://fgnass.github.io/spin.js/spin.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.54
+// @version        1.1.55
 // @copyright      2013+, Jigoku
 // @grant  GM_addStyle
 // @grant  GM_getResourceText
@@ -363,7 +363,7 @@ function cabf_conquestmistfilter() {
         var _storedStatus = item.get('cabfPageConquestBattleStatus', 'All');
         var _storedPoints = item.get('cabfPageConquestBattlePoints', 'All');
 
-        $('#your_guild_member_list_1 > div').each(function (_i, _e) {
+        $('#your_guild_member_list_1 > div[style!="clear:both;"]').each(function (_i, _e) {
             var _text = $(_e).text().trim(),
             _health,
             _maxHealth,
@@ -400,7 +400,7 @@ function cabf_conquestmistfilter() {
             var _count = 0;
             var _myLevel = $('a[href*="keep.php"] > div[style="color:#ffffff"]').text().match(/\d+/);
             var myLevel = Number(_myLevel[0]);
-            $('#your_guild_member_list_1 > div').each(function (_i, _e) {
+            $('#your_guild_member_list_1 > div[style!="clear:both;"]').each(function (_i, _e) {
                 var _class = new RegExp($('#cabfGateClassFilter').val());
                 var _state = new RegExp($('#cabfGateStatusFilter').val());
                 var _points = $('#cabfGatePointsFilter').val();
@@ -2921,9 +2921,9 @@ function farmNormalBattle(id) {
     }
 }
 
-function normalDuelStats() {
-    var _sel = $('#battleList');
-    addNormalDuelBoard('#battleList');
+function normalDuelStats(id) {
+    var _sel = $(id);
+    addNormalDuelBoard(id);
     _sel = $('#cabfToggleNormal');
     _sel.html('<div>Farm: <input type="checkbox" id="normalFarmCheck"></input>');
     try {
@@ -3342,6 +3342,7 @@ function cabf_filters() {
                     console.log('Mist land conquest battle');
                     battleStats();
                     cabf_conquestmistfilter();
+                    normalDuelStats('#guild_battle_section');
                 } else {
                     /* Arena battle */
                     if ($('#arena_mid').length > 0) {
@@ -3358,7 +3359,11 @@ function cabf_filters() {
                             }
                             if ($('div[style*="battle_top1.jpg"]').length > 0) {
                                 console.log('Normal Duel Battle');
-                                normalDuelStats();
+                                normalDuelStats('#battleList');
+                            }
+                            if ($('div[style*="war_conquest_header2.jpg"]').length > 0) {
+                                console.log('Conquest Duel Battle');
+                                normalDuelStats('#battleList');
                             }
                             battleStats();
                         }
