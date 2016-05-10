@@ -11,7 +11,7 @@
 // @require        http://fgnass.github.io/spin.js/spin.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.55
+// @version        1.1.56
 // @copyright      2013+, Jigoku
 // @grant  GM_addStyle
 // @grant  GM_getResourceText
@@ -22,7 +22,7 @@
 /*jshint browser: true, devel: true, loopfunc: true, jquery: true */
 /*global document, setInterval, Spinner, localStorage, console, $, window, GM_getResourceText, GM_addStyle, GM_registerMenuCommand, MutationObserver */
 
-var version = '1.1.48', clickUrl = '', updated = false;
+var version = '1.1.56', clickUrl = '', updated = false;
 
 var defaultStats = {
     "targets" : [{
@@ -2906,8 +2906,11 @@ function farmNormalBattle(id) {
         if (item.get('#normalFarmCheck', 'false') == 'true') {
             console.log("farmNormalBattle", id);
             var _button;
-            _button = $("input[src*='war_duelagainbtn2.gif']");
+            _button = $("input[src*='war_duelagainbtn2.gif'],input[src*='war_invadeagainbtn.gif']");
             if (_button.length > 0) {
+                if ($("div[style*='battle_top1.jpg']").length > 0) {
+                    item.set('LASTfarmNormalBattle', _button.parents('form').parent().html());
+                }
                 _button.click();
             } else {
                 window.clearTimeout(NormalTimer);
@@ -2925,7 +2928,7 @@ function normalDuelStats(id) {
     var _sel = $(id);
     addNormalDuelBoard(id);
     _sel = $('#cabfToggleNormal');
-    _sel.html('<div>Farm: <input type="checkbox" id="normalFarmCheck"></input>');
+    _sel.html('<div>Farm: <input type="checkbox" id="normalFarmCheck"></input></div><div id="lastfarmnormalbattle">Last</div>');
     try {
         if (item.get('#normalFarmCheck', 'false') == 'true') {
             $('#normalFarmCheck')[0].checked = true;
@@ -2944,6 +2947,9 @@ function normalDuelStats(id) {
         item.set('#normalFarmCheck', 'false');
         console.error(e);
     }
+    $('#lastfarmnormalbattle').click(function () {
+        $('#lastfarmnormalbattle').html(item.get('LASTfarmNormalBattle', ' '));
+    });
 }
 
 /******************************************************************************************************************************************************************************
