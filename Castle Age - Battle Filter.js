@@ -2909,7 +2909,7 @@ function farmNormalBattle(id) {
             _button = $("input[src*='war_duelagainbtn2.gif'],input[src*='war_invadeagainbtn.gif']");
             if (_button.length > 0) {
                 if ($("div[style*='battle_top1.jpg']").length > 0) {
-                    item.set('LASTfarmNormalBattle', _button.parents('form').parent().html());
+                    item.set('LASTfarmNormalBattle', $('#results_main_wrapper').html());
                 }
                 _button.click();
             } else {
@@ -2928,7 +2928,7 @@ function normalDuelStats(id) {
     var _sel = $(id);
     addNormalDuelBoard(id);
     _sel = $('#cabfToggleNormal');
-    _sel.html('<div>Farm: <input type="checkbox" id="normalFarmCheck"></input></div><div id="lastfarmnormalbattle">Last</div>');
+    _sel.html('<div>Farm: <input type="checkbox" id="normalFarmCheck"></input></div><div id="lastfarmnormalbattle"><button  id="btlastfarm">Last</button></div>');
     try {
         if (item.get('#normalFarmCheck', 'false') == 'true') {
             $('#normalFarmCheck')[0].checked = true;
@@ -2947,8 +2947,10 @@ function normalDuelStats(id) {
         item.set('#normalFarmCheck', 'false');
         console.error(e);
     }
-    $('#lastfarmnormalbattle').click(function () {
-        $('#lastfarmnormalbattle').html(item.get('LASTfarmNormalBattle', ' '));
+    $('#btlastfarm').click(function () {
+		if ($("div[style*='battle_top1.jpg']").length > 0) {
+			$('#results_main_wrapper').html(item.get('LASTfarmNormalBattle', ' '));
+		}
     });
 }
 
