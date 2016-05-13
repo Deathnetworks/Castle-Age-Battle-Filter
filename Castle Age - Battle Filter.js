@@ -11,7 +11,7 @@
 // @require        http://fgnass.github.io/spin.js/spin.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.56
+// @version        1.1.57
 // @copyright      2013+, Jigoku
 // @grant  GM_addStyle
 // @grant  GM_getResourceText
@@ -2252,6 +2252,17 @@ function stunBar() {
     return '';
 }
 
+function linkMonsters() {
+    console.log('linkMonsters');
+    // link facebook to web4...
+    $('div[id*="link_copy_"]').each(function (_i, _e) {
+        var linkText = $('input', _e).val();
+        linkText = linkText.replace('apps.facebook.com', 'web4.castleagegame.com');
+        linkText = linkText.replace('castle_age', 'castle_ws');
+        $('input', _e).val(linkText);
+    });
+}
+
 /******************************************************************************************************************************************************************************
  *******************************************************************************************************************************************************************************
  *************    ARENA BATTLE *************************************************************************************************************************************************
@@ -2948,9 +2959,9 @@ function normalDuelStats(id) {
         console.error(e);
     }
     $('#btlastfarm').click(function () {
-		if ($("div[style*='battle_top1.jpg']").length > 0) {
-			$('#results_main_wrapper').html(item.get('LASTfarmNormalBattle', ' '));
-		}
+        if ($("div[style*='battle_top1.jpg']").length > 0) {
+            $('#results_main_wrapper').html(item.get('LASTfarmNormalBattle', ' '));
+        }
     });
 }
 
@@ -3417,6 +3428,9 @@ function cabf_filters() {
         monsterBars();
         defenseBar();
         stunBar();
+    }
+    if ($('img[src*="list_btn_tabpublic_on.gif"]').length > 0) {
+        linkMonsters();
     }
 }
 
