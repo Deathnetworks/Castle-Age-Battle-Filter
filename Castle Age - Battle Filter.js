@@ -2388,8 +2388,14 @@ function battleStats() {
                 new_data = true;
             } else if ($('#results_main_wrapper>div:contains("HEAL")').length > 0) {
                 console.log("HEAL");
-                window.clearTimeout(NormalTimer);
-                NormalTimer = window.setTimeout(farmNormalBattle, 1000, target_id);
+                var _e = $('#results_main_wrapper');
+                if (_e.length > 0) {
+                    var _credits = /GUARDIAN\ PATH\ CREDIT:\ YES/.exec(_e.text());
+                    if (_credits !== null) {
+						window.clearTimeout(NormalTimer);
+						NormalTimer = window.setTimeout(farmNormalBattle, 1000, target_id);
+					}
+				}
             } else if ($('#results_main_wrapper>div:contains("DISPEL")').length > 0) {
                 console.log("DISPEL");
             } else if ($('#results_main_wrapper>div:contains("ILLUSION")').length > 0) {
