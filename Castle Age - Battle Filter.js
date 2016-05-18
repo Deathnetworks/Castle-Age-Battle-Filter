@@ -11,7 +11,7 @@
 // @require        http://fgnass.github.io/spin.js/spin.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.57
+// @version        1.1.58
 // @copyright      2013+, Jigoku
 // @grant  GM_addStyle
 // @grant  GM_getResourceText
@@ -2388,6 +2388,8 @@ function battleStats() {
                 new_data = true;
             } else if ($('#results_main_wrapper>div:contains("HEAL")').length > 0) {
                 console.log("HEAL");
+                window.clearTimeout(NormalTimer);
+                NormalTimer = window.setTimeout(farmNormalBattle, 1000, target_id);
             } else if ($('#results_main_wrapper>div:contains("DISPEL")').length > 0) {
                 console.log("DISPEL");
             } else if ($('#results_main_wrapper>div:contains("ILLUSION")').length > 0) {
@@ -2917,7 +2919,7 @@ function farmNormalBattle(id) {
         if (item.get('#normalFarmCheck', 'false') == 'true') {
             console.log("farmNormalBattle", id);
             var _button;
-            _button = $("input[src*='war_duelagainbtn2.gif'],input[src*='war_invadeagainbtn.gif']");
+            _button = $("input[src*='war_duelagainbtn2.gif'],input[src*='war_invadeagainbtn.gif'],input[src*='war_healagainbtn.gif']");
             if (_button.length > 0) {
                 if ($("div[style*='battle_top1.jpg']").length > 0) {
                     item.set('LASTfarmNormalBattle', $('#results_main_wrapper').html());
@@ -3665,7 +3667,7 @@ var craftList = {
     },
     HERO_CRYSTAL : {
         name : "HERO CRYSTAL",
-        alchemy_id : 14
+        alchemy_id : 12
     },
     AGGRESSIVE_HERO_POTION : {
         name : "AGGRESSIVE HERO POTION",
