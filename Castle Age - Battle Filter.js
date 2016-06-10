@@ -11,7 +11,7 @@
 // @require        http://fgnass.github.io/spin.js/spin.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @version        1.1.58
+// @version        1.1.59
 // @copyright      2013+, Jigoku
 // @grant  GM_addStyle
 // @grant  GM_getResourceText
@@ -69,7 +69,14 @@ function addLoadingImg(id) {
     spinner = new Spinner(opts).spin(target);
 }
 
+var SyncDataTimer;
+
 function syncData() {
+        window.clearTimeout(SyncDataTimer);
+        SyncDataTimer = window.setTimeout(syncDataAjax, 5000);
+}
+
+function syncDataAjax() {
     //item.set('syncKey','https://api.myjson.com/bins/xxxxx');
     /*if (!localStorage.hasOwnProperty('cabf_syncKey') {
     item.set('syncKey','https://api.myjson.com/bins/xxxxx');
@@ -77,6 +84,7 @@ function syncData() {
     /*if (!localStorage.hasOwnProperty('cabf_stats') {
     item.set('stats',defaultStats);
     }*/
+    window.clearTimeout(SyncDataTimer);
     var key = JSON.parse(localStorage.cabf_syncKey);
     if (!key || key === null || key === "") {
         console.log('Sync key not set.');
@@ -88,7 +96,7 @@ function syncData() {
                 dataType : "json",
                 beforeSend : function () {
                     addLoadingImg('globalContainer');
-                    console.log('spinner', spinner);
+                    //console.log('spinner', spinner);
                     $('div[class="spinner"]').html($('div[class="spinner"]').html() + 'Synchronizing');
                 },
                 success : function (statsToMerge, textStatus, jqXHR) {
@@ -179,11 +187,13 @@ var _dialogConnect = '<div id="dialogConnect" title="Connect to CAAP">  <form><f
 var _dialogCraft = '<div id="dialogCraft" title="Craft Alchemy"><form><fieldset><label for="name">Select alchemy</label><select name="selectAlchemy" id="selectAlchemy"></select></fieldset></form></div>';
 var _dialogIO = '<div id="dialogIO" title="Import/Export">  <textarea id="statsDg" style="margin: 2px; height: 250px; width: 600px;"></textarea></div>';
 var _dialogSync = '<div id="dialogSync" title="Sync with CAAP">  <form><fieldset><label for="syncKey">Sync Key : </label><input type="text" name="syncKey" id="syncKey" value="" style="width: 420px;"></fieldset></form></div>';
-var _statBoard = '<div id="cabfHealthStatBoard"><div id="cabfStatType">Enemy</div><div><br></div><div id="cabfStatTower"><span>-</span><span>Stat</span></div><div id="cabfToggleTower"><div id="cabfTotalHealth">Total Health: 0</div><div id="cabfAverageHealth">Average Health: 0</div><div id="cabfHealthLeft">Health Left: 0</div><div id="cabfAverageHealthLeft">Average Health Left: 0</div><div id="cabfPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatCleric"><span>-</span><span>Cleric Stat</span></div><div id="cabfToggleCleric"><div id="cabfClericTotalHealth">Total Health: 0</div><div id="cabfClericAverageHealth">Average Health: 0</div><div id="cabfClericHealthLeft">Health Left: 0</div><div id="cabfClericAverageHealthLeft">Average Health Left: 0</div><div id="cabfClericPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatMage"><span>-</span><span>Mage Stat</span></div><div id="cabfToggleMage"><div id="cabfMageTotalHealth">Total Health: 0</div><div id="cabfMageAverageHealth">Average Health: 0</div><div id="cabfMageHealthLeft">Health Left: 0</div><div id="cabfMageAverageHealthLeft">Average Health Left: 0</div><div id="cabfMagePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatRogue"><span>-</span><span>Rogue Stat</span></div><div id="cabfToggleRogue"><div id="cabfRogueTotalHealth">Total Health: 0</div><div id="cabfRogueAverageHealth">Average Health: 0</div><div id="cabfRogueHealthLeft">Health Left: 0</div><div id="cabfRogueAverageHealthLeft">Average Health Left: 0</div><div id="cabfRoguePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatWarrior"><span>-</span><span>Warrior Stat</span></div><div id="cabfToggleWarrior"><div id="cabfWarriorTotalHealth">Total Health: 0</div><div id="cabfWarriorAverageHealth">Average Health: 0</div><div id="cabfWarriorHealthLeft">Health Left: 0</div><div id="cabfWarriorAverageHealthLeft">Average Health Left: 0</div><div id="cabfWarriorPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatActive"><span>-</span><span>Active Stat</span></div><div id="cabfToggleActive"><div id="cabfActiveTotalHealth">Total Health: 0</div><div id="cabfActiveAverageHealth">Average Health: 0</div><div id="cabfActiveHealthLeft">Health Left: 0</div><div id="cabfActiveAverageHealthLeft">Average Health Left: 0</div><div id="cabfActivePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div></div>';
-var _FestivalDuelBoard = '<div id="cabfFestivalDuelBoard"><div id="cabfFestivalDuelType">Enemy</div><div><br></div><div id="cabfFarmTarget"><span>-</span><span>Farm Targets</span></div><div><br></div><div id="cabfToggleFarm"><span class="cabfFarmTargetTitle ui-state-default"><a id="farmKeep" href="keep.php" target="_blank">Target</a> </span><select id="cabfTargetSelect" class="cabffarmfargettitle"></select></div><div><br></div></div>';
-var _NormalDuelBoard = '<div id="cabfNormalDuelBoard"><div id="cabfNormalDuelType">Enemy</div><div><br></div><div id="cabfCollapseNormal"><span>-</span><span>Farm Targets</span></div><div><br></div><div id="cabfToggleNormal"></div><div><br></div></div>';
-var _QuestDuelBoard = '<div id="cabfQuestBoard"><div id="cabfQuestDuelType">Quests</div><div><br></div><div id="cabfCollapseQuest"><span>-</span><span>Farm Quest</span></div><div><br></div><div id="cabfToggleQuest"></div><div><br></div></div>';
-var _essenceBoard = '<div id="cabfEssenceBoard"><div id="cabfEssenceTilte">Essences</div><div><br></div><div id="cabfDamageStorage"><span>-</span><span>Damage Storage</span></div><div id="cabfToggleDamageStorage"></div><div><br></div><div id="cabfAttackStorage"><span>-</span><span>Attack Storage</span></div><div id="cabfToggleAttackStorage"></div><div><br></div><div id="cabfDefenseStorage"><span>-</span><span>Defense Storage</span></div><div id="cabfToggleDefenseStorage"></div><div><br></div><div id="cabfHealthStorage"><span>-</span><span>Health Storage</span></div><div id="cabfToggleHealthStorage"></div><div><br></div></div>';
+var _statBlock = '<div id="cabfHealthStatBlock"><div id="cabfStatType">Enemy</div><div><br></div><div id="cabfStatTower"><span>-</span><span>Stat</span></div><div id="cabfToggleTower"><div id="cabfTotalHealth">Total Health: 0</div><div id="cabfAverageHealth">Average Health: 0</div><div id="cabfHealthLeft">Health Left: 0</div><div id="cabfAverageHealthLeft">Average Health Left: 0</div><div id="cabfPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatCleric"><span>-</span><span>Cleric Stat</span></div><div id="cabfToggleCleric"><div id="cabfClericTotalHealth">Total Health: 0</div><div id="cabfClericAverageHealth">Average Health: 0</div><div id="cabfClericHealthLeft">Health Left: 0</div><div id="cabfClericAverageHealthLeft">Average Health Left: 0</div><div id="cabfClericPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatMage"><span>-</span><span>Mage Stat</span></div><div id="cabfToggleMage"><div id="cabfMageTotalHealth">Total Health: 0</div><div id="cabfMageAverageHealth">Average Health: 0</div><div id="cabfMageHealthLeft">Health Left: 0</div><div id="cabfMageAverageHealthLeft">Average Health Left: 0</div><div id="cabfMagePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatRogue"><span>-</span><span>Rogue Stat</span></div><div id="cabfToggleRogue"><div id="cabfRogueTotalHealth">Total Health: 0</div><div id="cabfRogueAverageHealth">Average Health: 0</div><div id="cabfRogueHealthLeft">Health Left: 0</div><div id="cabfRogueAverageHealthLeft">Average Health Left: 0</div><div id="cabfRoguePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatWarrior"><span>-</span><span>Warrior Stat</span></div><div id="cabfToggleWarrior"><div id="cabfWarriorTotalHealth">Total Health: 0</div><div id="cabfWarriorAverageHealth">Average Health: 0</div><div id="cabfWarriorHealthLeft">Health Left: 0</div><div id="cabfWarriorAverageHealthLeft">Average Health Left: 0</div><div id="cabfWarriorPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatActive"><span>-</span><span>Active Stat</span></div><div id="cabfToggleActive"><div id="cabfActiveTotalHealth">Total Health: 0</div><div id="cabfActiveAverageHealth">Average Health: 0</div><div id="cabfActiveHealthLeft">Health Left: 0</div><div id="cabfActiveAverageHealthLeft">Average Health Left: 0</div><div id="cabfActivePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div></div>';
+var _FestivalDuelBlock = '<div id="cabfFestivalDuelBlock"><div id="cabfFestivalDuelType">Festival Battle</div><div><br></div><div id="cabfFarmTarget"><span>-</span><span>Farm Targets</span></div><div><br></div><div id="cabfToggleFarm"><span class="cabfFarmTargetTitle ui-state-default"><a id="farmKeep" href="keep.php" target="_blank">Target</a> </span><select id="cabfTargetSelect" class="cabffarmfargettitle"></select></div><div><br></div></div>';
+var _NormalDuelBlock = '<div id="cabfNormalDuelBlock"><div id="cabfNormalDuelType">Battle</div><div><br></div><div id="cabfCollapseNormal"><span>-</span><span>Farm Targets</span></div><div><br></div><div id="cabfToggleNormal"></div><div><br></div></div>';
+var _QuestDuelBlock = '<div id="cabfQuestBlock"><div id="cabfQuestDuelType">Quests</div><div><br></div><div id="cabfCollapseQuest"><span>-</span><span>Farm Quest</span></div><div><br></div><div id="cabfToggleQuest"></div><div><br></div></div>';
+var _essenceBlock = '<div id="cabfEssenceBlock"><div id="cabfEssenceTilte">Essences</div><div><br></div><div id="cabfDamageStorage"><span>-</span><span>Damage Storage</span></div><div id="cabfToggleDamageStorage"></div><div><br></div><div id="cabfAttackStorage"><span>-</span><span>Attack Storage</span></div><div id="cabfToggleAttackStorage"></div><div><br></div><div id="cabfDefenseStorage"><span>-</span><span>Defense Storage</span></div><div id="cabfToggleDefenseStorage"></div><div><br></div><div id="cabfHealthStorage"><span>-</span><span>Health Storage</span></div><div id="cabfToggleHealthStorage"></div><div><br></div></div>';
+var _rightBoard = '<div id="cabfRigthBoard"></div>';
+var _leftBoard = '<div id="cabfLeftBoard"></div>';
 
 function runEffect(idButton, idToggle) {
     var options = {},
@@ -201,18 +211,35 @@ function runEffect(idButton, idToggle) {
 }
 
 function addFestivalDuelBoard(id) {
-    $(id).after(_FestivalDuelBoard);
+
+    if ($('#cabfLeftBoard').length <= 0) {
+        $(id).after(_leftBoard);		
+	}
+
+    if ($('#cabfFestivalDuelBlock').length <= 0) {
+		$('#cabfLeftBoard').append(_FestivalDuelBlock);
+	}
+	
     $('#cabfFarmTarget').click(function () {
         runEffect('#cabfFarmTarget', '#cabfToggleFarm');
     });
-    if (item.get('#cabfToggleFarm', 'false') === 'false') {
+    
+	if (item.get('#cabfToggleFarm', 'false') === 'false') {
         $('#cabfToggleFarm').css("display", "none");
         $('#cabfFarmTarget span:first').html('+');
     }
 }
 
 function addNormalDuelBoard(id) {
-    $(id).after(_NormalDuelBoard);
+
+    if ($('#cabfLeftBoard').length <= 0) {
+        $(id).after(_leftBoard);		
+	}
+
+    if ($('#cabfNormalDuelBlock').length <= 0) {
+		$('#cabfLeftBoard').append(_NormalDuelBlock);
+	}
+	
     $('#cabfCollapseNormal').click(function () {
         runEffect('#cabfCollapseNormal', '#cabfToggleNormal');
     });
@@ -223,7 +250,15 @@ function addNormalDuelBoard(id) {
 }
 
 function addQuestDuelBoard(id) {
-    $(id).after(_QuestDuelBoard);
+
+    if ($('#cabfLeftBoard').length <= 0) {
+        $(id).after(_leftBoard);		
+	}
+
+    if ($('#cabfQuestBlock').length <= 0) {
+		$('#cabfLeftBoard').append(_QuestDuelBlock);
+	}
+	
     $('#cabfCollapseQuest').click(function () {
         runEffect('#cabfCollapseQuest', '#cabfToggleQuest');
     });
@@ -234,7 +269,15 @@ function addQuestDuelBoard(id) {
 }
 
 function addStatBoard(id) {
-    $(id).after(_statBoard);
+
+    if ($('#cabfLeftBoard').length <= 0) {
+        $(id).after(_leftBoard);		
+	}
+
+    if ($('#cabfHealthStatBlock').length <= 0) {
+		$('#cabfLeftBoard').append(_statBlock);
+	}
+	
     $('#cabfStatTower').click(function () {
         runEffect('#cabfStatTower', '#cabfToggleTower');
     });
@@ -281,8 +324,12 @@ function addStatBoard(id) {
 
 function addEssenceBoard(id) {
 
-    if ($('#cabfEssenceBoard').length <= 0) {
-        $(id).append(_essenceBoard);
+    if ($('#cabfRigthBoard').length <= 0) {
+        $(id).append(_rightBoard);		
+	}
+
+    if ($('#cabfEssenceBlock').length <= 0) {
+        $('#cabfRigthBoard').append(_essenceBlock);
 
         $('#cabfDamageStorage').click(function () {
             runEffect('#cabfDamageStorage', '#cabfToggleDamageStorage');
@@ -919,6 +966,7 @@ function cabf_guildbattlefilter() {
     $('#guild_battle_banner_section > div:eq(2)').css('marginTop', 0);
     $('div:contains("The Battle Between"):last').parent().css('marginTop', 20);
     $('input[src*="collect_reward_button2.jpg"]').parents('div:eq(2)').css('marginTop', 0);
+	normalDuelStats('#guild_battle_guild_tabs');
     addStatBoard('#guild_battle_guild_tabs');
 
     // add current tokens to result
@@ -1400,6 +1448,7 @@ function cabf_tenbattlefilter() {
     $('#guild_battle_banner_section > div:eq(2)').css('marginTop', 0);
     $('div:contains("The Battle Between"):last').parent().css('marginTop', 20);
     $('input[src*="collect_reward_button2.jpg"]').parents('div:eq(2)').css('marginTop', 0);
+	normalDuelStats('#guild_battle_guild_tabs');
     addStatBoard('#guild_battle_guild_tabs');
 
     // add current tokens to result
@@ -1815,6 +1864,7 @@ function cabf_festivalbattlefilter() {
     $('#guild_battle_banner_section > div:eq(2)').css('marginTop', 0);
     $('div:contains("The Battle Between"):last').parent().css('marginTop', 20);
     $('input[src*="collect_reward_button2.jpg"]').parents('div:eq(2)').css('marginTop', 0);
+	normalDuelStats('#guild_battle_guild_tabs');
     addStatBoard('#guild_battle_guild_tabs');
 
     // add current tokens to result
@@ -3414,7 +3464,7 @@ function cabf_filters() {
 
         window.clearTimeout(QuestTimer);
         if (item.get('#questFarmCheck', 'false') == 'true') {
-            NormalTimer = window.setTimeout(farmQuestClick, 1000);
+            QuestTimer = window.setTimeout(farmQuestClick, 1000);
         }
     }
 
@@ -3878,7 +3928,7 @@ function init() {
         addCss('#cabfGateStatusFilter-button {color: white;top: 3px;left: 9px;position: relative;float: left;font-size: 12px;border-radius: 0;width: 100px !important;height: 23px;}');
         addCss('#cabfGateStatusFilter-menu {font-size: 12px;width: 100px !important;}');
         addCss('#cabfGateClassFilter,#cabfGateStatusFilter,#cabfGatePointsFilter { color: #fff; height: 25px; border: 1px solid #444444; background-color: #222; position: relative; top: 3px; left: 9px; float: left;}');
-        addCss("#cabfHealthStatBoard {position:fixed;background:#000;padding:5px;color:#fff;margin-top:0px;width:275px;text-align:center;opacity:0.75;top:0px;left:0px;height:100%;overflow:auto;display:block;font-size:11px;}");
+        //addCss("#cabfHealthStatBoard {position:fixed;background:#000;padding:5px;color:#fff;margin-top:0px;width:275px;text-align:center;opacity:0.75;top:0px;left:0px;height:100%;overflow:auto;display:block;font-size:11px;}");
         addCss("#cabfStatType  {color:rosybrown; font-weight: bold;}");
         addCss("#cabfStatTower {color:rosybrown; font-weight: bold;}");
         addCss("#cabfStatCleric {color: yellow; font-weight: bold;}");
@@ -3923,14 +3973,18 @@ function init() {
         addCss("#cabfActiveAverageHealthLeft {color: #fff;text-align:end;}");
         addCss("#cabfActivePercentageHealthLeft {color: #fff;text-align:end;}");
 
-        addCss("#cabfFestivalDuelBoard {position:fixed;background:#000;padding:5px;color:#fff;margin-top:0px;width:275px;text-align:center;opacity:0.75;top:0px;left:0px;height:100%;overflow:auto;display:block;font-size:11px;}");
+        addCss("#cabfRigthBoard {position:fixed;background:#000;padding:5px;color:#fff;margin-top:0px;width:275px;text-align:center;opacity:0.75;top:0px;right:0px;height:100%;overflow:auto;display:block;font-size:11px;}");
+
+        addCss("#cabfLeftBoard {position:fixed;background:#000;padding:5px;color:#fff;margin-top:0px;width:275px;text-align:center;opacity:0.75;top:0px;left:0px;height:100%;overflow:auto;display:block;font-size:11px;}");
+
+        //addCss("#cabfFestivalDuelBoard {position:fixed;background:#000;padding:5px;color:#fff;margin-top:0px;width:275px;text-align:center;opacity:0.75;top:0px;left:0px;height:100%;overflow:auto;display:block;font-size:11px;}");
         addCss("#cabfFestivalDuelType  {color:rosybrown; font-weight: bold;}");
         addCss("#cabfFarmTarget {color:rosybrown; font-weight: bold;}");
         addCss('.cabfFarmTargetTitle {position: relative !important;left: 11px;top: 3px;float: left;font-size: 12px;height: 15px;padding: 4px !important;color: rgb(255, 255, 255);background-color: rgb(34, 34, 34);border: 1px solid rgb(68, 68, 68);}');
 
-        addCss("#cabfNormalDuelBoard {position:fixed;background:#000;padding:5px;color:#fff;margin-top:0px;width:275px;text-align:center;opacity:0.75;top:0px;left:0px;height:100%;overflow:auto;display:block;font-size:11px;}");
+        //addCss("#cabfNormalDuelBlock {position:fixed;background:#000;padding:5px;color:#fff;margin-top:0px;width:275px;text-align:center;opacity:0.75;top:0px;left:0px;height:100%;overflow:auto;display:block;font-size:11px;}");
 
-        addCss("#cabfQuestBoard {position:fixed;background:#000;padding:5px;color:#fff;margin-top:0px;width:275px;text-align:center;opacity:0.75;top:0px;left:0px;height:100%;overflow:auto;display:block;font-size:11px;}");
+        //addCss("#cabfQuestBoard {position:fixed;background:#000;padding:5px;color:#fff;margin-top:0px;width:275px;text-align:center;opacity:0.75;top:0px;left:0px;height:100%;overflow:auto;display:block;font-size:11px;}");
 
         addCss('.GuildNum { color:white;position:relative;top:-100px;left:35px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');
         addCss('.GuildNumG{ color:green;position:relative;top:-100px;left:35px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');
@@ -3942,7 +3996,7 @@ function init() {
         addCss('#tooltip .tipBody {background-color:#000;padding:5px 5px 5px 15px;}');
         addCss('#tooltip .tipFooter {height:8px;background:url(images/tipFooter.gif) no-repeat;}');
 
-        addCss("#cabfEssenceBoard {position:fixed;background:#000;padding:5px;color:#fff;margin-top:0px;width:275px;text-align:center;opacity:0.75;top:0px;right:0px;height:100%;overflow:auto;display:block;font-size:11px;}");
+        //addCss("#cabfEssenceBoard {position:fixed;background:#000;padding:5px;color:#fff;margin-top:0px;width:275px;text-align:center;opacity:0.75;top:0px;right:0px;height:100%;overflow:auto;display:block;font-size:11px;}");
         addCss("#cabfEssenceTilte  {color:rosybrown; font-weight: bold;}");
         addCss("#cabfDamageStorage {color: blueviolet; font-weight: bold;}");
         addCss("#cabfAttackStorage {color: yellow; font-weight: bold;}");
