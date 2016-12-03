@@ -11,6 +11,7 @@
 // @require        http://fgnass.github.io/spin.js/spin.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
+// @resource       cabfCss https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/Castle%20Age%20-%20Battle%20Filter.css
 // @resource       arenaBoard https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/ArenaBoard.html
 // @version        1.2.00
 // @copyright      2013+, Jigoku
@@ -2401,21 +2402,21 @@ function cabf_arenabattlefilter() {
         }
     });
     try {
-        if (item.get('cabfCleanCheck', 'false') == 'true') {
-            $('#cleanCheck')[0].checked = true;
+        if (item.get('cabfRefillTokens', 'false') == 'true') {
+            $('#refillTokens')[0].checked = true;
         } else {
-            $('#cleanCheck')[0].checked = false;
+            $('#refillTokens')[0].checked = false;
         }
-        $('#cleanCheck').change(function () {
+        $('#refillTokens').change(function () {
             if (this.checked) {
-                item.set('cabfCleanCheck', 'true');
+                item.set('cabfRefillTokens', 'true');
             } else {
-                item.set('cabfCleanCheck', 'false');
+                item.set('cabfRefillTokens', 'false');
             }
-            console.log("cabfCleanCheck", item.get('cabfCleanCheck', 'false'));
+            console.log("cabfRefillTokens", item.get('cabfRefillTokens', 'false'));
         });
     } catch (e) {
-        item.set('cabfCleanCheck', 'false');
+        item.set('cabfRefillTokens', 'false');
         console.error(e);
     }
     $('#CleanButton').button();
@@ -2480,6 +2481,24 @@ function cabf_arenabattlefilter() {
         item.set('guildIDs', JSON.parse(this.value));
         guildIDs = JSON.parse(this.value);
     });
+    try {
+        if (item.get('cabfRefillTokens', 'false') == 'true') {
+            $('#cleanCheck')[0].checked = true;
+        } else {
+            $('#cleanCheck')[0].checked = false;
+        }
+        $('#cleanCheck').change(function () {
+            if (this.checked) {
+                item.set('cabfCleanCheck', 'true');
+            } else {
+                item.set('cabfCleanCheck', 'false');
+            }
+            console.log("cabfCleanCheck", item.get('cabfCleanCheck', 'false'));
+        });
+    } catch (e) {
+        item.set('cabfCleanCheck', 'false');
+        console.error(e);
+    }
     $('#targetMinRank')[0].value = chainArenaRankMin;
     $('#targetMinRank').change(function () {
         item.set('chainArenaRankMin', this.value);
@@ -2924,9 +2943,11 @@ function battleStats() {
 						arenaHealthWidth=/width:\d+/i.exec(arenaHealth[0].outerHTML)[0];
 						if (!arenaHealthWidth.match("width:0")) {							
 							try {
-								var button = $("input[src*='arena_10_token_refill_btn.jpg']");
-								console.log (1, "Refill to burn Arena Health");
-								button.click();
+								if (item.get('cabfRefillTokens', 'false') == 'true') {
+									var button = $("input[src*='arena_10_token_refill_btn.jpg']");
+									console.log (1, "Refill to burn Arena Health");
+									button.click();
+								}
 								window.clearTimeout(ArenaTimer);
 								ArenaTimer = window.setTimeout(chainArena, xDelayArenaHealth * 1000);
 							} catch (err) {
@@ -4326,105 +4347,7 @@ function init() {
     });
 
     try {
-        addCss("#cabfEarthFiltered1 { color: #fff;}");
-        addCss("#cabfEarthFiltered2 { color: #fff;}");
-        addCss("#cabfEarthFiltered3 { color: #fff;}");
-        addCss("#cabfEarthFiltered4 { color: #fff;}");
-        addCss("#cabfEarthAction1 { color: #fff;}");
-        addCss("#cabfEarthAction2 { color: #fff;}");
-        addCss("#cabfEarthAction3 { color: #fff;}");
-        addCss("#cabfEarthAction4 { color: #fff;}");
-        addCss("#cabfHealthAction { position: absolute; background: #000; padding: 5px; color: #fff; width: 170px; text-align: center; opacity: 0.75;}");
-        addCss("#cabfHealthActionEarth { position: fixed; background: #000; padding: 5px; color: #fff; margin-top: 0px; width: 200px; text-align: center; opacity: 0.75; top: 58px; left: 0px;}");
-        addCss("#cabfConquestEarthFilterContainer { width: 740px; position: fixed; top: 0px; left: 0px; margin-bottom: 0px; height: 57px; z-index: 99;}");
-        addCss("#cabfConquestEarthFilter { height: 30px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; box-shadow: 0 5px 5px #000; padding: 0 11px 0 4px; position: fixed; width: 480px; margin-left: 0px; opacity: 0.75;}");
-        addCss("#cabfConquestBattleFilterContainer { background-image: url('https://castleagegame1-a.akamaihd.net/22284/graphics/conq2_insideland_midrepeat.jpg'); width: 740px; position: relative; top: -10px; margin-bottom: -10px; height: 57px;}");
-        addCss("#cabfConquestBattleFilter { height: 30px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; box-shadow: 0 5px 5px #000; padding: 0 11px 0 4px; position: relative; width: 550px; margin-left: 90px;}");
-        addCss('.cabfGateFilterTitle {position: relative !important;left: 11px;top: 3px;float: left;font-size: 12px;height: 15px;padding: 4px !important;color: rgb(255, 255, 255);background-color: rgb(34, 34, 34);border: 1px solid rgb(68, 68, 68);}');
-        addCss('#cabfGateClassFilter-button {color: white;top: 3px;left: 9px;position: relative;float: left;font-size: 12px;border-radius: 0;width: 90px !important;height: 23px;}');
-        addCss('#cabfGateClassFilter-menu {font-size: 12px;width: 90px !important;}');
-        addCss('#cabfGateActivityFilter-button {color: white;top: 3px;left: 9px;position: relative;float: left;font-size: 12px;border-radius: 0;width: 80px !important;height: 23px;}');
-        addCss('#cabfGateActivityFilter-menu {font-size: 12px;width: 80px !important;}');
-        addCss('#cabfGateStatusFilter-button {color: white;top: 3px;left: 9px;position: relative;float: left;font-size: 12px;border-radius: 0;width: 100px !important;height: 23px;}');
-        addCss('#cabfGateStatusFilter-menu {font-size: 12px;width: 100px !important;}');
-        addCss('#cabfGateClassFilter,#cabfGateStatusFilter,#cabfGatePointsFilter { color: #fff; height: 25px; border: 1px solid #444444; background-color: #222; position: relative; top: 3px; left: 9px; float: left;}');
-        //addCss("#cabfHealthStatBoard {position:fixed;background:#000;padding:5px;color:#fff;margin-top:0px;width:275px;text-align:center;opacity:0.75;top:0px;left:0px;height:100%;overflow:auto;display:block;font-size:11px;}");
-        addCss("#cabfStatType  {color:rosybrown; font-weight: bold;}");
-        addCss("#cabfStatTower {color:rosybrown; font-weight: bold;}");
-        addCss("#cabfStatCleric {color: yellow; font-weight: bold;}");
-        addCss("#cabfStatMage {color: blueviolet; font-weight: bold;}");
-        addCss("#cabfStatRogue {color: green; font-weight: bold;}");
-        addCss("#cabfStatWarrior {color: royalblue; font-weight: bold;}");
-        addCss("#cabfStatActive {color: red; font-weight: bold;}");
-
-        addCss("#cabfTotalHealth       {color: #fff;text-align:end;}");
-        addCss("#cabfAverageHealth     {color: #fff;text-align:end;}");
-        addCss("#cabfHealthLeft        {color: #fff;text-align:end;}");
-        addCss("#cabfAverageHealthLeft {color: #fff;text-align:end;}");
-        addCss("#cabfPercentageHealthLeft {color: #fff;text-align:end;}");
-
-        addCss("#cabfClericTotalHealth       {color: #fff;text-align:end;}");
-        addCss("#cabfClericAverageHealth     {color: #fff;text-align:end;}");
-        addCss("#cabfClericHealthLeft        {color: #fff;text-align:end;}");
-        addCss("#cabfClericAverageHealthLeft {color: #fff;text-align:end;}");
-        addCss("#cabfClericPercentageHealthLeft {color: #fff;text-align:end;}");
-
-        addCss("#cabfMageTotalHealth       {color: #fff;text-align:end;}");
-        addCss("#cabfMageAverageHealth     {color: #fff;text-align:end;}");
-        addCss("#cabfMageHealthLeft        {color: #fff;text-align:end;}");
-        addCss("#cabfMageAverageHealthLeft {color: #fff;text-align:end;}");
-        addCss("#cabfMagePercentageHealthLeft {color: #fff;text-align:end;}");
-
-        addCss("#cabfRogueTotalHealth       {color: #fff;text-align:end;}");
-        addCss("#cabfRogueAverageHealth     {color: #fff;text-align:end;}");
-        addCss("#cabfRogueHealthLeft        {color: #fff;text-align:end;}");
-        addCss("#cabfRogueAverageHealthLeft {color: #fff;text-align:end;}");
-        addCss("#cabfRoguePercentageHealthLeft {color: #fff;text-align:end;}");
-
-        addCss("#cabfWarriorTotalHealth       {color: #fff;text-align:end;}");
-        addCss("#cabfWarriorAverageHealth     {color: #fff;text-align:end;}");
-        addCss("#cabfWarriorHealthLeft        {color: #fff;text-align:end;}");
-        addCss("#cabfWarriorAverageHealthLeft {color: #fff;text-align:end;}");
-        addCss("#cabfWarriorPercentageHealthLeft {color: #fff;text-align:end;}");
-
-        addCss("#cabfActiveTotalHealth       {color: #fff;text-align:end;}");
-        addCss("#cabfActiveAverageHealth     {color: #fff;text-align:end;}");
-        addCss("#cabfActiveHealthLeft        {color: #fff;text-align:end;}");
-        addCss("#cabfActiveAverageHealthLeft {color: #fff;text-align:end;}");
-        addCss("#cabfActivePercentageHealthLeft {color: #fff;text-align:end;}");
-
-        addCss("#cabfRigthBoard {position:fixed;background:#000;padding:5px;color:#fff;margin-top:0px;width:275px;text-align:center;opacity:0.75;top:0px;right:0px;height:100%;overflow:auto;display:block;font-size:11px;}");
-
-        addCss("#cabfLeftBoard {position:fixed;background:#000;padding:5px;color:#fff;margin-top:0px;width:275px;text-align:center;opacity:0.75;top:0px;left:0px;height:100%;overflow:auto;display:block;font-size:11px;}");
-
-        //addCss("#cabfFestivalDuelBoard {position:fixed;background:#000;padding:5px;color:#fff;margin-top:0px;width:275px;text-align:center;opacity:0.75;top:0px;left:0px;height:100%;overflow:auto;display:block;font-size:11px;}");
-        addCss("#cabfFestivalDuelType  {color:rosybrown; font-weight: bold;}");
-        addCss("#cabfFarmTarget {color:rosybrown; font-weight: bold;}");
-        addCss('.cabfFarmTargetTitle {position: relative !important;left: 11px;top: 3px;float: left;font-size: 12px;height: 15px;padding: 4px !important;color: rgb(255, 255, 255);background-color: rgb(34, 34, 34);border: 1px solid rgb(68, 68, 68);}');
-
-        addCss("#cabfArenaDuelType  {color:rosybrown; font-weight: bold;}");
-
-        //addCss("#cabfNormalDuelBlock {position:fixed;background:#000;padding:5px;color:#fff;margin-top:0px;width:275px;text-align:center;opacity:0.75;top:0px;left:0px;height:100%;overflow:auto;display:block;font-size:11px;}");
-
-        //addCss("#cabfQuestBoard {position:fixed;background:#000;padding:5px;color:#fff;margin-top:0px;width:275px;text-align:center;opacity:0.75;top:0px;left:0px;height:100%;overflow:auto;display:block;font-size:11px;}");
-
-        addCss('.GuildNum { color:white;position:relative;top:-100px;left:35px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');
-        addCss('.GuildNumG{ color:green;position:relative;top:-100px;left:35px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');
-        addCss('.GuildNumR{ color:red;position:relative;top:-100px;left:35px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');
-        addCss('.KeepLink { color:white;position:relative;top:-100px;left:35px;text-shadow: 0 0 1px black, 0 0 4px black;font-weight: bold;}');
-
-        addCss('#tooltip {position:absolute;z-index:9999;color:#fff;font-size:10px;width:180px;}');
-        addCss('#tooltip .tipHeader {height:8px;background:url(images/tipHeader.gif) no-repeat;}');
-        addCss('#tooltip .tipBody {background-color:#000;padding:5px 5px 5px 15px;}');
-        addCss('#tooltip .tipFooter {height:8px;background:url(images/tipFooter.gif) no-repeat;}');
-
-        //addCss("#cabfEssenceBoard {position:fixed;background:#000;padding:5px;color:#fff;margin-top:0px;width:275px;text-align:center;opacity:0.75;top:0px;right:0px;height:100%;overflow:auto;display:block;font-size:11px;}");
-        addCss("#cabfEssenceTilte  {color:rosybrown; font-weight: bold;}");
-        addCss("#cabfDamageStorage {color: blueviolet; font-weight: bold;}");
-        addCss("#cabfAttackStorage {color: yellow; font-weight: bold;}");
-        addCss("#cabfDefenseStorage {color: royalblue; font-weight: bold;}");
-        addCss("#cabfHealthStorage {color: green; font-weight: bold;}");
-        addCss("#cabfGuildLink       {color: #fff;text-align:end;}");
+        addCss(GM_getResourceText("cabfCss"););
 
     } catch (e) {
         console.error("Error addCss", e);
