@@ -11,6 +11,7 @@
 // @require        http://fgnass.github.io/spin.js/spin.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
+// @resource       arenaBoard https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/ArenaBoard.html
 // @version        1.2.00
 // @copyright      2013+, Jigoku
 // @grant  GM_addStyle
@@ -190,7 +191,7 @@ var _dialogIO = '<div id="dialogIO" title="Import/Export">  <textarea id="statsD
 var _dialogSync = '<div id="dialogSync" title="Sync with CAAP">  <form><fieldset><label for="syncKey">Sync Key : </label><input type="text" name="syncKey" id="syncKey" value="" style="width: 420px;"></fieldset></form></div>';
 var _statBlock = '<div id="cabfHealthStatBlock"><div id="cabfStatType">Enemy</div><div><br></div><div id="cabfStatTower"><span>-</span><span>Stat</span></div><div id="cabfToggleTower"><div id="cabfTotalHealth">Total Health: 0</div><div id="cabfAverageHealth">Average Health: 0</div><div id="cabfHealthLeft">Health Left: 0</div><div id="cabfAverageHealthLeft">Average Health Left: 0</div><div id="cabfPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatCleric"><span>-</span><span>Cleric Stat</span></div><div id="cabfToggleCleric"><div id="cabfClericTotalHealth">Total Health: 0</div><div id="cabfClericAverageHealth">Average Health: 0</div><div id="cabfClericHealthLeft">Health Left: 0</div><div id="cabfClericAverageHealthLeft">Average Health Left: 0</div><div id="cabfClericPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatMage"><span>-</span><span>Mage Stat</span></div><div id="cabfToggleMage"><div id="cabfMageTotalHealth">Total Health: 0</div><div id="cabfMageAverageHealth">Average Health: 0</div><div id="cabfMageHealthLeft">Health Left: 0</div><div id="cabfMageAverageHealthLeft">Average Health Left: 0</div><div id="cabfMagePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatRogue"><span>-</span><span>Rogue Stat</span></div><div id="cabfToggleRogue"><div id="cabfRogueTotalHealth">Total Health: 0</div><div id="cabfRogueAverageHealth">Average Health: 0</div><div id="cabfRogueHealthLeft">Health Left: 0</div><div id="cabfRogueAverageHealthLeft">Average Health Left: 0</div><div id="cabfRoguePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatWarrior"><span>-</span><span>Warrior Stat</span></div><div id="cabfToggleWarrior"><div id="cabfWarriorTotalHealth">Total Health: 0</div><div id="cabfWarriorAverageHealth">Average Health: 0</div><div id="cabfWarriorHealthLeft">Health Left: 0</div><div id="cabfWarriorAverageHealthLeft">Average Health Left: 0</div><div id="cabfWarriorPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatActive"><span>-</span><span>Active Stat</span></div><div id="cabfToggleActive"><div id="cabfActiveTotalHealth">Total Health: 0</div><div id="cabfActiveAverageHealth">Average Health: 0</div><div id="cabfActiveHealthLeft">Health Left: 0</div><div id="cabfActiveAverageHealthLeft">Average Health Left: 0</div><div id="cabfActivePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div></div>';
 var _FestivalDuelBlock = '<div id="cabfFestivalDuelBlock"><div id="cabfFestivalDuelType">Festival Battle</div><div><br></div><div id="cabfFarmTarget"><span>-</span><span>Farm Targets</span></div><div><br></div><div id="cabfToggleFarm"><span class="cabfFarmTargetTitle ui-state-default"><a id="farmKeep" href="keep.php" target="_blank">Target</a> </span><select id="cabfTargetSelect" class="cabffarmfargettitle"></select></div><div><br></div></div>';
-var _ArenaDuelBlock = '<div id="cabfArenaDuelBlock"><div id="cabfArenaDuelType">Arena Battle</div><div><br></div><div id="cabfFarmTarget"><span>-</span><span>Farm Targets</span></div><div><br></div><div id="cabfToggleFarm"><span class="cabfFarmTargetTitle ui-state-default"><a id="farmKeep" href="keep.php" target="_blank">Target</a> </span><select id="cabfTargetSelect" class="cabffarmfargettitle"></select></div><div><br></div></div>';
+var _ArenaDuelBlock = GM_getResourceText("arenaBoard");
 var _NormalDuelBlock = '<div id="cabfNormalDuelBlock"><div id="cabfNormalDuelType">Battle</div><div><br></div><div id="cabfCollapseNormal"><span>-</span><span>Farm Targets</span></div><div><br></div><div id="cabfToggleNormal"></div><div><br></div></div>';
 var _QuestDuelBlock = '<div id="cabfQuestBlock"><div id="cabfQuestDuelType">Quests</div><div><br></div><div id="cabfCollapseQuest"><span>-</span><span>Farm Quest</span></div><div><br></div><div id="cabfToggleQuest"></div><div><br></div></div>';
 var _essenceBlock = '<div id="cabfEssenceBlock"><div id="cabfEssenceTilte">Essences</div><div><br></div><div id="cabfDamageStorage"><span>-</span><span>Damage Storage</span></div><div id="cabfToggleDamageStorage"></div><div><br></div><div id="cabfAttackStorage"><span>-</span><span>Attack Storage</span></div><div id="cabfToggleAttackStorage"></div><div><br></div><div id="cabfDefenseStorage"><span>-</span><span>Defense Storage</span></div><div id="cabfToggleDefenseStorage"></div><div><br></div><div id="cabfHealthStorage"><span>-</span><span>Health Storage</span></div><div id="cabfToggleHealthStorage"></div><div><br></div></div>';
@@ -249,6 +250,15 @@ function addArenaDuelBoard(id) {
 	if (item.get('#cabfToggleFarm', 'false') === 'false') {
         $('#cabfToggleFarm').css("display", "none");
         $('#cabfFarmTarget span:first').html('+');
+    }
+
+    $('#cabfLoopConfig').click(function () {
+        runEffect('#cabfLoopConfig', '#cabfToggleLoop');
+    });
+
+	if (item.get('#cabfToggleLoop', 'false') === 'false') {
+        $('#cabfToggleLoop').css("display", "none");
+        $('#cabfLoopConfig span:first').html('+');
     }
 }
 
@@ -2376,17 +2386,19 @@ function cabf_arenabattlefilter() {
         arenaDuelFarmButton(_storedFarm);
         $('#farmKeep').attr('href', "keep.php?casuser=" + _storedFarm);
     });
-    _sel.after('<div><br></div><div id="cabfFarmTargetButton"><span>BUTTON</span></div><div><br></div><div>Min Rank : <input id="targetMinRank" type="number" min="0" max="10"></input></div><div><br></div><div>Min Points : <input id="targetMinPoint" type="number" min="0" max="200"></input></div><div><br></div><div><input id="autocompleteRemove"></input><button id="RemoveButton">Remove</button></div><div><br></div><div id="cabfFarmStopStartButton"><button id="StopButton">Stop</button><span> - </span><button id="StartButton">Start</button></div><div><br></div><div><input type="checkbox" id="cleanCheck"></input><button id="CleanButton">Clean</button></div><div><br></div><div><button id="ClearButton">Clear</button></div><div><br></div><div><span>Black List : </span><span><textarea id="BlackList" rows="5" cols="35" ></textarea></span></div></div>');
     $('#farmKeep').attr('href', "keep.php?casuser=" + _storedFarm);
-    $('#targetMinRank')[0].value = chainArenaRankMin;
-    $('#targetMinRank').change(function () {
-        item.set('chainArenaRankMin', this.value);
-        chainArenaRankMin = this.value;
+    arenaDuelFarmButton(_storedFarm);
+    $('#autocompleteRemove').autocomplete({
+        source : FarmArenaIds
     });
-    $('#targetMinPoint')[0].value = chainArenaPointMin;
-    $('#targetMinPoint').change(function () {
-        item.set('chainArenaPointMin', this.value);
-        chainArenaPointMin = parseInt(this.value);
+    $('#RemoveButton').button();
+    $('#RemoveButton').click(function () {
+        var valId = $("#autocompleteRemove").val();
+        if (confirm('Are you sure to retreive ' + valId + ' from farm targets?')) {
+            var index = FarmArenaIds.indexOf(valId);
+            FarmArenaIds.splice(index, 1);
+            $("#cabfTargetSelect option[value='" + valId + "']").remove();
+        }
     });
     try {
         if (item.get('cabfCleanCheck', 'false') == 'true') {
@@ -2406,32 +2418,6 @@ function cabf_arenabattlefilter() {
         item.set('cabfCleanCheck', 'false');
         console.error(e);
     }
-    arenaDuelFarmButton(_storedFarm);
-    $('#autocompleteRemove').autocomplete({
-        source : FarmArenaIds
-    });
-    $('#RemoveButton').button();
-    $('#RemoveButton').click(function () {
-        var valId = $("#autocompleteRemove").val();
-        if (confirm('Are you sure to retreive ' + valId + ' from farm targets?')) {
-            var index = FarmArenaIds.indexOf(valId);
-            FarmArenaIds.splice(index, 1);
-            $("#cabfTargetSelect option[value='" + valId + "']").remove();
-        }
-    });
-    $('#StopButton').button();
-    $('#StopButton').click(function () {
-		console.log("Stop");
-        window.clearTimeout(ArenaTimer);
-        item.set('ArenaTimer', false);
-    });
-    $('#StartButton').button();
-    $('#StartButton').click(function () {
-		console.log("Start");
-        item.set('ArenaTimer', true);
-        window.clearTimeout(ArenaTimer);
-        ArenaTimer = window.setTimeout(chainArena, 5000);
-    });
     $('#CleanButton').button();
     $('#CleanButton').click(function () {
 		console.log("Clean");
@@ -2484,7 +2470,6 @@ function cabf_arenabattlefilter() {
             item.set('FarmArenaIds', FarmArenaIds);
         }
     });
-
     $('#BlackList').resizable({
         handles : "se, e, s",
         maxWidth : "260px",
@@ -2494,6 +2479,29 @@ function cabf_arenabattlefilter() {
     $('#BlackList').change(function () {
         item.set('guildIDs', JSON.parse(this.value));
         guildIDs = JSON.parse(this.value);
+    });
+    $('#targetMinRank')[0].value = chainArenaRankMin;
+    $('#targetMinRank').change(function () {
+        item.set('chainArenaRankMin', this.value);
+        chainArenaRankMin = this.value;
+    });
+    $('#targetMinPoint')[0].value = chainArenaPointMin;
+    $('#targetMinPoint').change(function () {
+        item.set('chainArenaPointMin', this.value);
+        chainArenaPointMin = parseInt(this.value);
+    });
+    $('#StopButton').button();
+    $('#StopButton').click(function () {
+		console.log("Stop");
+        window.clearTimeout(ArenaTimer);
+        item.set('ArenaTimer', false);
+    });
+    $('#StartButton').button();
+    $('#StartButton').click(function () {
+		console.log("Start");
+        item.set('ArenaTimer', true);
+        window.clearTimeout(ArenaTimer);
+        ArenaTimer = window.setTimeout(chainArena, 5000);
     });
 }
 
