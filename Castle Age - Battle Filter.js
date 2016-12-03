@@ -4347,7 +4347,7 @@ function init() {
     });
 
     try {
-        addCss(GM_getResourceText("cabfCss"););
+        addCss(GM_getResourceText("cabfCss"));
 
     } catch (e) {
         console.error("Error addCss", e);
