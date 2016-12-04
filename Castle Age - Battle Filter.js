@@ -13,7 +13,7 @@
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
 // @resource       cabfCss https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/Castle%20Age%20-%20Battle%20Filter.css
 // @resource       arenaBoard https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/ArenaBoard.html
-// @version        1.2.03
+// @version        1.2.04
 // @copyright      2013+, Jigoku
 // @grant  GM_addStyle
 // @grant  GM_getResourceText
@@ -2596,8 +2596,7 @@ function chainArena() {
 			ArenaTimer = window.setTimeout(chainArenaById, 1000, chainArenaId);
 		}
 	} else {
-		window.clearTimeout(ArenaTimer);
-		ArenaTimer = window.setTimeout(chainArena, 1000);		
+		reloadArena();	
 	}
 }
 
@@ -2641,8 +2640,7 @@ function chainArenaById(id) {
 			reloadArena();
 		}
 	} else {
-		window.clearTimeout(ArenaTimer);
-		ArenaTimer = window.setTimeout(chainArenaById, 1000, id);		
+		reloadArena();		
 	}
 }
 
@@ -2679,8 +2677,7 @@ function chainArenaNext(id) {
 			reloadArena();
 		}
 	} else {
-		window.clearTimeout(ArenaTimer);
-		ArenaTimer = window.setTimeout(chainArenaNext, 1000, id);		
+		reloadArena();
 	}
 }
 
