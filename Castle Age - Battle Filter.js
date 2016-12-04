@@ -13,7 +13,7 @@
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
 // @resource       cabfCss https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/Castle%20Age%20-%20Battle%20Filter.css
 // @resource       arenaBoard https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/ArenaBoard.html
-// @version        1.2.01
+// @version        1.2.02
 // @copyright      2013+, Jigoku
 // @grant  GM_addStyle
 // @grant  GM_getResourceText
@@ -2360,6 +2360,7 @@ var chainArenaRankMin = item.get('chainArenaRankMin', 2);
 var chainArenaPointMin = parseInt(item.get('chainArenaPointMin', 100));
 var maxArenaTokens = parseInt(item.get('MaxArenaTokens', 45));
 var ArenaTimer;
+var arenaStarted = item.get('ArenaStarted', false);
 function cabf_arenabattlefilter() {
     var _storedFarm = item.get('cabfPageArenaDuelPoints', '100000433761803');
     var _sel = $('#cabfTargetSelect');
@@ -2518,12 +2519,16 @@ function cabf_arenabattlefilter() {
     $('#StopButton').button();
     $('#StopButton').click(function () {
 		console.log("Stop");
+		arenaStarted = false;
+		item.set('ArenaStarted', arenaStarted);
         window.clearTimeout(ArenaTimer);
         item.set('ArenaTimer', false);
     });
     $('#StartButton').button();
     $('#StartButton').click(function () {
 		console.log("Start");
+		arenaStarted = true;
+		item.set('ArenaStarted', arenaStarted);
         item.set('ArenaTimer', true);
         window.clearTimeout(ArenaTimer);
         ArenaTimer = window.setTimeout(chainArena, 5000);
@@ -2573,6 +2578,9 @@ function chainArena() {
 			window.clearTimeout(ArenaTimer);
 			ArenaTimer = window.setTimeout(chainArenaById, 1000, chainArenaId);
 		}
+	} else {
+		window.clearTimeout(ArenaTimer);
+		ArenaTimer = window.setTimeout(chainArena, 1000);		
 	}
 }
 
@@ -2615,6 +2623,9 @@ function chainArenaById(id) {
 			console.log("Error: chainArenaId", e);
 			reloadArena();
 		}
+	} else {
+		window.clearTimeout(ArenaTimer);
+		ArenaTimer = window.setTimeout(chainArenaById, 1000, id);		
 	}
 }
 
@@ -2650,6 +2661,9 @@ function chainArenaNext(id) {
 			console.log("Error: chainArenaNext", e);
 			reloadArena();
 		}
+	} else {
+		window.clearTimeout(ArenaTimer);
+		ArenaTimer = window.setTimeout(chainArenaNext, 1000, id);		
 	}
 }
 
@@ -4419,4 +4433,8 @@ cabf_connect();
 console.log('init()');
 init();
 addEssenceBoard('#main_bntp');
-FestTimer = window.setTimeout(chainFestNext, 5000, 0);
+if (arenaStarted) {
+	ArenaTimer = window.setTimeout(chainArenaNext, 5000, 0);
+} else {
+	FestTimer = window.setTimeout(chainFestNext, 5000, 0);
+}
