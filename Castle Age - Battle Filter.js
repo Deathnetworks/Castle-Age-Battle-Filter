@@ -13,7 +13,7 @@
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
 // @resource       cabfCss https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/Castle%20Age%20-%20Battle%20Filter.css
 // @resource       arenaBoard https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/ArenaBoard.html
-// @version        1.2.02
+// @version        1.2.03
 // @copyright      2013+, Jigoku
 // @grant  GM_addStyle
 // @grant  GM_getResourceText
@@ -2535,22 +2535,39 @@ function cabf_arenabattlefilter() {
     });
 }
 
-function arenaControlHealthAndTokens() {
+function arenaRefill() {
 	try {
-		var arenaHealth = $("div img[src*='graphics/orange_healthbar.jpg']"), 
-			arenaHealthWidth = "",
-			currentTokens = parseInt($('#guild_token_current_value').text());
-		arenaHealthWidth=/width:\d+/i.exec(arenaHealth[0].outerHTML)[0];
-		
-		if (!arenaHealthWidth.match("width:0")) {
-			return currentTokens>0;
-		} 
-		return currentTokens>=maxArenaTokens;
-    } catch (e) {
-        console.log("Error in arenaControlHealthAndTokens");
-        console.error(e);
+		if (item.get('cabfRefillTokens', 'false') == 'true') {
+			var button = $("input[src*='arena_10_token_refill_btn.jpg']");
+			console.log (1, "Refill to burn Arena Health");
+			button.click();
+		}
+		window.clearTimeout(ArenaTimer);
+		ArenaTimer = window.setTimeout(chainArena, 1000);
+	} catch (err) {
+		console.error("ERROR in Refill to burn Arena Health: " + err);
+		window.clearTimeout(ArenaTimer);
+		ArenaTimer = window.setTimeout(chainArena, 1000);
+	}
+}
+
+function arenaControlHealthAndTokens() {
+    var arenaHealth = $("div img[src*='graphics/orange_healthbar.jpg']"),
+        arenaHealthWidth = "",
+        currentTokens = parseInt($('#guild_token_current_value').text());
+	if (arenaHealth.length==0) {
 		return true;
+	}
+    arenaHealthWidth=/width:\d+/i.exec(arenaHealth[0].outerHTML)[0];
+    if (!arenaHealthWidth.match("width:0")) {
+        if (currentTokens>0) {
+            return true;
+        } else {
+            arenaRefill();
+            return false;
+        }
     }
+    return currentTokens>=maxArenaTokens;
 }
 
 function chainArena() {
@@ -2905,10 +2922,10 @@ function battleStats() {
                 stats.targets[indexTarget].victory++;
                 new_data = false;
                 try {
-                    var _text = $('#results_main_wrapper>div[style*="festival_duelchamp_victory.jpg"]').text().trim();
-                    var _points = /(\d+)\ Champion\ Points!/.exec(_text)[1];
-                    console.log("_points=", _points);
-                    if (_points === 0) {
+                    var _textVictory = $('#results_main_wrapper>div[style*="festival_duelchamp_victory.jpg"]').text().trim();
+                    var _pointsVictory = /(\d+)\ Champion\ Points!/.exec(_textVictory)[1];
+                    console.log("_points=", _pointsVictory);
+                    if (_pointsVictory === 0) {
                         chainId = 0;
                         if (DeadIds.lastIndexOf(target_id) < 0) {
                             DeadIds.push(target_id);
@@ -2921,9 +2938,9 @@ function battleStats() {
                         chainId = target_id;
                         window.clearTimeout(FestTimer);
                         FestTimer = window.setTimeout(chainFest, 1000);
-                    } else if (_points > chainPointMin) {
+                    } else if (_pointsVictory > chainPointMin) {
                         console.log("_points>" + chainPointMin);
-                        if (_points > 11) {
+                        if (_pointsVictory > 11) {
                             console.log("_points>11");
                             try {
                                 if (FarmIds.lastIndexOf(target_id) < 0) {
@@ -2943,7 +2960,7 @@ function battleStats() {
                         console.log("else chainFestNext");
                         chainId = 0;
                         window.clearTimeout(FestTimer);
-                        FestTimer = window.setTimeout(chainFestNext, (10 - _points) * 1000, target_id);
+                        FestTimer = window.setTimeout(chainFestNext, (10 - _pointsVictory) * 1000, target_id);
                     }
                 } catch (e) {
                     console.log("UNKNOWN ERROR", e);
@@ -2956,14 +2973,15 @@ function battleStats() {
         } else {
             var myHealth = parseInt($('#health_current_value').text().trim()),
             xDelayHealth = 1,
-            xDelayArenaHealth = 10;
+            xDelayArenaHealth = 10,
+            _textRes ;
             console.log('at battleStats, Health:', myHealth);
             if (myHealth < 10) {
                 xDelayHealth = 30;
             }
 			if ($('#arena_mid').length > 0) {
 				if (chainArenaId > 0) {
-					var _textRes = $('#results_main_wrapper>div[class="results"]>div[class="result"]>span[class="result_body"]').text().trim();
+					_textRes = $('#results_main_wrapper>div[class="results"]>div[class="result"]>span[class="result_body"]').text().trim();
 					console.log(_textRes);
 					/*var _coins= /You need more Stamina to undertake this action/.exec($('#results_main_wrapper>div>div>div>div').text().trim());*/
 					if (_textRes.match('Your opponent is dead or too weak to battle.')) {
@@ -2985,20 +3003,8 @@ function battleStats() {
 					if (_textRes.match('Out Of Tokens: You do not have enough arena tokens to engage in more battles, wait for a recharge or purchase a refill!')) {
 						var arenaHealth = $("div img[src*='graphics/orange_healthbar.jpg']"), arenaHealthWidth = "";
 						arenaHealthWidth=/width:\d+/i.exec(arenaHealth[0].outerHTML)[0];
-						if (!arenaHealthWidth.match("width:0")) {							
-							try {
-								if (item.get('cabfRefillTokens', 'false') == 'true') {
-									var button = $("input[src*='arena_10_token_refill_btn.jpg']");
-									console.log (1, "Refill to burn Arena Health");
-									button.click();
-								}
-								window.clearTimeout(ArenaTimer);
-								ArenaTimer = window.setTimeout(chainArena, xDelayArenaHealth * 1000);
-							} catch (err) {
-								console.error("ERROR in Refill to burn Arena Health: " + err);
-								window.clearTimeout(ArenaTimer);
-								ArenaTimer = window.setTimeout(chainArena, xDelayArenaHealth * 1000);
-							}
+						if (!arenaHealthWidth.match("width:0")) {
+							arenaRefill();
 						} else {
 							window.clearTimeout(ArenaTimer);
 							ArenaTimer = window.setTimeout(chainArena, xDelayArenaHealth * 1000);
@@ -3014,7 +3020,7 @@ function battleStats() {
 				}
 			} else {
 				if (chainId > 0) {
-					var _textRes = $('#results_main_wrapper>div[class="results"]>div[class="result"]>span[class="result_body"]').text().trim();
+					_textRes = $('#results_main_wrapper>div[class="results"]>div[class="result"]>span[class="result_body"]').text().trim();
 					console.log(_textRes);
 					/*var _coins= /You need more Stamina to undertake this action/.exec($('#results_main_wrapper>div>div>div>div').text().trim());*/
 					if (_textRes.match('Your opponent is dead or too weak to battle.')) {
@@ -3740,7 +3746,7 @@ function searchEssence() {
         params = null;
         return true;
     } catch (err) {
-        console.error("ERROR in testAjax for " + params.guild_id + " : " + err);
+        console.error("ERROR in testAjax : " + err);
         return false;
     }
 }
