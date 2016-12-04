@@ -13,7 +13,7 @@
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
 // @resource       cabfCss https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/Castle%20Age%20-%20Battle%20Filter.css
 // @resource       arenaBoard https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/ArenaBoard.html
-// @version        1.2.00
+// @version        1.2.01
 // @copyright      2013+, Jigoku
 // @grant  GM_addStyle
 // @grant  GM_getResourceText
@@ -2358,6 +2358,7 @@ var DeadArenaIds = [];
 var chainArenaId = 0;
 var chainArenaRankMin = item.get('chainArenaRankMin', 2);
 var chainArenaPointMin = parseInt(item.get('chainArenaPointMin', 100));
+var maxArenaTokens = parseInt(item.get('MaxArenaTokens', 45));
 var ArenaTimer;
 function cabf_arenabattlefilter() {
     var _storedFarm = item.get('cabfPageArenaDuelPoints', '100000433761803');
@@ -2509,6 +2510,11 @@ function cabf_arenabattlefilter() {
         item.set('chainArenaPointMin', this.value);
         chainArenaPointMin = parseInt(this.value);
     });
+    $('#MaxArenaTokens')[0].value = maxArenaTokens;
+    $('#MaxArenaTokens').change(function () {
+        item.set('MaxArenaTokens', this.value);
+        maxArenaTokens = parseInt(this.value);
+    });
     $('#StopButton').button();
     $('#StopButton').click(function () {
 		console.log("Stop");
@@ -2524,103 +2530,127 @@ function cabf_arenabattlefilter() {
     });
 }
 
+function arenaControlHealthAndTokens() {
+	try {
+		var arenaHealth = $("div img[src*='graphics/orange_healthbar.jpg']"), 
+			arenaHealthWidth = "",
+			currentTokens = parseInt($('#guild_token_current_value').text());
+		arenaHealthWidth=/width:\d+/i.exec(arenaHealth[0].outerHTML)[0];
+		
+		if (!arenaHealthWidth.match("width:0")) {
+			return currentTokens>0;
+		} 
+		return currentTokens>=maxArenaTokens;
+    } catch (e) {
+        console.log("Error in arenaControlHealthAndTokens");
+        console.error(e);
+		return true;
+    }
+}
+
 function chainArena() {
     console.log("chainArena");
-    try {
-        var _button = $("input[src*='war_duelagainbtn2.gif']");
-        if (_button.length > 0) {
-            var target = $('#arena_duel input[name="target_id"]');
-            chainArenaId = target.attr("value");
-            if (LostArenaIds.lastIndexOf(chainArenaId) < 0 && guildIDs.lastIndexOf(chainArenaId) < 0 && DeadArenaIds.lastIndexOf(chainArenaId) < 0) {
-                _button.click();
-            } else {
-                var _list = (LostArenaIds.lastIndexOf(chainArenaId) >= 0 ? "LostArenaIds" : (guildIDs.lastIndexOf(chainArenaId) >= 0 ? "guildIDs" : "LostArenaIds or guildIDs"));
-                console.log("FarmArenaIds " + chainArenaId + " is in " + _list + "! So, don't chain it.");
-                window.clearTimeout(ArenaTimer);
-                ArenaTimer = window.setTimeout(chainArenaNext, 1000, chainArenaId);
-            }
-        } else {
-            window.clearTimeout(ArenaTimer);
-            ArenaTimer = window.setTimeout(chainArenaById, 1000, chainArenaId);
-        }
-    } catch (e) {
-        console.log("chainArena", e);
-        window.clearTimeout(ArenaTimer);
-        ArenaTimer = window.setTimeout(chainArenaById, 1000, chainArenaId);
-    }
+	if (arenaControlHealthAndTokens()) {
+		try {
+			var _button = $("input[src*='war_duelagainbtn2.gif']");
+			if (_button.length > 0) {
+				var target = $('#arena_duel input[name="target_id"]');
+				chainArenaId = target.attr("value");
+				if (LostArenaIds.lastIndexOf(chainArenaId) < 0 && guildIDs.lastIndexOf(chainArenaId) < 0 && DeadArenaIds.lastIndexOf(chainArenaId) < 0) {
+					_button.click();
+				} else {
+					var _list = (LostArenaIds.lastIndexOf(chainArenaId) >= 0 ? "LostArenaIds" : (guildIDs.lastIndexOf(chainArenaId) >= 0 ? "guildIDs" : "LostArenaIds or guildIDs"));
+					console.log("FarmArenaIds " + chainArenaId + " is in " + _list + "! So, don't chain it.");
+					window.clearTimeout(ArenaTimer);
+					ArenaTimer = window.setTimeout(chainArenaNext, 1000, chainArenaId);
+				}
+			} else {
+				window.clearTimeout(ArenaTimer);
+				ArenaTimer = window.setTimeout(chainArenaById, 1000, chainArenaId);
+			}
+		} catch (e) {
+			console.log("chainArena", e);
+			window.clearTimeout(ArenaTimer);
+			ArenaTimer = window.setTimeout(chainArenaById, 1000, chainArenaId);
+		}
+	}
 }
 
 function chainArenaById(id) {
-    try {
-        console.log("chainArenaId", id);
-        var _button,
-        ready = false;
-        if (id>0) {
-            if (LostArenaIds.lastIndexOf(id) < 0 && guildIDs.lastIndexOf(id) < 0 && DeadArenaIds.lastIndexOf(id) < 0) {
-                $('#arena_mid #battle_person').each(function (_i, _e) {
-                    if (!ready) {
-                        var temp_id = $("input[name='target_id']", _e).attr("value");
-                        if (id == temp_id) {
-                            var _text = $('div>div:contains("Rank")', _e).text().trim();
-                            var _rank = /Rank\ (\d+)/.exec(_text)[1];
-                            if (parseInt(_rank) >= chainArenaRankMin) {
-                                _button = $("input[src*='arena_btn_duel.gif']", _e);
-                                if (_button.length > 0) {
-                                    chainArenaId = temp_id;
-                                    ready = true;
-                                }
-                            }
-                        }
-                    }
-                });
-            } else {
-                var _list = (LostArenaIds.lastIndexOf(id) >= 0 ? "LostArenaIds" : (guildIDs.lastIndexOf(id) >= 0 ? "guildIDs" : "LostArenaIds or guildIDs"));
-                console.log("FarmArenaIds " + id + " is in " + _list + "! So, don't chain it.");
-            }
-        }
-        if (ready) {
-            _button.click();
-        } else {
-            window.clearTimeout(ArenaTimer);
-            ArenaTimer = window.setTimeout(chainArenaNext, 1000, id);
-        }
-    } catch (e) {
-        console.log("Error: chainArenaId", e);
-        reloadArena();
-    }
+	console.log("chainArenaId", id);
+	if (arenaControlHealthAndTokens()) {
+		try {
+			var _button,
+			ready = false;
+			if (id>0) {
+				if (LostArenaIds.lastIndexOf(id) < 0 && guildIDs.lastIndexOf(id) < 0 && DeadArenaIds.lastIndexOf(id) < 0) {
+					$('#arena_mid #battle_person').each(function (_i, _e) {
+						if (!ready) {
+							var temp_id = $("input[name='target_id']", _e).attr("value");
+							if (id == temp_id) {
+								var _text = $('div>div:contains("Rank")', _e).text().trim();
+								var _rank = /Rank\ (\d+)/.exec(_text)[1];
+								if (parseInt(_rank) >= chainArenaRankMin) {
+									_button = $("input[src*='arena_btn_duel.gif']", _e);
+									if (_button.length > 0) {
+										chainArenaId = temp_id;
+										ready = true;
+									}
+								}
+							}
+						}
+					});
+				} else {
+					var _list = (LostArenaIds.lastIndexOf(id) >= 0 ? "LostArenaIds" : (guildIDs.lastIndexOf(id) >= 0 ? "guildIDs" : "LostArenaIds or guildIDs"));
+					console.log("FarmArenaIds " + id + " is in " + _list + "! So, don't chain it.");
+				}
+			}
+			if (ready) {
+				_button.click();
+			} else {
+				window.clearTimeout(ArenaTimer);
+				ArenaTimer = window.setTimeout(chainArenaNext, 1000, id);
+			}
+		} catch (e) {
+			console.log("Error: chainArenaId", e);
+			reloadArena();
+		}
+	}
 }
 
 function chainArenaNext(id) {
-    try {
-        console.log("chainArenaNext", id);
-        var _button,
-        ready = false;
-		$('#arena_mid #battle_person').each(function (_i, _e) {
-			if (!ready) {
-				var temp_id = $("input[name='target_id']", _e).attr("value");
-				if (id != temp_id && LostArenaIds.lastIndexOf(temp_id) < 0 && guildIDs.lastIndexOf(temp_id) < 0 && DeadArenaIds.lastIndexOf(temp_id) < 0) {
-					var _text = $('div>div:contains("Rank")', _e).text().trim();
-					var _rank = /Rank\ (\d+)/.exec(_text)[1];
-					if (parseInt(_rank) >= chainArenaRankMin) {
-						_button = $("input[src*='arena_btn_duel.gif']", _e);
-						chainArenaId = temp_id;
-						ready = true;
+	console.log("chainArenaNext", id);
+	if (arenaControlHealthAndTokens()) {
+		try {
+			var _button,
+			ready = false;
+			$('#arena_mid #battle_person').each(function (_i, _e) {
+				if (!ready) {
+					var temp_id = $("input[name='target_id']", _e).attr("value");
+					if (id != temp_id && LostArenaIds.lastIndexOf(temp_id) < 0 && guildIDs.lastIndexOf(temp_id) < 0 && DeadArenaIds.lastIndexOf(temp_id) < 0) {
+						var _text = $('div>div:contains("Rank")', _e).text().trim();
+						var _rank = /Rank\ (\d+)/.exec(_text)[1];
+						if (parseInt(_rank) >= chainArenaRankMin) {
+							_button = $("input[src*='arena_btn_duel.gif']", _e);
+							chainArenaId = temp_id;
+							ready = true;
+						}
+					} else {
+						var _list = (LostArenaIds.lastIndexOf(temp_id) >= 0 ? "LostArenaIds" : (guildIDs.lastIndexOf(temp_id) >= 0 ? "guildIDs" : "LostArenaIds or guildIDs"));
+						console.log("FarmArenaIds " + temp_id + " is in " + _list + "! So, don't chain it.");
 					}
-				} else {
-					var _list = (LostArenaIds.lastIndexOf(temp_id) >= 0 ? "LostArenaIds" : (guildIDs.lastIndexOf(temp_id) >= 0 ? "guildIDs" : "LostArenaIds or guildIDs"));
-					console.log("FarmArenaIds " + temp_id + " is in " + _list + "! So, don't chain it.");
 				}
+			});
+			if (ready) {
+				_button.click();
+			} else {
+				reloadArena();
 			}
-		});
-        if (ready) {
-            _button.click();
-        } else {
-            reloadArena();
-        }
-    } catch (e) {
-        console.log("Error: chainArenaNext", e);
-        reloadArena();
-    }
+		} catch (e) {
+			console.log("Error: chainArenaNext", e);
+			reloadArena();
+		}
+	}
 }
 
 function arenaDuelFarmButton(id) {
