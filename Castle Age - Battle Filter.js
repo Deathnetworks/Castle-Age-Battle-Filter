@@ -13,7 +13,7 @@
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
 // @resource       cabfCss https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/Castle%20Age%20-%20Battle%20Filter.css
 // @resource       arenaBoard https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/ArenaBoard.html
-// @version        1.2.04
+// @version        1.2.05
 // @copyright      2013+, Jigoku
 // @grant  GM_addStyle
 // @grant  GM_getResourceText
@@ -2483,6 +2483,10 @@ function cabf_arenabattlefilter() {
         item.set('guildIDs', JSON.parse(this.value));
         guildIDs = JSON.parse(this.value);
     });
+    $('#UpdateMyGuild').button();
+    $('#UpdateMyGuild').click(function () {
+		checkMyGuildIds();
+    });
     try {
         if (item.get('cabfRefillTokens', 'false') == 'true') {
             $('#cleanCheck')[0].checked = true;
@@ -3056,95 +3060,7 @@ var LostIds = item.get('lostids', []);
 var FarmIds = eliminateDuplicates(item.get('farmids', ['100000433761803']));
 item.set('farmids', FarmIds);
 var DeadIds = [];
-var defaultGuildIDs = [
-    1614649664,
-    100001404200291,
-    100002208019895,
-    1796388608,
-    1209228111,
-    1513795125,
-    100001670634402,
-    100000484685611,
-    100001074103633,
-    100002931562587,
-    100000115372610,
-    100000727167447,
-    1101141264,
-    100000409426435,
-    100002370996235,
-    1004344009,
-    1226526047,
-    749256737,
-    1814383044,
-    553719829,
-    1152195662,
-    100001655216164,
-    1242282335,
-    100002507563559,
-    1514685682,
-    1233511068,
-    100000228432745,
-    100000515902154,
-    100002045456251,
-    1317111534,
-    1561761279,
-    1667642557,
-    100001142529160,
-    100001739844779,
-    1213322293,
-    1064781094,
-    1305061361,
-    1245393433,
-    100000587927131,
-    100000164289128,
-    100000388074002,
-    100002728044343,
-    100001394000398,
-    100002293424199,
-    100002637747502,
-    100001503597929,
-    100002089411089,
-    1631484122,
-    100002093275444,
-    100005636348270,
-    749126669,
-    100006647884596,
-    1611861738,
-    100001120999662,
-    100000464406032,
-    1117242704,
-    100001555908841,
-    100002911096065,
-    100004335552750,
-    100002619652042,
-    100000004555321,
-    1839738622,
-    100000528692265,
-    100000077934198,
-    100001001423496,
-    100001705275040,
-    100002428701046,
-    1405493831,
-    100001620131907,
-    100000470995410,
-    637908815,
-    100001878674824,
-    100006465367471,
-    1093036758,
-    100002525950460,
-    1329906482,
-    100001554402420,
-    676767668,
-    100000948289882,
-    1004918695,
-    1342894916,
-    1224839012,
-    100003365874809,
-    100007042083959,
-    100000571658869,
-    //Guild: ℂℍaɱℙs-Ɛℓyℤées
-    100001033725149,
-    100000130806515];
+var defaultGuildIDs = [];
 var guildIDs = item.get('guildIDs', defaultGuildIDs);
 var chainId = 0;
 var chainRankMin = item.get('chainRankMin', 12);
@@ -3579,6 +3495,56 @@ function questFarm() {
         console.error(e);
     }
 }
+
+/******************************************************************************************************************************************************************************
+ *******************************************************************************************************************************************************************************
+ *************    GUILD MEMBERS ***********************************************************************************************************************************************
+ *******************************************************************************************************************************************************************************
+ ******************************************************************************************************************************************************************************/
+function checkMyGuildIds() {
+
+    function onError() {
+        $().alert("Unable to use ajax");
+    }
+
+    function onSuccess(data) {
+		try {
+			var tempDiv = $j("#guildv2_formation_middle", data),
+				tempArray=[], i;
+				
+			con.log(2, 'checkMyGuildIds');        
+			if ($u.hasContent(tempDiv)) {
+				//Checking caap.MyGuildIds
+				for (i=0;i<100;i++) {
+					try {
+						tempDiv = $j("#player"+i); 
+						if ($u.hasContent(tempDiv)) {
+							tempArray.push(parseInt(tempDiv.attr("key")));
+						}
+					} catch (err) {
+						con.error("ERROR in #player"+i+": " + err.stack);					
+					}
+				}
+				item.set('guildIDs', tempArray);
+				guildIDs = item.get('guildIDs', []);
+			}
+			return true;
+		} catch (err) {
+			con.error("ERROR in checkMyGuildIds: " + err.stack);
+			return false;			
+		}
+    }
+
+    try {
+        var params = {};
+        myAjax('guildv2_battle.php', params, onError, onSuccess);
+        params = null;
+        return true;
+    } catch (err) {
+        console.error("ERROR in testAjax : " + err);
+        return false;
+    }
+};
 
 /******************************************************************************************************************************************************************************
  *******************************************************************************************************************************************************************************
