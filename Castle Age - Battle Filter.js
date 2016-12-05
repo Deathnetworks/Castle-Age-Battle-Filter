@@ -13,7 +13,7 @@
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
 // @resource       cabfCss https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/Castle%20Age%20-%20Battle%20Filter.css
 // @resource       arenaBoard https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/ArenaBoard.html
-// @version        1.2.06
+// @version        1.2.07
 // @copyright      2013+, Jigoku
 // @grant  GM_addStyle
 // @grant  GM_getResourceText
@@ -2485,7 +2485,7 @@ function cabf_arenabattlefilter() {
     });
     $('#UpdateMyGuild').button();
     $('#UpdateMyGuild').click(function () {
-		checkMyGuildIds();
+		checkMyGuildIds(reloadArena);
     });
     try {
         if (item.get('cabfRefillTokens', 'false') == 'true') {
@@ -2559,7 +2559,7 @@ function arenaControlHealthAndTokens() {
     var arenaHealth = $("div img[src*='graphics/orange_healthbar.jpg']"),
         arenaHealthWidth = "",
         currentTokens = parseInt($('#guild_token_current_value').text());
-	if (arenaHealth.length==0) {
+	if (arenaHealth.length===0) {
 		return true;
 	}
     arenaHealthWidth=/width:\d+/i.exec(arenaHealth[0].outerHTML)[0];
@@ -2600,7 +2600,7 @@ function chainArena() {
 			ArenaTimer = window.setTimeout(chainArenaById, 1000, chainArenaId);
 		}
 	} else {
-		reloadArena();	
+		reloadArena();
 	}
 }
 
@@ -2644,7 +2644,7 @@ function chainArenaById(id) {
 			reloadArena();
 		}
 	} else {
-		reloadArena();		
+		reloadArena();
 	}
 }
 
@@ -3501,31 +3501,7 @@ function questFarm() {
  *************    GUILD MEMBERS ***********************************************************************************************************************************************
  *******************************************************************************************************************************************************************************
  ******************************************************************************************************************************************************************************/
-var myWindow;
-function openWin(text, title) {
-    myWindow = window.open("", "", "width=400 ,height=200");
-    console.log("myWindow ", myWindow);
-    if (myWindow) {
-        var closetimer;
-        var closefunc = function () {
-            myWindow.close();
-            myWindow = null;
-        };
-        myWindow.document.write("<html><head></head><body>");
-        myWindow.document.write(text);
-        myWindow.document.write("</body></html>");
-        myWindow.document.title = title;
-        try {
-            closetimer = myWindow.setTimeout(closefunc, 15 * 1000);
-        } catch (e) {
-            console.error("closetimer error:", e);
-        }
-    } else {
-        console.log("POPUP is blocked", myWindow);
-    }
-}
-
-function checkMyGuildIds() {
+function checkMyGuildIds(callback) {
 
     function onError() {
         $().alert("Unable to use ajax");
@@ -3542,6 +3518,9 @@ function checkMyGuildIds() {
 				});
 				item.set('guildIDs', tempArray);
 				guildIDs = item.get('guildIDs', []);
+                console.log("my guild is updated with success");
+                window.clearTimeout(ArenaTimer);
+                ArenaTimer = window.setTimeout(callback, 1000);
 			}
 			return true;
 		} catch (err) {
@@ -3559,7 +3538,7 @@ function checkMyGuildIds() {
         console.error("ERROR in testAjax : " + err);
         return false;
     }
-};
+}
 
 /******************************************************************************************************************************************************************************
  *******************************************************************************************************************************************************************************
