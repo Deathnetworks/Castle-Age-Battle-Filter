@@ -13,7 +13,7 @@
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
 // @resource       cabfCss https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/Castle%20Age%20-%20Battle%20Filter.css
 // @resource       arenaBoard https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/ArenaBoard.html
-// @version        1.2.05
+// @version        1.2.06
 // @copyright      2013+, Jigoku
 // @grant  GM_addStyle
 // @grant  GM_getResourceText
@@ -3501,30 +3501,47 @@ function questFarm() {
  *************    GUILD MEMBERS ***********************************************************************************************************************************************
  *******************************************************************************************************************************************************************************
  ******************************************************************************************************************************************************************************/
+var myWindow;
+function openWin(text, title) {
+    myWindow = window.open("", "", "width=400 ,height=200");
+    console.log("myWindow ", myWindow);
+    if (myWindow) {
+        var closetimer;
+        var closefunc = function () {
+            myWindow.close();
+            myWindow = null;
+        };
+        myWindow.document.write("<html><head></head><body>");
+        myWindow.document.write(text);
+        myWindow.document.write("</body></html>");
+        myWindow.document.title = title;
+        try {
+            closetimer = myWindow.setTimeout(closefunc, 15 * 1000);
+        } catch (e) {
+            console.error("closetimer error:", e);
+        }
+    } else {
+        console.log("POPUP is blocked", myWindow);
+    }
+}
+
 function checkMyGuildIds() {
 
     function onError() {
         $().alert("Unable to use ajax");
     }
-
     function onSuccess(data) {
 		try {
-			var guildDiv = $("#single_popup_content", data),
+            var guildDiv = $("#guildv2_formation_middle", data),
 				tempArray=[], i;
-			console.log('checkMyGuildIds');
-                        console.log(guildDiv);
 			if ($u.hasContent(guildDiv)) {
-                var membersDiv = $("a[href*='keep.php?casuser=']", data);
-                        console.log(membersDiv);
-                if ($u.hasContent(membersDiv)) {
-                    $.each(membersDiv, function (_i, _e) {
-						console.log(_i);
-						console.log(_e);
-					});
-					console.log(tempArray);
-					item.set('guildIDs', tempArray);
-					guildIDs = item.get('guildIDs', []);
-				}
+				var membersKeys=$("script:contains('initTowerSlots()')",data).text().match(/key=\\"(\d+)\\/gm);
+			    $.each(membersKeys, function (_i, _e) {
+					var res = /(\d+)/gm.exec(_e);
+					tempArray.push(parseInt(res[0]));
+				});
+				item.set('guildIDs', tempArray);
+				guildIDs = item.get('guildIDs', []);
 			}
 			return true;
 		} catch (err) {
@@ -3535,7 +3552,7 @@ function checkMyGuildIds() {
 
     try {
         var params = {};
-        myAjax('guildv2_home.php', params, onError, onSuccess);
+        myAjax('hundred_battle.php', params, onError, onSuccess);
         params = null;
         return true;
     } catch (err) {
