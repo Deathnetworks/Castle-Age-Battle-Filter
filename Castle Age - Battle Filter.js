@@ -3509,35 +3509,33 @@ function checkMyGuildIds() {
 
     function onSuccess(data) {
 		try {
-			var tempDiv = $j("#guildv2_formation_middle", data),
+			var guildDiv = $("#single_popup_content", data),
 				tempArray=[], i;
-				
-			con.log(2, 'checkMyGuildIds');        
-			if ($u.hasContent(tempDiv)) {
-				//Checking caap.MyGuildIds
-				for (i=0;i<100;i++) {
-					try {
-						tempDiv = $j("#player"+i); 
-						if ($u.hasContent(tempDiv)) {
-							tempArray.push(parseInt(tempDiv.attr("key")));
-						}
-					} catch (err) {
-						con.error("ERROR in #player"+i+": " + err.stack);					
-					}
+			console.log('checkMyGuildIds');
+                        console.log(guildDiv);
+			if ($u.hasContent(guildDiv)) {
+                var membersDiv = $("a[href*='keep.php?casuser=']", data);
+                        console.log(membersDiv);
+                if ($u.hasContent(membersDiv)) {
+                    $.each(membersDiv, function (_i, _e) {
+						console.log(_i);
+						console.log(_e);
+					});
+					console.log(tempArray);
+					item.set('guildIDs', tempArray);
+					guildIDs = item.get('guildIDs', []);
 				}
-				item.set('guildIDs', tempArray);
-				guildIDs = item.get('guildIDs', []);
 			}
 			return true;
 		} catch (err) {
-			con.error("ERROR in checkMyGuildIds: " + err.stack);
-			return false;			
+			console.error("ERROR in checkMyGuildIds: " + err.stack);
+			return false;
 		}
     }
 
     try {
         var params = {};
-        myAjax('guildv2_battle.php', params, onError, onSuccess);
+        myAjax('guildv2_home.php', params, onError, onSuccess);
         params = null;
         return true;
     } catch (err) {
