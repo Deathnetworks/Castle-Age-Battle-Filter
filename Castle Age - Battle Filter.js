@@ -2421,7 +2421,9 @@ function cabf_arenabattlefilter() {
         item.set('cabfRefillTokens', 'false');
         console.error(e);
     }
+	$('#cleanCheck').attr('title', 'Always don\'t list all lost, dead, and my guild.');
     $('#CleanButton').button();
+	$('#CleanButton').attr('title', 'Don\'t list all lost, dead, and my guild.');
     $('#CleanButton').click(function () {
 		console.log("Clean");
         var _select = $('#cabfTargetSelect'),
