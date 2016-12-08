@@ -13,6 +13,7 @@
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
 // @resource       cabfCss https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/Castle%20Age%20-%20Battle%20Filter.css
 // @resource       arenaBoard https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/ArenaBoard.html
+// @resource       syncDialog https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/SyncDialog.html
 // @version        1.2.07
 // @copyright      2013+, Jigoku
 // @grant  GM_addStyle
@@ -76,7 +77,79 @@ var SyncDataTimer;
 
 function syncData() {
         window.clearTimeout(SyncDataTimer);
-        SyncDataTimer = window.setTimeout(syncDataAjax, 5000);
+        SyncDataTimer = window.setTimeout(syncRemoteAjax, 5000);
+}
+
+function syncRemoteAjax() {
+    if (!localStorage.hasOwnProperty('cabf_syncRemoteKey')) {
+		item.set('cabf_syncRemoteKey','https://api.myjson.com/bins/xxxxx');
+    }
+    window.clearTimeout(SyncDataTimer);
+    SyncDataTimer = window.setTimeout(syncDataAjax, 2000);
+    var key = JSON.parse(localStorage.cabf_syncRemoteKey);
+    if (!key || key === null || key === "") {
+        console.log('Sync key not set.');
+    } else {
+        var requestGET = $.ajax({
+                url : key,
+                type : "GET",
+                contentType : "application/json; charset=utf-8",
+                dataType : "json",
+                beforeSend : function () {
+                    addLoadingImg('globalContainer');
+                    $('div[class="spinner"]').html($('div[class="spinner"]').html() + 'Synchronizing');
+                },
+                success : function (remoteStorage, textStatus, jqXHR) {
+					if (!remoteStorage.hasOwnProperty('cabf_LostArenaIds')) {
+						remoteStorage.cabf_LostArenaIds = [];
+						console.log('New remote storage',remoteStorage);
+					}
+					var nbMerge = 0;
+					var tempLostArenaIds = JSON.parse(localStorage.cabf_LostArenaIds);
+					$.each(remoteStorage.cabf_LostArenaIds,function(_i, _e) {
+						if (tempLostArenaIds.lastIndexOf(_e) < 0) {
+							tempLostArenaIds.push(_e);
+							nbMerge++;
+						}
+					});
+					localStorage.cabf_LostArenaIds = JSON.stringify(tempLostArenaIds);
+					remoteStorage.cabf_LostArenaIds = localStorage.cabf_LostArenaIds;
+					console.log('Merge remote storage succeed. Total of ' + nbMerge + ' remote storage',remoteStorage);
+					try {
+						var requestPUT = $.ajax({
+								url : key,
+								type : "PUT",
+								data : JSON.stringify(remoteStorage),
+								contentType : "application/json; charset=utf-8",
+								dataType : "json",
+								success : function (data, textStatus, jqXHR) {
+									console.log('Sync success in saving remote storage : ', textStatus, data);
+									spinner.stop();
+								},
+								error : function (jqXHR, textStatus, errorThrown) {
+									console.log('Sync remote storage PUT: ' + textStatus, errorThrown);
+									spinner.stop();
+								}
+							});
+						requestPUT.onreadystatechange = null;
+						requestPUT.abort = null;
+						requestPUT = null;
+					} catch (ePUT) {
+						console.error(ePUT);
+						spinner.stop();
+					}
+					nbMerge = null;
+					tempLostArenaIds = null;
+				},
+                error : function (jqXHR, textStatus, errorThrown) {
+                    console.log('Sync remote storage GET: ' + textStatus, errorThrown);
+                    spinner.stop();
+                }
+            });
+        requestGET.onreadystatechange = null;
+        requestGET.abort = null;
+        requestGET = null;
+    }
 }
 
 function syncDataAjax() {
@@ -189,7 +262,7 @@ var item = {
 var _dialogConnect = '<div id="dialogConnect" title="Connect to CAAP">  <form><fieldset><label for="player_email">E-Mail : </label><input type="text" name="player_email" id="player_email" value="" style="width: 420px;"></fieldset><div><br></div><fieldset><label for="player_password">Password : </label><input type="password" name="player_password" id="player_password" value="" style="width: 420px;"></fieldset></form></div>';
 var _dialogCraft = '<div id="dialogCraft" title="Craft Alchemy"><form><fieldset><label for="name">Select alchemy</label><select name="selectAlchemy" id="selectAlchemy"></select></fieldset></form></div>';
 var _dialogIO = '<div id="dialogIO" title="Import/Export">  <textarea id="statsDg" style="margin: 2px; height: 250px; width: 600px;"></textarea></div>';
-var _dialogSync = '<div id="dialogSync" title="Sync with CAAP">  <form><fieldset><label for="syncKey">Sync Key : </label><input type="text" name="syncKey" id="syncKey" value="" style="width: 420px;"></fieldset></form></div>';
+var _dialogSync = GM_getResourceText("syncDialog");
 var _statBlock = '<div id="cabfHealthStatBlock"><div id="cabfStatType">Enemy</div><div><br></div><div id="cabfStatTower"><span>-</span><span>Stat</span></div><div id="cabfToggleTower"><div id="cabfTotalHealth">Total Health: 0</div><div id="cabfAverageHealth">Average Health: 0</div><div id="cabfHealthLeft">Health Left: 0</div><div id="cabfAverageHealthLeft">Average Health Left: 0</div><div id="cabfPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatCleric"><span>-</span><span>Cleric Stat</span></div><div id="cabfToggleCleric"><div id="cabfClericTotalHealth">Total Health: 0</div><div id="cabfClericAverageHealth">Average Health: 0</div><div id="cabfClericHealthLeft">Health Left: 0</div><div id="cabfClericAverageHealthLeft">Average Health Left: 0</div><div id="cabfClericPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatMage"><span>-</span><span>Mage Stat</span></div><div id="cabfToggleMage"><div id="cabfMageTotalHealth">Total Health: 0</div><div id="cabfMageAverageHealth">Average Health: 0</div><div id="cabfMageHealthLeft">Health Left: 0</div><div id="cabfMageAverageHealthLeft">Average Health Left: 0</div><div id="cabfMagePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatRogue"><span>-</span><span>Rogue Stat</span></div><div id="cabfToggleRogue"><div id="cabfRogueTotalHealth">Total Health: 0</div><div id="cabfRogueAverageHealth">Average Health: 0</div><div id="cabfRogueHealthLeft">Health Left: 0</div><div id="cabfRogueAverageHealthLeft">Average Health Left: 0</div><div id="cabfRoguePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatWarrior"><span>-</span><span>Warrior Stat</span></div><div id="cabfToggleWarrior"><div id="cabfWarriorTotalHealth">Total Health: 0</div><div id="cabfWarriorAverageHealth">Average Health: 0</div><div id="cabfWarriorHealthLeft">Health Left: 0</div><div id="cabfWarriorAverageHealthLeft">Average Health Left: 0</div><div id="cabfWarriorPercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div><div id="cabfStatActive"><span>-</span><span>Active Stat</span></div><div id="cabfToggleActive"><div id="cabfActiveTotalHealth">Total Health: 0</div><div id="cabfActiveAverageHealth">Average Health: 0</div><div id="cabfActiveHealthLeft">Health Left: 0</div><div id="cabfActiveAverageHealthLeft">Average Health Left: 0</div><div id="cabfActivePercentageHealthLeft">Percentage Health Left: 0%</div></div><div><br></div></div>';
 var _FestivalDuelBlock = '<div id="cabfFestivalDuelBlock"><div id="cabfFestivalDuelType">Festival Battle</div><div><br></div><div id="cabfFarmTarget"><span>-</span><span>Farm Targets</span></div><div><br></div><div id="cabfToggleFarm"><span class="cabfFarmTargetTitle ui-state-default"><a id="farmKeep" href="keep.php" target="_blank">Target</a> </span><select id="cabfTargetSelect" class="cabffarmfargettitle"></select></div><div><br></div></div>';
 var _ArenaDuelBlock = GM_getResourceText("arenaBoard");
@@ -4064,13 +4137,14 @@ function sync() {
         $('#main_bntp').append(_dialogSync);
         $("#dialogSync").dialog({
             modal : true,
-            height : 200,
-            width : 620,
+            height : 250,
+            width : 720,
             buttons : {
                 "Save" : function () {
                     try {
                         var key = $(this).children('form')[0][1].value;
                         item.set('syncKey', key);
+                        item.set('syncRemoteKey', $('#syncRemoteKey',this)[0].value);
                         console.log('Save succeed.');
                         $(this).dialog("close");
                     } catch (e) {
@@ -4104,7 +4178,9 @@ function sync() {
                 }
             },
             open : function (event, ui) {
+				console.log($('#syncRemoteKey',this));
                 $(this).children('form')[0][1].value = item.get('syncKey', "");
+                $('#syncRemoteKey',this)[0].value = item.get('syncRemoteKey', "");
                 console.log('Sync Dialog opened.', item.get('syncKey', ""));
             }
         });
