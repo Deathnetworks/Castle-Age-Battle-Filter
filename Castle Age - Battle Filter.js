@@ -14,7 +14,8 @@
 // @resource       cabfCss https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/Castle%20Age%20-%20Battle%20Filter.css
 // @resource       arenaBoard https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/ArenaBoard.html
 // @resource       syncDialog https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/SyncDialog.html
-// @version        1.2.07
+// @resource       param https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/param.txt
+// @version        1.2.08
 // @copyright      2013+, Jigoku
 // @grant  GM_addStyle
 // @grant  GM_getResourceText
@@ -82,7 +83,7 @@ function syncData() {
 
 function syncRemoteAjax() {
     if (!localStorage.hasOwnProperty('cabf_syncRemoteKey')) {
-		item.set('cabf_syncRemoteKey','https://api.myjson.com/bins/xxxxx');
+		item.set('syncRemoteKey','https://api.myjson.com/bins/xxxxx');
     }
     window.clearTimeout(SyncDataTimer);
     SyncDataTimer = window.setTimeout(syncDataAjax, 2000);
@@ -4444,6 +4445,33 @@ GM_addStyle(GM_getResourceText("jqueryUiCss"));
 //GM_addStyle (GM_getResourceText ("ca_cabfCss") );
 
 
+function updateParam(parameter) {
+	var urlParam = GM_getResourceText("param"); 
+	try {
+		var requestPUT = $.ajax({
+				url : urlParam,
+				type : "PUT",
+				data : JSON.stringify(parameter),
+				contentType : "application/json; charset=utf-8",
+				dataType : "json",
+				success : function (data, textStatus, jqXHR) {
+					console.log('Param is updated : ', textStatus, data);
+					spinner.stop();
+				},
+				error : function (jqXHR, textStatus, errorThrown) {
+					console.log('Error in update param: ' + textStatus, errorThrown);
+					spinner.stop();
+				}
+			});
+		requestPUT.onreadystatechange = null;
+		requestPUT.abort = null;
+		requestPUT = null;
+	} catch (ePUT) {
+		console.error(ePUT);
+		spinner.stop();
+	}	
+}
+
 function cabf_connect() {
     console.log('cabf_connect');
     if ($("input[src*='crusader2_btn_submit.gif']").length > 0) {
@@ -4467,7 +4495,61 @@ function cabf_connect() {
 		var test = $("#main_bntp").text().trim();
 		var res = /Welcome\s(.+)\s\(Logout\)/gm.exec(test);
 		if (res.length==2) {
+			var urlParam = GM_getResourceText("param"); 
+			console.log(res[1]);
+			console.log(urlParam);
 			item.set('player_name', res[1]);
+			var requestGET = $.ajax({
+					url : urlParam,
+					type : "GET",
+					contentType : "application/json; charset=utf-8",
+					dataType : "json",
+					beforeSend : function () {
+						addLoadingImg('globalContainer');
+						$('div[class="spinner"]').html($('div[class="spinner"]').html() + 'Synchronizing');
+					},
+					success : function (parameter, textStatus, jqXHR) {
+						var namePlayer = item.get('player_name', 'xxxxxxx');
+						if ('xxxxxxx'.match(namePlayer)) {
+							console.log("Error on player name");
+							return false;
+						}
+						if (!parameter.hasOwnProperty(namePlayer)) {
+							console.log('New remote storage:',namePlayer,parameter);
+							try {
+								$.ajax({
+									url : "https://api.myjson.com/bins",
+									type : "POST",
+									data : '{"key":"value"}',
+									contentType : "application/json; charset=utf-8",
+									dataType : "json",
+									success : function (data, textStatus, jqXHR) {
+										console.log('data', data);
+										parameter[namePlayer] = data.uri;
+										item.set('New param entry',namePlayer, data.uri,parameter);
+										updateParam(parameter);
+									},
+									error : function (jqXHR, textStatus, errorThrown) {
+										console.log('Error making new entry: ' + textStatus, errorThrown);
+										spinner.stop();
+									}
+								});
+							} catch (e) {
+								console.log('Make new Key failed : ', e);
+							}
+						} else {
+							parameter[namePlayer] = item.get('syncRemoteKey','https://api.myjson.com/bins/xxxxx');
+							updateParam(parameter);
+						}
+					},
+					error : function (jqXHR, textStatus, errorThrown) {
+						console.log('Sync remote storage GET: ' + textStatus, errorThrown);
+						spinner.stop();
+					}
+				});
+			requestGET.onreadystatechange = null;
+			requestGET.abort = null;
+			requestGET = null;
 		}
 	}
 }
