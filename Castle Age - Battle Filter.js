@@ -4463,6 +4463,13 @@ function cabf_connect() {
                 button.click();
         }
     }
+	if ($("#main_bntp").length > 0 ) {
+		var test = $("#main_bntp").text().trim();
+		var res = /Welcome\s(.+)\s\(Logout\)/gm.exec(test);
+		if (res.length==2) {
+			item.set('player_name', res[1]);
+		}
+	}
 }
 
 console.log(GM_listValues());
