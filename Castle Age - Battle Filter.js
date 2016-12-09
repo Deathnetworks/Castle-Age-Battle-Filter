@@ -15,7 +15,7 @@
 // @resource       arenaBoard https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/ArenaBoard.html
 // @resource       syncDialog https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/SyncDialog.html
 // @resource       param https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/param.txt
-// @version        1.2.08
+// @version        1.2.09
 // @copyright      2013+, Jigoku
 // @grant  GM_addStyle
 // @grant  GM_getResourceText
@@ -81,6 +81,36 @@ function syncData() {
         SyncDataTimer = window.setTimeout(syncRemoteAjax, 5000);
 }
 
+function mergeRemoteAndLocal(remoteStorage, property) {
+	try {
+		var nbMerge = 0;
+		console.log('mergeRemoteAndLocal ' + property);
+		if (!remoteStorage.hasOwnProperty(property)) {
+			remoteStorage[property] = [];
+			console.log('New remote storage',remoteStorage);
+		} else {
+			if (remoteStorage[property].length>0) {
+				var tempLostArenaIds = JSON.parse(localStorage[property]);
+				$.each(JSON.parse(remoteStorage[property]),function(_i, _e) {
+					try {
+						if (tempLostArenaIds.lastIndexOf(_e) < 0) {
+							tempLostArenaIds.push(_e);
+							nbMerge++;
+						}
+					} catch(e) {
+						console.error('Error in mergeRemoteAndLocal ' + property + ' index='+_i+' with: ',e);
+					}
+				});
+				localStorage[property] = JSON.stringify(tempLostArenaIds);
+			}
+		}
+		remoteStorage[property] = localStorage[property];
+		console.log('Merge remote storage succeed. Total of ' + nbMerge + ' remote storage',remoteStorage);
+	} catch (e) {
+		console.error('Error in mergeRemoteAndLocal ' + property + ' : ',e);
+	}
+}
+
 function syncRemoteAjax() {
     if (!localStorage.hasOwnProperty('cabf_syncRemoteKey')) {
 		item.set('syncRemoteKey','https://api.myjson.com/bins/xxxxx');
@@ -101,21 +131,11 @@ function syncRemoteAjax() {
                     $('div[class="spinner"]').html($('div[class="spinner"]').html() + 'Synchronizing');
                 },
                 success : function (remoteStorage, textStatus, jqXHR) {
-					if (!remoteStorage.hasOwnProperty('cabf_LostArenaIds')) {
-						remoteStorage.cabf_LostArenaIds = [];
-						console.log('New remote storage',remoteStorage);
-					}
-					var nbMerge = 0;
-					var tempLostArenaIds = JSON.parse(localStorage.cabf_LostArenaIds);
-					$.each(remoteStorage.cabf_LostArenaIds,function(_i, _e) {
-						if (tempLostArenaIds.lastIndexOf(_e) < 0) {
-							tempLostArenaIds.push(_e);
-							nbMerge++;
-						}
-					});
-					localStorage.cabf_LostArenaIds = JSON.stringify(tempLostArenaIds);
-					remoteStorage.cabf_LostArenaIds = localStorage.cabf_LostArenaIds;
-					console.log('Merge remote storage succeed. Total of ' + nbMerge + ' remote storage',remoteStorage);
+					mergeRemoteAndLocal(remoteStorage, 'cabf_LostArenaIds');
+					mergeRemoteAndLocal(remoteStorage, 'cabf_FarmArenaIds');
+					mergeRemoteAndLocal(remoteStorage, 'cabf_LostIds');
+					mergeRemoteAndLocal(remoteStorage, 'cabf_farmids');
+					mergeRemoteAndLocal(remoteStorage, 'cabf_guildIDs');					
 					try {
 						var requestPUT = $.ajax({
 								url : key,
@@ -4520,13 +4540,14 @@ function cabf_connect() {
 								$.ajax({
 									url : "https://api.myjson.com/bins",
 									type : "POST",
-									data : '{"key":"value"}',
+									data : '{}',
 									contentType : "application/json; charset=utf-8",
 									dataType : "json",
 									success : function (data, textStatus, jqXHR) {
 										console.log('data', data);
 										parameter[namePlayer] = data.uri;
-										item.set('New param entry',namePlayer, data.uri,parameter);
+										item.set('syncRemoteKey', data.uri);
+										console.log('New param entry',namePlayer, data.uri,parameter);
 										updateParam(parameter);
 									},
 									error : function (jqXHR, textStatus, errorThrown) {
