@@ -4516,8 +4516,7 @@ function cabf_connect() {
 		var res = /Welcome\s(.+)\s\(Logout\)/gm.exec(test);
 		if (res.length==2) {
 			var urlParam = GM_getResourceText("param"); 
-			console.log(res[1]);
-			console.log(urlParam);
+			console.log("update keys param");
 			item.set('player_name', res[1]);
 			var requestGET = $.ajax({
 					url : urlParam,
@@ -4544,10 +4543,9 @@ function cabf_connect() {
 									contentType : "application/json; charset=utf-8",
 									dataType : "json",
 									success : function (data, textStatus, jqXHR) {
-										console.log('data', data);
 										parameter[namePlayer] = data.uri;
 										item.set('syncRemoteKey', data.uri);
-										console.log('New param entry',namePlayer, data.uri,parameter);
+										console.log('New param entry',namePlayer, data.uri);
 										updateParam(parameter);
 									},
 									error : function (jqXHR, textStatus, errorThrown) {
