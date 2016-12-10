@@ -15,7 +15,7 @@
 // @resource       arenaBoard https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/ArenaBoard.html
 // @resource       syncDialog https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/SyncDialog.html
 // @resource       param https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/param.txt
-// @version        1.2.09
+// @version        1.2.10
 // @copyright      2013+, Jigoku
 // @grant  GM_addStyle
 // @grant  GM_getResourceText
@@ -70,8 +70,8 @@ var opts = {
 var spinContainer;
 var spinner;
 function addLoadingImg(id) {
-    target = document.getElementById(id);
-    spinner = new Spinner(opts).spin(target);
+    spot = document.getElementById(id);
+    spinner = new Spinner(opts).spin(spot);
 }
 
 var SyncDataTimer;
@@ -2700,6 +2700,17 @@ function chainArena() {
 	}
 }
 
+function sortArenaTarget(a, b) {
+	var rankA = /Rank\ (\d+)/.exec($('div>div:contains("Rank")', a).text().trim())[1],
+		rankB = /Rank\ (\d+)/.exec($('div>div:contains("Rank")', b).text().trim())[1];
+	if (rankB===rankA) {
+		var levelA = /level\: (\d+)/.exec($('div>div:contains("level\:")', a).text().trim())[1],
+			levelB = /level\: (\d+)/.exec($('div>div:contains("level\:")', b).text().trim())[1];
+		return levelA-levelB;
+	}
+	return rankB-rankA;
+}
+
 function chainArenaById(id) {
 	console.log("chainArenaId", id);
 	if (arenaControlHealthAndTokens()) {
@@ -2708,7 +2719,7 @@ function chainArenaById(id) {
 			ready = false;
 			if (id>0) {
 				if (LostArenaIds.lastIndexOf(id) < 0 && guildIDs.lastIndexOf(id) < 0 && DeadArenaIds.lastIndexOf(id) < 0) {
-					$('#arena_mid #battle_person').each(function (_i, _e) {
+					$('#arena_mid #battle_person').sort(sortArenaTarget).each(function (_i, _e) {
 						if (!ready) {
 							var temp_id = $("input[name='target_id']", _e).attr("value");
 							if (id == temp_id) {
@@ -2750,7 +2761,7 @@ function chainArenaNext(id) {
 		try {
 			var _button,
 			ready = false;
-			$('#arena_mid #battle_person').each(function (_i, _e) {
+			$('#arena_mid #battle_person').sort(sortArenaTarget).each(function (_i, _e) {
 				if (!ready) {
 					var temp_id = $("input[name='target_id']", _e).attr("value");
 					if (id != temp_id && LostArenaIds.lastIndexOf(temp_id) < 0 && guildIDs.lastIndexOf(temp_id) < 0 && DeadArenaIds.lastIndexOf(temp_id) < 0) {
@@ -4348,6 +4359,7 @@ function Craft(craftChoosen) {
     }
 
 }
+
 
 /******************************************************************************************************************************************************************************
  *******************************************************************************************************************************************************************************
