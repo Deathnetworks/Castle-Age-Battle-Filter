@@ -4,17 +4,17 @@
 // @description    This script assists with filtering battles.
 // @include        https://apps.facebook.com/castle_age/*
 // @include        https://web4.castleagegame.com/castle_ws/*
-// @downloadURL    https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/Castle%20Age%20-%20Battle%20Filter.js
+// @downloadURL    https://raw.githubusercontent.com/Deathnetworks/Castle-Age-Battle-Filter/master/Castle%20Age%20-%20Battle%20Filter.js
 // @require        http://code.jquery.com/jquery-1.9.1.js
 // @require        http://code.jquery.com/ui/1.10.3/jquery-ui.js
 // @require     https://raw.githubusercontent.com/magowiz/Castle-Age-Autoplayer/master/Chrome/unpacked/extern/utility.js
 // @require        http://fgnass.github.io/spin.js/spin.js
 // @resource       jqueryUiCss http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css
 // @resource       ca_cabfCss https://raw.github.com/unknowner/CAGE/master/css/ca_cabf.css
-// @resource       cabfCss https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/Castle%20Age%20-%20Battle%20Filter.css
-// @resource       arenaBoard https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/ArenaBoard.html
-// @resource       syncDialog https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/SyncDialog.html
-// @resource       param https://raw.githubusercontent.com/Bonbons/Castle-Age-Battle-Filter/master/param.txt
+// @resource       cabfCss https://raw.githubusercontent.com/Deathnetworks/Castle-Age-Battle-Filter/master/Castle%20Age%20-%20Battle%20Filter.css
+// @resource       arenaBoard https://raw.githubusercontent.com/Deathnetworks/Castle-Age-Battle-Filter/master/ArenaBoard.html
+// @resource       syncDialog https://raw.githubusercontent.com/Deathnetworks/Castle-Age-Battle-Filter/master/SyncDialog.html
+// @resource       param https://raw.githubusercontent.com/Deathnetworks/Castle-Age-Battle-Filter/master/param.txt
 // @version        1.2.10
 // @copyright      2013+, Jigoku
 // @grant  GM_addStyle
@@ -31,23 +31,23 @@ var version = '1.1.56', clickUrl = '', updated = false;
 
 var defaultStats = {
     "targets" : [{
-            "target_id" : "0",
-            "victory" : 0,
-            "defeat" : 0
-        }
-    ]
+        "target_id" : "0",
+        "victory" : 0,
+        "defeat" : 0
+    }
+                ]
 };
 var defaultEssences = [{
-        "name" : "LES BRANQUES",
-        "level" : "13",
-        "lastCheck" : 1432865723408,
-        "attack" : -1,
-        "defense" : -1,
-        "damage" : -1,
-        "health" : -1,
-        "guildId" : "1796388608_1285087750"
-    }
-];
+    "name" : "LES BRANQUES",
+    "level" : "13",
+    "lastCheck" : 1432865723408,
+    "attack" : -1,
+    "defense" : -1,
+    "damage" : -1,
+    "health" : -1,
+    "guildId" : "1796388608_1285087750"
+}
+                      ];
 
 var opts = {
     lines : 17, // The number of lines to draw
@@ -77,43 +77,43 @@ function addLoadingImg(id) {
 var SyncDataTimer;
 
 function syncData() {
-        window.clearTimeout(SyncDataTimer);
-        SyncDataTimer = window.setTimeout(syncRemoteAjax, 5000);
+    window.clearTimeout(SyncDataTimer);
+    SyncDataTimer = window.setTimeout(syncRemoteAjax, 5000);
 }
 
 function mergeRemoteAndLocal(remoteStorage, property) {
-	try {
-		var nbMerge = 0;
-		console.log('mergeRemoteAndLocal ' + property);
-		if (!remoteStorage.hasOwnProperty(property)) {
-			remoteStorage[property] = [];
-			console.log('New remote storage',remoteStorage);
-		} else {
-			if (remoteStorage[property].length>0) {
-				var tempLostArenaIds = JSON.parse(localStorage[property]);
-				$.each(JSON.parse(remoteStorage[property]),function(_i, _e) {
-					try {
-						if (tempLostArenaIds.lastIndexOf(_e) < 0) {
-							tempLostArenaIds.push(_e);
-							nbMerge++;
-						}
-					} catch(e) {
-						console.error('Error in mergeRemoteAndLocal ' + property + ' index='+_i+' with: ',e);
-					}
-				});
-				localStorage[property] = JSON.stringify(tempLostArenaIds);
-			}
-		}
-		remoteStorage[property] = localStorage[property];
-		console.log('Merge remote storage succeed. Total of ' + nbMerge + ' remote storage',remoteStorage);
-	} catch (e) {
-		console.error('Error in mergeRemoteAndLocal ' + property + ' : ',e);
-	}
+    try {
+        var nbMerge = 0;
+        console.log('mergeRemoteAndLocal ' + property);
+        if (!remoteStorage.hasOwnProperty(property)) {
+            remoteStorage[property] = [];
+            console.log('New remote storage',remoteStorage);
+        } else {
+            if (remoteStorage[property].length>0) {
+                var tempLostArenaIds = JSON.parse(localStorage[property]);
+                $.each(JSON.parse(remoteStorage[property]),function(_i, _e) {
+                    try {
+                        if (tempLostArenaIds.lastIndexOf(_e) < 0) {
+                            tempLostArenaIds.push(_e);
+                            nbMerge++;
+                        }
+                    } catch(e) {
+                        console.error('Error in mergeRemoteAndLocal ' + property + ' index='+_i+' with: ',e);
+                    }
+                });
+                localStorage[property] = JSON.stringify(tempLostArenaIds);
+            }
+        }
+        remoteStorage[property] = localStorage[property];
+        console.log('Merge remote storage succeed. Total of ' + nbMerge + ' remote storage',remoteStorage);
+    } catch (e) {
+        console.error('Error in mergeRemoteAndLocal ' + property + ' : ',e);
+    }
 }
 
 function syncRemoteAjax() {
     if (!localStorage.hasOwnProperty('cabf_syncRemoteKey')) {
-		item.set('syncRemoteKey','https://api.myjson.com/bins/xxxxx');
+        item.set('syncRemoteKey','https://api.myjson.com/bins/xxxxx');
     }
     window.clearTimeout(SyncDataTimer);
     SyncDataTimer = window.setTimeout(syncDataAjax, 2000);
@@ -122,51 +122,51 @@ function syncRemoteAjax() {
         console.log('Sync key not set.');
     } else {
         var requestGET = $.ajax({
-                url : key,
-                type : "GET",
-                contentType : "application/json; charset=utf-8",
-                dataType : "json",
-                beforeSend : function () {
-                    addLoadingImg('globalContainer');
-                    $('div[class="spinner"]').html($('div[class="spinner"]').html() + 'Synchronizing');
-                },
-                success : function (remoteStorage, textStatus, jqXHR) {
-					mergeRemoteAndLocal(remoteStorage, 'cabf_LostArenaIds');
-					mergeRemoteAndLocal(remoteStorage, 'cabf_FarmArenaIds');
-					mergeRemoteAndLocal(remoteStorage, 'cabf_LostIds');
-					mergeRemoteAndLocal(remoteStorage, 'cabf_farmids');
-					mergeRemoteAndLocal(remoteStorage, 'cabf_guildIDs');					
-					try {
-						var requestPUT = $.ajax({
-								url : key,
-								type : "PUT",
-								data : JSON.stringify(remoteStorage),
-								contentType : "application/json; charset=utf-8",
-								dataType : "json",
-								success : function (data, textStatus, jqXHR) {
-									console.log('Sync success in saving remote storage : ', textStatus, data);
-									spinner.stop();
-								},
-								error : function (jqXHR, textStatus, errorThrown) {
-									console.log('Sync remote storage PUT: ' + textStatus, errorThrown);
-									spinner.stop();
-								}
-							});
-						requestPUT.onreadystatechange = null;
-						requestPUT.abort = null;
-						requestPUT = null;
-					} catch (ePUT) {
-						console.error(ePUT);
-						spinner.stop();
-					}
-					nbMerge = null;
-					tempLostArenaIds = null;
-				},
-                error : function (jqXHR, textStatus, errorThrown) {
-                    console.log('Sync remote storage GET: ' + textStatus, errorThrown);
+            url : key,
+            type : "GET",
+            contentType : "application/json; charset=utf-8",
+            dataType : "json",
+            beforeSend : function () {
+                addLoadingImg('globalContainer');
+                $('div[class="spinner"]').html($('div[class="spinner"]').html() + 'Synchronizing');
+            },
+            success : function (remoteStorage, textStatus, jqXHR) {
+                mergeRemoteAndLocal(remoteStorage, 'cabf_LostArenaIds');
+                mergeRemoteAndLocal(remoteStorage, 'cabf_FarmArenaIds');
+                mergeRemoteAndLocal(remoteStorage, 'cabf_LostIds');
+                mergeRemoteAndLocal(remoteStorage, 'cabf_farmids');
+                mergeRemoteAndLocal(remoteStorage, 'cabf_guildIDs');					
+                try {
+                    var requestPUT = $.ajax({
+                        url : key,
+                        type : "PUT",
+                        data : JSON.stringify(remoteStorage),
+                        contentType : "application/json; charset=utf-8",
+                        dataType : "json",
+                        success : function (data, textStatus, jqXHR) {
+                            console.log('Sync success in saving remote storage : ', textStatus, data);
+                            spinner.stop();
+                        },
+                        error : function (jqXHR, textStatus, errorThrown) {
+                            console.log('Sync remote storage PUT: ' + textStatus, errorThrown);
+                            spinner.stop();
+                        }
+                    });
+                    requestPUT.onreadystatechange = null;
+                    requestPUT.abort = null;
+                    requestPUT = null;
+                } catch (ePUT) {
+                    console.error(ePUT);
                     spinner.stop();
                 }
-            });
+                nbMerge = null;
+                tempLostArenaIds = null;
+            },
+            error : function (jqXHR, textStatus, errorThrown) {
+                console.log('Sync remote storage GET: ' + textStatus, errorThrown);
+                spinner.stop();
+            }
+        });
         requestGET.onreadystatechange = null;
         requestGET.abort = null;
         requestGET = null;
@@ -187,75 +187,75 @@ function syncDataAjax() {
         console.log('Sync key not set.');
     } else {
         var requestGET = $.ajax({
-                url : key,
-                type : "GET",
-                contentType : "application/json; charset=utf-8",
-                dataType : "json",
-                beforeSend : function () {
-                    addLoadingImg('globalContainer');
-                    //console.log('spinner', spinner);
-                    $('div[class="spinner"]').html($('div[class="spinner"]').html() + 'Synchronizing');
-                },
-                success : function (statsToMerge, textStatus, jqXHR) {
-                    if (statsToMerge.targets) {
-                        var statsLocal = JSON.parse(localStorage.cabf_stats);
-                        var arrayTargets = statsLocal.targets;
-                        var nbMerge = 0;
-                        for (var i = 0; i < statsToMerge.targets.length; i++) {
-                            var target_id = statsToMerge.targets[i].target_id;
-                            var indexTarget = getTargetIndex(arrayTargets, target_id);
-                            if (indexTarget < 0) {
-                                var newTarget = {
-                                    "target_id" : target_id,
-                                    "victory" : statsToMerge.targets[i].victory,
-                                    "defeat" : statsToMerge.targets[i].defeat
-                                };
-                                statsLocal.targets.push(newTarget);
+            url : key,
+            type : "GET",
+            contentType : "application/json; charset=utf-8",
+            dataType : "json",
+            beforeSend : function () {
+                addLoadingImg('globalContainer');
+                //console.log('spinner', spinner);
+                $('div[class="spinner"]').html($('div[class="spinner"]').html() + 'Synchronizing');
+            },
+            success : function (statsToMerge, textStatus, jqXHR) {
+                if (statsToMerge.targets) {
+                    var statsLocal = JSON.parse(localStorage.cabf_stats);
+                    var arrayTargets = statsLocal.targets;
+                    var nbMerge = 0;
+                    for (var i = 0; i < statsToMerge.targets.length; i++) {
+                        var target_id = statsToMerge.targets[i].target_id;
+                        var indexTarget = getTargetIndex(arrayTargets, target_id);
+                        if (indexTarget < 0) {
+                            var newTarget = {
+                                "target_id" : target_id,
+                                "victory" : statsToMerge.targets[i].victory,
+                                "defeat" : statsToMerge.targets[i].defeat
+                            };
+                            statsLocal.targets.push(newTarget);
+                            nbMerge++;
+                            newTarget = null;
+                        } else {
+                            if ((statsLocal.targets[indexTarget].victor + statsLocal.targets[indexTarget].defeat) < (statsToMerge.targets[i].victory + statsToMerge.targets[i].defeat)) {
+                                statsLocal.targets[indexTarget].victory = statsToMerge.targets[i].victory;
+                                statsLocal.targets[indexTarget].defeat = statsToMerge.targets[i].defeat;
                                 nbMerge++;
-                                newTarget = null;
-                            } else {
-                                if ((statsLocal.targets[indexTarget].victor + statsLocal.targets[indexTarget].defeat) < (statsToMerge.targets[i].victory + statsToMerge.targets[i].defeat)) {
-                                    statsLocal.targets[indexTarget].victory = statsToMerge.targets[i].victory;
-                                    statsLocal.targets[indexTarget].defeat = statsToMerge.targets[i].defeat;
-                                    nbMerge++;
-                                }
                             }
                         }
-                        localStorage.cabf_stats = JSON.stringify(statsLocal);
-                        console.log('Merge Sync Data succeed. Total of ' + nbMerge + ' Data');
-                        try {
-                            var requestPUT = $.ajax({
-                                    url : key,
-                                    type : "PUT",
-                                    data : JSON.stringify(statsLocal),
-                                    contentType : "application/json; charset=utf-8",
-                                    dataType : "json",
-                                    success : function (data, textStatus, jqXHR) {
-                                        console.log('Sync success in saving data : ', textStatus, data);
-                                        spinner.stop();
-                                    },
-                                    error : function (jqXHR, textStatus, errorThrown) {
-                                        console.log('Sync PUT: ' + textStatus, errorThrown);
-                                        spinner.stop();
-                                    }
-                                });
-                            requestPUT.onreadystatechange = null;
-                            requestPUT.abort = null;
-                            requestPUT = null;
-                        } catch (ePUT) {
-                            console.error(ePUT);
-                            spinner.stop();
-                        }
-                        statsToMerge = null;
-                        statsLocal = null;
-                        arrayTargets = null;
                     }
-                },
-                error : function (jqXHR, textStatus, errorThrown) {
-                    console.log('Sync GET: ' + textStatus, errorThrown);
-                    spinner.stop();
+                    localStorage.cabf_stats = JSON.stringify(statsLocal);
+                    console.log('Merge Sync Data succeed. Total of ' + nbMerge + ' Data');
+                    try {
+                        var requestPUT = $.ajax({
+                            url : key,
+                            type : "PUT",
+                            data : JSON.stringify(statsLocal),
+                            contentType : "application/json; charset=utf-8",
+                            dataType : "json",
+                            success : function (data, textStatus, jqXHR) {
+                                console.log('Sync success in saving data : ', textStatus, data);
+                                spinner.stop();
+                            },
+                            error : function (jqXHR, textStatus, errorThrown) {
+                                console.log('Sync PUT: ' + textStatus, errorThrown);
+                                spinner.stop();
+                            }
+                        });
+                        requestPUT.onreadystatechange = null;
+                        requestPUT.abort = null;
+                        requestPUT = null;
+                    } catch (ePUT) {
+                        console.error(ePUT);
+                        spinner.stop();
+                    }
+                    statsToMerge = null;
+                    statsLocal = null;
+                    arrayTargets = null;
                 }
-            });
+            },
+            error : function (jqXHR, textStatus, errorThrown) {
+                console.log('Sync GET: ' + textStatus, errorThrown);
+                spinner.stop();
+            }
+        });
         requestGET.onreadystatechange = null;
         requestGET.abort = null;
         requestGET = null;
@@ -295,7 +295,7 @@ var _leftBoard = '<div id="cabfLeftBoard"></div>';
 
 function runEffect(idButton, idToggle) {
     var options = {},
-    state;
+        state;
     $(idToggle).toggle('clip', options, 500);
     state = item.get(idToggle, 'false');
     if (state === 'false') {
@@ -312,17 +312,17 @@ function addFestivalDuelBoard(id) {
 
     if ($('#cabfLeftBoard').length <= 0) {
         $(id).after(_leftBoard);
-	}
+    }
 
     if ($('#cabfFestivalDuelBlock').length <= 0) {
-		$('#cabfLeftBoard').append(_FestivalDuelBlock);
-	}
+        $('#cabfLeftBoard').append(_FestivalDuelBlock);
+    }
 
     $('#cabfFarmTarget').click(function () {
         runEffect('#cabfFarmTarget', '#cabfToggleFarm');
     });
 
-	if (item.get('#cabfToggleFarm', 'false') === 'false') {
+    if (item.get('#cabfToggleFarm', 'false') === 'false') {
         $('#cabfToggleFarm').css("display", "none");
         $('#cabfFarmTarget span:first').html('+');
     }
@@ -332,17 +332,17 @@ function addArenaDuelBoard(id) {
 
     if ($('#cabfLeftBoard').length <= 0) {
         $(id).after(_leftBoard);
-	}
+    }
 
     if ($('#cabfArenaDuelBlock').length <= 0) {
-		$('#cabfLeftBoard').append(_ArenaDuelBlock);
-	}
+        $('#cabfLeftBoard').append(_ArenaDuelBlock);
+    }
 
     $('#cabfFarmTarget').click(function () {
         runEffect('#cabfFarmTarget', '#cabfToggleFarm');
     });
 
-	if (item.get('#cabfToggleFarm', 'false') === 'false') {
+    if (item.get('#cabfToggleFarm', 'false') === 'false') {
         $('#cabfToggleFarm').css("display", "none");
         $('#cabfFarmTarget span:first').html('+');
     }
@@ -351,7 +351,7 @@ function addArenaDuelBoard(id) {
         runEffect('#cabfLoopConfig', '#cabfToggleLoop');
     });
 
-	if (item.get('#cabfToggleLoop', 'false') === 'false') {
+    if (item.get('#cabfToggleLoop', 'false') === 'false') {
         $('#cabfToggleLoop').css("display", "none");
         $('#cabfLoopConfig span:first').html('+');
     }
@@ -361,11 +361,11 @@ function addNormalDuelBoard(id) {
 
     if ($('#cabfLeftBoard').length <= 0) {
         $(id).after(_leftBoard);
-	}
+    }
 
     if ($('#cabfNormalDuelBlock').length <= 0) {
-		$('#cabfLeftBoard').append(_NormalDuelBlock);
-	}
+        $('#cabfLeftBoard').append(_NormalDuelBlock);
+    }
 
     $('#cabfCollapseNormal').click(function () {
         runEffect('#cabfCollapseNormal', '#cabfToggleNormal');
@@ -380,11 +380,11 @@ function addQuestDuelBoard(id) {
 
     if ($('#cabfLeftBoard').length <= 0) {
         $(id).after(_leftBoard);
-	}
+    }
 
     if ($('#cabfQuestBlock').length <= 0) {
-		$('#cabfLeftBoard').append(_QuestDuelBlock);
-	}
+        $('#cabfLeftBoard').append(_QuestDuelBlock);
+    }
 
     $('#cabfCollapseQuest').click(function () {
         runEffect('#cabfCollapseQuest', '#cabfToggleQuest');
@@ -399,11 +399,11 @@ function addStatBoard(id) {
 
     if ($('#cabfLeftBoard').length <= 0) {
         $(id).after(_leftBoard);
-	}
+    }
 
     if ($('#cabfHealthStatBlock').length <= 0) {
-		$('#cabfLeftBoard').append(_statBlock);
-	}
+        $('#cabfLeftBoard').append(_statBlock);
+    }
 
     $('#cabfStatTower').click(function () {
         runEffect('#cabfStatTower', '#cabfToggleTower');
@@ -453,7 +453,7 @@ function addEssenceBoard(id) {
 
     if ($('#cabfRigthBoard').length <= 0) {
         $(id).append(_rightBoard);
-	}
+    }
 
     if ($('#cabfEssenceBlock').length <= 0) {
         $('#cabfRigthBoard').append(_essenceBlock);
@@ -531,7 +531,7 @@ function cabf_conquestmistfilter() {
 
     try {
         var _defenderHealth = 0,
-        _actions = parseInt(/\d+/.exec($('#app_body div:contains("ACTIONS LEFT:"):last').text()), 10);
+            _actions = parseInt(/\d+/.exec($('#app_body div:contains("ACTIONS LEFT:"):last').text()), 10);
         // Saved filter settings
         var _storedClass = item.get('cabfPageConquestBattleClass', 'All');
         var _storedStatus = item.get('cabfPageConquestBattleStatus', 'All');
@@ -539,10 +539,10 @@ function cabf_conquestmistfilter() {
 
         $('#your_guild_member_list_1 > div[style!="clear:both;"]').each(function (_i, _e) {
             var _text = $(_e).text().trim(),
-            _health,
-            _maxHealth,
-            _fullhealth,
-            winStat = '';
+                _health,
+                _maxHealth,
+                _fullhealth,
+                winStat = '';
 
             // enemy full health
             _health = /(\d+)\//.exec(_text)[1];
@@ -579,10 +579,10 @@ function cabf_conquestmistfilter() {
                 var _state = new RegExp($('#cabfGateStatusFilter').val());
                 var _points = $('#cabfGatePointsFilter').val();
                 var _text = $(_e).text().trim(),
-                _health,
-                _maxHealth,
-                _fullhealth,
-                _eClass;
+                    _health,
+                    _maxHealth,
+                    _fullhealth,
+                    _eClass;
 
                 // enemy class
                 _eClass = $(_e).find('img[title="Cleric"], img[title="Mage"], img[title="Warrior"], img[title="Rogue"]').attr("title");
@@ -602,33 +602,33 @@ function cabf_conquestmistfilter() {
                             var targetLevel = parseInt(/(?:Level:\ )(\d+)/g.exec(_text)[1]);
                             var _showTarget = false;
                             switch (_points) {
-                            case '50':
-                                if (targetLevel > 900) {
+                                case '50':
+                                    if (targetLevel > 900) {
+                                        _showTarget = true;
+                                    }
+                                    break;
+                                case '40':
+                                    if ((targetLevel > 600) && (targetLevel <= 900)) {
+                                        _showTarget = true;
+                                    }
+                                    break;
+                                case '30':
+                                    if ((targetLevel > 300) && (targetLevel <= 600)) {
+                                        _showTarget = true;
+                                    }
+                                    break;
+                                case '20':
+                                    if ((targetLevel > 100) && (targetLevel <= 300)) {
+                                        _showTarget = true;
+                                    }
+                                    break;
+                                case '10':
+                                    if (targetLevel <= 100) {
+                                        _showTarget = true;
+                                    }
+                                    break;
+                                default:
                                     _showTarget = true;
-                                }
-                                break;
-                            case '40':
-                                if ((targetLevel > 600) && (targetLevel <= 900)) {
-                                    _showTarget = true;
-                                }
-                                break;
-                            case '30':
-                                if ((targetLevel > 300) && (targetLevel <= 600)) {
-                                    _showTarget = true;
-                                }
-                                break;
-                            case '20':
-                                if ((targetLevel > 100) && (targetLevel <= 300)) {
-                                    _showTarget = true;
-                                }
-                                break;
-                            case '10':
-                                if (targetLevel <= 100) {
-                                    _showTarget = true;
-                                }
-                                break;
-                            default:
-                                _showTarget = true;
                             }
                             if (_showTarget) {
                                 $(_e).show();
@@ -660,24 +660,24 @@ function cabf_conquestmistfilter() {
             'Rogue' : 'Rogue',
             'Warrior' : 'Warrior'
         },
-        filterStatus = {
-            'All' : '\.',
-            'Full health' : 'FullHealth',
-            'Got health' : '[^0]\/',
-            'Healthy' : 'Healthy',
-            'Good' : 'Good',
-            'Fair' : 'Fair',
-            'Weakened' : 'Weakened',
-            'Stunned' : 'Stunned'
-        },
-        filterPoints = {
-            'All' : 'All',
-            '50' : '50',
-            '40' : '40',
-            '30' : '30',
-            '20' : '20',
-            '10' : '10'
-        };
+            filterStatus = {
+                'All' : '\.',
+                'Full health' : 'FullHealth',
+                'Got health' : '[^0]\/',
+                'Healthy' : 'Healthy',
+                'Good' : 'Good',
+                'Fair' : 'Fair',
+                'Weakened' : 'Weakened',
+                'Stunned' : 'Stunned'
+            },
+            filterPoints = {
+                'All' : 'All',
+                '50' : '50',
+                '40' : '40',
+                '30' : '30',
+                '20' : '20',
+                '10' : '10'
+            };
         $('body > ul.ui-selectmenu-menu').remove();
 
         $('div[style*="/graphics/conq2_insideland_battle_mid.jpg"]').after('<div id="cabfConquestBattleFilterContainer"><div id="cabfConquestBattleFilter" class="ui-state-default"></div></div>');
@@ -717,22 +717,22 @@ function cabf_conquestmistfilter() {
         });
         // Clear filters
         _cCBF.prepend($('<button>Clear filters</button>').button().css({
-                'position' : 'relative !important',
-                'left' : 9,
-                'top' : 3,
-                'fontSize' : 12,
-                'height' : 25,
-                'borderRadius' : 0,
-                'float' : 'left'
-            }).click(function () {
-                $('span.ui-selectmenu-status').text('All');
-                $('#cabfGateClassFilter, #cabfGateStatusFilter, #cabfGatePointsFilter').val('All');
-                _storedClass = _storedStatus = _storedPoints = 'All';
-                item.set('cabfPageConquestBattleClass', 'All');
-                item.set('cabfPageConquestBattleStatus', 'All');
-                item.set('cabfPageConquestBattlePoints', 'All');
-                filterGate();
-            }));
+            'position' : 'relative !important',
+            'left' : 9,
+            'top' : 3,
+            'fontSize' : 12,
+            'height' : 25,
+            'borderRadius' : 0,
+            'float' : 'left'
+        }).click(function () {
+            $('span.ui-selectmenu-status').text('All');
+            $('#cabfGateClassFilter, #cabfGateStatusFilter, #cabfGatePointsFilter').val('All');
+            _storedClass = _storedStatus = _storedPoints = 'All';
+            item.set('cabfPageConquestBattleClass', 'All');
+            item.set('cabfPageConquestBattleStatus', 'All');
+            item.set('cabfPageConquestBattlePoints', 'All');
+            filterGate();
+        }));
         window.setTimeout(function () {
             filterGate();
         }, 10);
@@ -782,7 +782,7 @@ function cabf_conquestearthfilter() {
                     console.log("_tower", _x);
 
                     var _defenderHealth = 0,
-                    _actions = parseInt(/\d+/.exec($('#app_body div[id="actions_left_' + _x + '"]:contains("ACTIONS LEFT:"):last').text()), 10);
+                        _actions = parseInt(/\d+/.exec($('#app_body div[id="actions_left_' + _x + '"]:contains("ACTIONS LEFT:"):last').text()), 10);
 
                     console.log("_actions", _actions);
                     if ($('#tower_' + _x + ' > #crystal_' + _x).length > 0) {
@@ -793,10 +793,10 @@ function cabf_conquestearthfilter() {
                         var _nb = 0;
                         $('#tower_' + _x + ' > div > div').each(function (_i, _e) {
                             var _text = $(_e).text().trim(),
-                            _health,
-                            _maxHealth,
-                            _fullhealth,
-                            winStat = '';
+                                _health,
+                                _maxHealth,
+                                _fullhealth,
+                                winStat = '';
                             if (_text) {
                                 _nb++;
                                 // enemy full health
@@ -850,10 +850,10 @@ function cabf_conquestearthfilter() {
                             var _state = new RegExp($('#cabfGateStatusFilter').val());
                             var _points = $('#cabfGatePointsFilter').val();
                             var _text = $(_e).text().trim(),
-                            _health,
-                            _maxHealth,
-                            _fullhealth,
-                            _eClass;
+                                _health,
+                                _maxHealth,
+                                _fullhealth,
+                                _eClass;
 
                             // enemy class
                             _eClass = $(_e).find('img[title="Cleric"], img[title="Mage"], img[title="Warrior"], img[title="Rogue"]').attr("title");
@@ -874,33 +874,33 @@ function cabf_conquestearthfilter() {
                                         var targetLevel = parseInt(/(?:Level:\ )(\d+)/g.exec(_text)[1]);
                                         var _showTarget = false;
                                         switch (_points) {
-                                        case '50':
-                                            if (targetLevel > 900) {
+                                            case '50':
+                                                if (targetLevel > 900) {
+                                                    _showTarget = true;
+                                                }
+                                                break;
+                                            case '40':
+                                                if ((targetLevel > 600) && (targetLevel <= 900)) {
+                                                    _showTarget = true;
+                                                }
+                                                break;
+                                            case '30':
+                                                if ((targetLevel > 300) && (targetLevel <= 600)) {
+                                                    _showTarget = true;
+                                                }
+                                                break;
+                                            case '20':
+                                                if ((targetLevel > 100) && (targetLevel <= 300)) {
+                                                    _showTarget = true;
+                                                }
+                                                break;
+                                            case '10':
+                                                if (targetLevel <= 100) {
+                                                    _showTarget = true;
+                                                }
+                                                break;
+                                            default:
                                                 _showTarget = true;
-                                            }
-                                            break;
-                                        case '40':
-                                            if ((targetLevel > 600) && (targetLevel <= 900)) {
-                                                _showTarget = true;
-                                            }
-                                            break;
-                                        case '30':
-                                            if ((targetLevel > 300) && (targetLevel <= 600)) {
-                                                _showTarget = true;
-                                            }
-                                            break;
-                                        case '20':
-                                            if ((targetLevel > 100) && (targetLevel <= 300)) {
-                                                _showTarget = true;
-                                            }
-                                            break;
-                                        case '10':
-                                            if (targetLevel <= 100) {
-                                                _showTarget = true;
-                                            }
-                                            break;
-                                        default:
-                                            _showTarget = true;
                                         }
                                         if (_showTarget) {
                                             $(_e).show();
@@ -945,24 +945,24 @@ function cabf_conquestearthfilter() {
                 'Rogue' : 'Rogue',
                 'Warrior' : 'Warrior'
             },
-            filterStatus = {
-                'All' : '\.',
-                'Full health' : 'FullHealth',
-                'Got health' : '[^0]\/',
-                'Healthy' : 'Healthy',
-                'Good' : 'Good',
-                'Fair' : 'Fair',
-                'Weakened' : 'Weakened',
-                'Stunned' : 'Stunned'
-            },
-            filterPoints = {
-                'All' : 'All',
-                '50' : '50',
-                '40' : '40',
-                '30' : '30',
-                '20' : '20',
-                '10' : '10'
-            };
+                filterStatus = {
+                    'All' : '\.',
+                    'Full health' : 'FullHealth',
+                    'Got health' : '[^0]\/',
+                    'Healthy' : 'Healthy',
+                    'Good' : 'Good',
+                    'Fair' : 'Fair',
+                    'Weakened' : 'Weakened',
+                    'Stunned' : 'Stunned'
+                },
+                filterPoints = {
+                    'All' : 'All',
+                    '50' : '50',
+                    '40' : '40',
+                    '30' : '30',
+                    '20' : '20',
+                    '10' : '10'
+                };
             $('body > ul.ui-selectmenu-menu').remove();
 
             if ($("#cabfConquestEarthFilterContainer").length > 0) {
@@ -1005,22 +1005,22 @@ function cabf_conquestearthfilter() {
                 });
                 // Clear filters
                 _cCBF.prepend($('<button>Clear filters</button>').button().css({
-                        'position' : 'relative !important',
-                        'left' : 9,
-                        'top' : 3,
-                        'fontSize' : 12,
-                        'height' : 25,
-                        'borderRadius' : 0,
-                        'float' : 'left'
-                    }).click(function () {
-                        $('span.ui-selectmenu-status').text('All');
-                        $('#cabfGateClassFilter, #cabfGateStatusFilter, #cabfGatePointsFilter').val('All');
-                        _storedClass = _storedStatus = _storedPoints = 'All';
-                        item.set('cabfPageConquestBattleClass', 'All');
-                        item.set('cabfPageConquestBattleStatus', 'All');
-                        item.set('cabfPageConquestBattlePoints', 'All');
-                        filterGate();
-                    }));
+                    'position' : 'relative !important',
+                    'left' : 9,
+                    'top' : 3,
+                    'fontSize' : 12,
+                    'height' : 25,
+                    'borderRadius' : 0,
+                    'float' : 'left'
+                }).click(function () {
+                    $('span.ui-selectmenu-status').text('All');
+                    $('#cabfGateClassFilter, #cabfGateStatusFilter, #cabfGatePointsFilter').val('All');
+                    _storedClass = _storedStatus = _storedPoints = 'All';
+                    item.set('cabfPageConquestBattleClass', 'All');
+                    item.set('cabfPageConquestBattleStatus', 'All');
+                    item.set('cabfPageConquestBattlePoints', 'All');
+                    filterGate();
+                }));
             }
             if (_burnEarthToken) {
                 var _e = $('#results_main_wrapper');
@@ -1093,7 +1093,7 @@ function cabf_guildbattlefilter() {
     $('#guild_battle_banner_section > div:eq(2)').css('marginTop', 0);
     $('div:contains("The Battle Between"):last').parent().css('marginTop', 20);
     $('input[src*="collect_reward_button2.jpg"]').parents('div:eq(2)').css('marginTop', 0);
-	normalDuelStats('#guild_battle_guild_tabs');
+    normalDuelStats('#guild_battle_guild_tabs');
     addStatBoard('#guild_battle_guild_tabs');
 
     // add current tokens to result
@@ -1103,29 +1103,29 @@ function cabf_guildbattlefilter() {
     // reduce gate size and add number
     if ($('#your_new_guild_member_list:contains("No Soldiers Posted In This Position!"), #enemy_new_guild_member_list:contains("No Soldiers Posted In This Position!")').length === 0) {
         var _guildnum = 1,
-        _count = 0,
-        _totalhealth = 0,
-        _totalhealthleft = 0,
-        _clericcount = 0,
-        _clericlivecount = 0,
-        _clerictotalhealth = 0,
-        _clerictotalhealthleft = 0,
-        _magecount = 0,
-        _magelivecount = 0,
-        _magetotalhealth = 0,
-        _magetotalhealthleft = 0,
-        _roguecount = 0,
-        _roguelivecount = 0,
-        _roguetotalhealth = 0,
-        _roguetotalhealthleft = 0,
-        _warriorcount = 0,
-        _warriorlivecount = 0,
-        _warriortotalhealth = 0,
-        _warriortotalhealthleft = 0,
-        _activecount = 0,
-        _activelivecount = 0,
-        _activetotalhealth = 0,
-        _activetotalhealthleft = 0;
+            _count = 0,
+            _totalhealth = 0,
+            _totalhealthleft = 0,
+            _clericcount = 0,
+            _clericlivecount = 0,
+            _clerictotalhealth = 0,
+            _clerictotalhealthleft = 0,
+            _magecount = 0,
+            _magelivecount = 0,
+            _magetotalhealth = 0,
+            _magetotalhealthleft = 0,
+            _roguecount = 0,
+            _roguelivecount = 0,
+            _roguetotalhealth = 0,
+            _roguetotalhealthleft = 0,
+            _warriorcount = 0,
+            _warriorlivecount = 0,
+            _warriortotalhealth = 0,
+            _warriortotalhealthleft = 0,
+            _activecount = 0,
+            _activelivecount = 0,
+            _activetotalhealth = 0,
+            _activetotalhealthleft = 0;
         var _gateNum = $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').attr('class').match(/\d/)[0];
         var _gateName = '';
         if ($('#enemy_guild_battle_section_battle_list').length > 0) {
@@ -1134,20 +1134,20 @@ function cabf_guildbattlefilter() {
             $('#cabfStatType').html('Ally');
         }
         switch (_gateNum) {
-        case '1':
-            _gateName = 'North';
-            break;
-        case '2':
-            _gateName = 'West';
-            break;
-        case '3':
-            _gateName = 'East';
-            break;
-        case '4':
-            _gateName = 'South';
-            break;
-        default:
-            _gateName = ' ';
+            case '1':
+                _gateName = 'North';
+                break;
+            case '2':
+                _gateName = 'West';
+                break;
+            case '3':
+                _gateName = 'East';
+                break;
+            case '4':
+                _gateName = 'South';
+                break;
+            default:
+                _gateName = ' ';
         }
         $('#cabfStatTower span:last').html(_gateName + ' Tower Stat');
         $('#cabfStatCleric span:last').html(_gateName + ' Cleric Stat');
@@ -1158,7 +1158,7 @@ function cabf_guildbattlefilter() {
 
         $('#enemy_new_guild_member_list > div > div, #your_new_guild_member_list > div > div').each(function (_i, _e) {
             var _text = $(_e).text().trim(),
-            _FullHealth = true;
+                _FullHealth = true;
             if (_text && $(_e).text().trim().length > 0) {
                 var _test = /(\d+)\/(\d+)/g.exec(_text);
                 var _active = /Battle\ Points:\ [1-9]/g.exec(_text);
@@ -1290,20 +1290,20 @@ function cabf_guildbattlefilter() {
             $('#cabfStatType').html('Ally');
         }
         switch (_gateNumNull) {
-        case '1':
-            $('#cabfStatTower span:last').html('North Tower Stat');
-            break;
-        case '2':
-            $('#cabfStatTower span:last').html('West Tower Stat');
-            break;
-        case '3':
-            $('#cabfStatTower span:last').html('East Tower Stat');
-            break;
-        case '4':
-            $('#cabfStatTower span:last').html('South Tower Stat');
-            break;
-        default:
-            $('#cabfStatTower span:last').html('Stat (Tower not Found)');
+            case '1':
+                $('#cabfStatTower span:last').html('North Tower Stat');
+                break;
+            case '2':
+                $('#cabfStatTower span:last').html('West Tower Stat');
+                break;
+            case '3':
+                $('#cabfStatTower span:last').html('East Tower Stat');
+                break;
+            case '4':
+                $('#cabfStatTower span:last').html('South Tower Stat');
+                break;
+            default:
+                $('#cabfStatTower span:last').html('Stat (Tower not Found)');
         }
         // Clear var
         _gateNumNull = '';
@@ -1328,24 +1328,24 @@ function cabf_guildbattlefilter() {
             var _state = $('#cabfGateStatusFilter').val();
             var _points = $('#cabfGatePointsFilter').val();
             var _text = $(_e).text().trim(),
-            _stateTest = true;
+                _stateTest = true;
             var _test = false;
             switch (_state) {
-            case 'FullHealth':
-                _test = /(\d+)\/(\d+)/g.exec(_text);
-                _stateTest = (_test.length === 3 && _test[1] === _test[2]) ? true : false;
-                break;
-            case 'GotHealth':
-                _test = /(\d+)\/(\d+)/g.exec(_text);
-                _stateTest = (_test.length === 3 && parseInt(_test[1]) !== 0) ? true : false;
-                break;
-            case 'NoHealth':
-                _test = /(\d+)\/(\d+)/g.exec(_text);
-                _stateTest = (_test.length === 3 && parseInt(_test[1]) === 0) ? true : false;
-                break;
-            default:
-                _test = new RegExp(_state, "g");
-                _stateTest = _test.test(_text);
+                case 'FullHealth':
+                    _test = /(\d+)\/(\d+)/g.exec(_text);
+                    _stateTest = (_test.length === 3 && _test[1] === _test[2]) ? true : false;
+                    break;
+                case 'GotHealth':
+                    _test = /(\d+)\/(\d+)/g.exec(_text);
+                    _stateTest = (_test.length === 3 && parseInt(_test[1]) !== 0) ? true : false;
+                    break;
+                case 'NoHealth':
+                    _test = /(\d+)\/(\d+)/g.exec(_text);
+                    _stateTest = (_test.length === 3 && parseInt(_test[1]) === 0) ? true : false;
+                    break;
+                default:
+                    _test = new RegExp(_state, "g");
+                    _stateTest = _test.test(_text);
             }
 
             var _classTest = _class === 'all' ? 1 : $(_e).find('img[src*="/graphics/class_' + _class + '.gif"]').length;
@@ -1357,23 +1357,23 @@ function cabf_guildbattlefilter() {
                         var targetLevel = parseInt(/(?:Level:\ )(\d+)/g.exec(_text)[1]);
                         var _showTarget = false;
                         switch (_points) {
-                        case '160':
-                            if (targetLevel <= myLevel * 80 / 100) {
+                            case '160':
+                                if (targetLevel <= myLevel * 80 / 100) {
+                                    _showTarget = true;
+                                }
+                                break;
+                            case '200':
+                                if ((targetLevel > myLevel * 80 / 100) && (targetLevel <= myLevel * 120 / 100)) {
+                                    _showTarget = true;
+                                }
+                                break;
+                            case '240':
+                                if (targetLevel > myLevel * 120 / 100) {
+                                    _showTarget = true;
+                                }
+                                break;
+                            default:
                                 _showTarget = true;
-                            }
-                            break;
-                        case '200':
-                            if ((targetLevel > myLevel * 80 / 100) && (targetLevel <= myLevel * 120 / 100)) {
-                                _showTarget = true;
-                            }
-                            break;
-                        case '240':
-                            if (targetLevel > myLevel * 120 / 100) {
-                                _showTarget = true;
-                            }
-                            break;
-                        default:
-                            _showTarget = true;
                         }
                         if (_showTarget) {
                             $(_e).show();
@@ -1419,49 +1419,49 @@ function cabf_guildbattlefilter() {
         'Rogue' : 'rogue',
         'Warrior' : 'warrior'
     },
-    filterActivity = {
-        'All' : '\.',
-        'Active' : 'Battle Points: [1-9]',
-        'Inactive' : 'Battle Points: 0'
-    },
-    filterStatus = {
-        'All' : '\.',
-        'Full health' : 'FullHealth',
-        'Got health' : 'GotHealth',
-        'No health' : 'NoHealth',
-        'Healthy' : 'Healthy',
-        'Good' : 'Good',
-        'Fair' : 'Fair',
-        'Weakened' : 'Weakened',
-        'Stunned' : 'Stunned'
-    },
-    filterPoints = {
-        'All' : 'all',
-        '240' : '240',
-        '200' : '200',
-        '160' : '160'
-    };
+        filterActivity = {
+            'All' : '\.',
+            'Active' : 'Battle Points: [1-9]',
+            'Inactive' : 'Battle Points: 0'
+        },
+        filterStatus = {
+            'All' : '\.',
+            'Full health' : 'FullHealth',
+            'Got health' : 'GotHealth',
+            'No health' : 'NoHealth',
+            'Healthy' : 'Healthy',
+            'Good' : 'Good',
+            'Fair' : 'Fair',
+            'Weakened' : 'Weakened',
+            'Stunned' : 'Stunned'
+        },
+        filterPoints = {
+            'All' : 'all',
+            '240' : '240',
+            '200' : '200',
+            '160' : '160'
+        };
     // Class filter
     $('body > ul.ui-selectmenu-menu').remove();
     $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').prepend('<div id="cabf_menu" style="padding: 0 0 30px 0;" >');
     $('#cabf_menu').append($('<button>Clear filters</button>').button().css({
-            'position' : 'relative !important',
-            'left' : 9,
-            'top' : 3,
-            'float' : 'left',
-            'fontSize' : 12,
-            'height' : 25,
-            'borderRadius' : 0
-        }).click(function () {
-            $('span.ui-selectmenu-status').text('All');
-            $('#cabfGateClassFilter, #cabfGateActivityFilter, #cabfGateStatusFilter, #cabfGatePointsFilter').val('All');
-            _storedClass = _storedActivity = _storedStatus = _storedPoints = 'All';
-            item.set('cabfPageGuildBattleClass', 'All');
-            item.set('cabfPageGuildBattleActivity', 'All');
-            item.set('cabfPageGuildBattleStatus', 'All');
-            item.set('cabfPageGuildBattlePoints', 'All');
-            filterGate();
-        }));
+        'position' : 'relative !important',
+        'left' : 9,
+        'top' : 3,
+        'float' : 'left',
+        'fontSize' : 12,
+        'height' : 25,
+        'borderRadius' : 0
+    }).click(function () {
+        $('span.ui-selectmenu-status').text('All');
+        $('#cabfGateClassFilter, #cabfGateActivityFilter, #cabfGateStatusFilter, #cabfGatePointsFilter').val('All');
+        _storedClass = _storedActivity = _storedStatus = _storedPoints = 'All';
+        item.set('cabfPageGuildBattleClass', 'All');
+        item.set('cabfPageGuildBattleActivity', 'All');
+        item.set('cabfPageGuildBattleStatus', 'All');
+        item.set('cabfPageGuildBattlePoints', 'All');
+        filterGate();
+    }));
     $('#cabf_menu').append('<span class="cabfGateFilterTitle ui-state-default"> Class </span><select id="cabfGateClassFilter" class="cabfgatefiltertitle">');
     _sel = $('#cabfGateClassFilter');
     $.each(filterClass, function (_i, _e) {
@@ -1575,7 +1575,7 @@ function cabf_tenbattlefilter() {
     $('#guild_battle_banner_section > div:eq(2)').css('marginTop', 0);
     $('div:contains("The Battle Between"):last').parent().css('marginTop', 20);
     $('input[src*="collect_reward_button2.jpg"]').parents('div:eq(2)').css('marginTop', 0);
-	normalDuelStats('#guild_battle_guild_tabs');
+    normalDuelStats('#guild_battle_guild_tabs');
     addStatBoard('#guild_battle_guild_tabs');
 
     // add current tokens to result
@@ -1585,25 +1585,25 @@ function cabf_tenbattlefilter() {
     // reduce gate size and add number
     if ($('#your_new_guild_member_list:contains("No Soldiers Posted In This Position!"), #enemy_new_guild_member_list:contains("No Soldiers Posted In This Position!")').length === 0) {
         var _guildnum = 1,
-        _count = 0,
-        _totalhealth = 0,
-        _totalhealthleft = 0,
-        _clericcount = 0,
-        _clerictotalhealth = 0,
-        _clerictotalhealthleft = 0,
-        _magecount = 0,
-        _magetotalhealth = 0,
-        _magetotalhealthleft = 0,
-        _roguecount = 0,
-        _roguetotalhealth = 0,
-        _roguetotalhealthleft = 0,
-        _warriorcount = 0,
-        _warriortotalhealth = 0,
-        _warriortotalhealthleft = 0,
-        _activecount = 0,
-        _activelivecount = 0,
-        _activetotalhealth = 0,
-        _activetotalhealthleft = 0;
+            _count = 0,
+            _totalhealth = 0,
+            _totalhealthleft = 0,
+            _clericcount = 0,
+            _clerictotalhealth = 0,
+            _clerictotalhealthleft = 0,
+            _magecount = 0,
+            _magetotalhealth = 0,
+            _magetotalhealthleft = 0,
+            _roguecount = 0,
+            _roguetotalhealth = 0,
+            _roguetotalhealthleft = 0,
+            _warriorcount = 0,
+            _warriortotalhealth = 0,
+            _warriortotalhealthleft = 0,
+            _activecount = 0,
+            _activelivecount = 0,
+            _activetotalhealth = 0,
+            _activetotalhealthleft = 0;
         if ($('#enemy_guild_battle_section_battle_list').length > 0) {
             $('#cabfStatType').html('Enemy Stat');
         } else {
@@ -1618,7 +1618,7 @@ function cabf_tenbattlefilter() {
 
         $('#enemy_new_guild_member_list > div > div, #your_new_guild_member_list > div > div').each(function (_i, _e) {
             var _text = $(_e).text().trim(),
-            _FullHealth = true;
+                _FullHealth = true;
             if (_text && $(_e).text().trim().length > 0) {
                 var _test = /(\d+)\/(\d+)/g.exec(_text);
                 var _active = /Battle\ Points:\ [1-9]/g.exec(_text);
@@ -1764,24 +1764,24 @@ function cabf_tenbattlefilter() {
             var _state = $('#cabfGateStatusFilter').val();
             var _points = $('#cabfGatePointsFilter').val();
             var _text = $(_e).text().trim(),
-            _stateTest = true;
+                _stateTest = true;
             var _test = false;
             switch (_state) {
-            case 'FullHealth':
-                _test = /(\d+)\/(\d+)/g.exec(_text);
-                _stateTest = (_test.length === 3 && _test[1] === _test[2]) ? true : false;
-                break;
-            case 'GotHealth':
-                _test = /(\d+)\/(\d+)/g.exec(_text);
-                _stateTest = (_test.length === 3 && parseInt(_test[1]) !== 0) ? true : false;
-                break;
-            case 'NoHealth':
-                _test = /(\d+)\/(\d+)/g.exec(_text);
-                _stateTest = (_test.length === 3 && parseInt(_test[1]) === 0) ? true : false;
-                break;
-            default:
-                _test = new RegExp(_state, "g");
-                _stateTest = _test.test(_text);
+                case 'FullHealth':
+                    _test = /(\d+)\/(\d+)/g.exec(_text);
+                    _stateTest = (_test.length === 3 && _test[1] === _test[2]) ? true : false;
+                    break;
+                case 'GotHealth':
+                    _test = /(\d+)\/(\d+)/g.exec(_text);
+                    _stateTest = (_test.length === 3 && parseInt(_test[1]) !== 0) ? true : false;
+                    break;
+                case 'NoHealth':
+                    _test = /(\d+)\/(\d+)/g.exec(_text);
+                    _stateTest = (_test.length === 3 && parseInt(_test[1]) === 0) ? true : false;
+                    break;
+                default:
+                    _test = new RegExp(_state, "g");
+                    _stateTest = _test.test(_text);
             }
 
             var _classTest = _class === 'all' ? 1 : $(_e).find('img[src*="/graphics/class_' + _class + '.gif"]').length;
@@ -1793,23 +1793,23 @@ function cabf_tenbattlefilter() {
                         var targetLevel = parseInt(/(?:Level:\ )(\d+)/g.exec(_text)[1]);
                         var _showTarget = false;
                         switch (_points) {
-                        case '160':
-                            if (targetLevel <= myLevel * 80 / 100) {
+                            case '160':
+                                if (targetLevel <= myLevel * 80 / 100) {
+                                    _showTarget = true;
+                                }
+                                break;
+                            case '200':
+                                if ((targetLevel > myLevel * 80 / 100) && (targetLevel <= myLevel * 120 / 100)) {
+                                    _showTarget = true;
+                                }
+                                break;
+                            case '240':
+                                if (targetLevel > myLevel * 120 / 100) {
+                                    _showTarget = true;
+                                }
+                                break;
+                            default:
                                 _showTarget = true;
-                            }
-                            break;
-                        case '200':
-                            if ((targetLevel > myLevel * 80 / 100) && (targetLevel <= myLevel * 120 / 100)) {
-                                _showTarget = true;
-                            }
-                            break;
-                        case '240':
-                            if (targetLevel > myLevel * 120 / 100) {
-                                _showTarget = true;
-                            }
-                            break;
-                        default:
-                            _showTarget = true;
                         }
                         if (_showTarget) {
                             $(_e).show();
@@ -1842,49 +1842,49 @@ function cabf_tenbattlefilter() {
         'Rogue' : 'rogue',
         'Warrior' : 'warrior'
     },
-    filterActivity = {
-        'All' : '\.',
-        'Active' : 'Battle Points: [1-9]',
-        'Inactive' : 'Battle Points: 0'
-    },
-    filterStatus = {
-        'All' : '\.',
-        'Full health' : 'FullHealth',
-        'Got health' : 'GotHealth',
-        'No health' : 'NoHealth',
-        'Healthy' : 'Healthy',
-        'Good' : 'Good',
-        'Fair' : 'Fair',
-        'Weakened' : 'Weakened',
-        'Stunned' : 'Stunned'
-    },
-    filterPoints = {
-        'All' : 'all',
-        '240' : '240',
-        '200' : '200',
-        '160' : '160'
-    };
+        filterActivity = {
+            'All' : '\.',
+            'Active' : 'Battle Points: [1-9]',
+            'Inactive' : 'Battle Points: 0'
+        },
+        filterStatus = {
+            'All' : '\.',
+            'Full health' : 'FullHealth',
+            'Got health' : 'GotHealth',
+            'No health' : 'NoHealth',
+            'Healthy' : 'Healthy',
+            'Good' : 'Good',
+            'Fair' : 'Fair',
+            'Weakened' : 'Weakened',
+            'Stunned' : 'Stunned'
+        },
+        filterPoints = {
+            'All' : 'all',
+            '240' : '240',
+            '200' : '200',
+            '160' : '160'
+        };
     // Class filter
     $('body > ul.ui-selectmenu-menu').remove();
     $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').prepend('<div id="cabf_menu" style="padding: 0 0 30px 0;" >');
     $('#cabf_menu').append($('<button>Clear filters</button>').button().css({
-            'position' : 'relative !important',
-            'left' : 9,
-            'top' : 3,
-            'float' : 'left',
-            'fontSize' : 12,
-            'height' : 25,
-            'borderRadius' : 0
-        }).click(function () {
-            $('span.ui-selectmenu-status').text('All');
-            $('#cabfGateClassFilter, #cabfGateActivityFilter, #cabfGateStatusFilter, #cabfGatePointsFilter').val('All');
-            _storedClass = _storedActivity = _storedStatus = _storedPoints = 'All';
-            item.set('cabfPageTenBattleClass', 'All');
-            item.set('cabfPageTenBattleActivity', 'All');
-            item.set('cabfPageTenBattleStatus', 'All');
-            item.set('cabfPageTenBattlePoints', 'All');
-            filterGate();
-        }));
+        'position' : 'relative !important',
+        'left' : 9,
+        'top' : 3,
+        'float' : 'left',
+        'fontSize' : 12,
+        'height' : 25,
+        'borderRadius' : 0
+    }).click(function () {
+        $('span.ui-selectmenu-status').text('All');
+        $('#cabfGateClassFilter, #cabfGateActivityFilter, #cabfGateStatusFilter, #cabfGatePointsFilter').val('All');
+        _storedClass = _storedActivity = _storedStatus = _storedPoints = 'All';
+        item.set('cabfPageTenBattleClass', 'All');
+        item.set('cabfPageTenBattleActivity', 'All');
+        item.set('cabfPageTenBattleStatus', 'All');
+        item.set('cabfPageTenBattlePoints', 'All');
+        filterGate();
+    }));
     $('#cabf_menu').append('<span class="cabfGateFilterTitle ui-state-default"> Class </span><select id="cabfGateClassFilter" class="cabfgatefiltertitle">');
     _sel = $('#cabfGateClassFilter');
     $.each(filterClass, function (_i, _e) {
@@ -1991,7 +1991,7 @@ function cabf_festivalbattlefilter() {
     $('#guild_battle_banner_section > div:eq(2)').css('marginTop', 0);
     $('div:contains("The Battle Between"):last').parent().css('marginTop', 20);
     $('input[src*="collect_reward_button2.jpg"]').parents('div:eq(2)').css('marginTop', 0);
-	normalDuelStats('#guild_battle_guild_tabs');
+    normalDuelStats('#guild_battle_guild_tabs');
     addStatBoard('#guild_battle_guild_tabs');
 
     // add current tokens to result
@@ -2000,25 +2000,25 @@ function cabf_festivalbattlefilter() {
 
     // reduce gate size and add number
     var _guildnum = 1,
-    _count = 0,
-    _totalhealth = 0,
-    _totalhealthleft = 0,
-    _clericcount = 0,
-    _clerictotalhealth = 0,
-    _clerictotalhealthleft = 0,
-    _magecount = 0,
-    _magetotalhealth = 0,
-    _magetotalhealthleft = 0,
-    _roguecount = 0,
-    _roguetotalhealth = 0,
-    _roguetotalhealthleft = 0,
-    _warriorcount = 0,
-    _warriortotalhealth = 0,
-    _warriortotalhealthleft = 0,
-    _activecount = 0,
-    _activelivecount = 0,
-    _activetotalhealth = 0,
-    _activetotalhealthleft = 0;
+        _count = 0,
+        _totalhealth = 0,
+        _totalhealthleft = 0,
+        _clericcount = 0,
+        _clerictotalhealth = 0,
+        _clerictotalhealthleft = 0,
+        _magecount = 0,
+        _magetotalhealth = 0,
+        _magetotalhealthleft = 0,
+        _roguecount = 0,
+        _roguetotalhealth = 0,
+        _roguetotalhealthleft = 0,
+        _warriorcount = 0,
+        _warriortotalhealth = 0,
+        _warriortotalhealthleft = 0,
+        _activecount = 0,
+        _activelivecount = 0,
+        _activetotalhealth = 0,
+        _activetotalhealthleft = 0;
     var _gateNum = $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').attr('class').match(/\d/)[0];
     var _gateName = '';
     if ($('#enemy_guild_battle_section_battle_list').length > 0) {
@@ -2027,20 +2027,20 @@ function cabf_festivalbattlefilter() {
         $('#cabfStatType').html('Ally');
     }
     switch (_gateNum) {
-    case '1':
-        _gateName = 'North';
-        break;
-    case '2':
-        _gateName = 'West';
-        break;
-    case '3':
-        _gateName = 'East';
-        break;
-    case '4':
-        _gateName = 'South';
-        break;
-    default:
-        _gateName = ' ';
+        case '1':
+            _gateName = 'North';
+            break;
+        case '2':
+            _gateName = 'West';
+            break;
+        case '3':
+            _gateName = 'East';
+            break;
+        case '4':
+            _gateName = 'South';
+            break;
+        default:
+            _gateName = ' ';
     }
     $('#cabfStatTower span:last').html(_gateName + ' Tower Stat');
     $('#cabfStatCleric span:last').html(_gateName + ' Cleric Stat');
@@ -2050,7 +2050,7 @@ function cabf_festivalbattlefilter() {
     $('#cabfStatActive span:last').html(_gateName + ' Active Stat');
     $('#enemy_guild_member_list > div > div, #your_guild_member_list > div > div').each(function (_i, _e) {
         var _text = $(_e).text().trim(),
-        _FullHealth = true;
+            _FullHealth = true;
         if (_text && $(_e).text().trim().length > 0) {
             var _test = /(\d+)\/(\d+)/g.exec(_text);
             var _active = /Battle\ Points:\ [1-9]/g.exec(_text);
@@ -2176,24 +2176,24 @@ function cabf_festivalbattlefilter() {
             var _state = $('#cabfGateStatusFilter').val();
             var _points = $('#cabfGatePointsFilter').val();
             var _text = $(_e).text().trim(),
-            _stateTest = true;
+                _stateTest = true;
             var _test = false;
             switch (_state) {
-            case 'FullHealth':
-                _test = /(\d+)\/(\d+)/g.exec(_text);
-                _stateTest = (_test.length === 3 && _test[1] === _test[2]) ? true : false;
-                break;
-            case 'GotHealth':
-                _test = /(\d+)\/(\d+)/g.exec(_text);
-                _stateTest = (_test.length === 3 && parseInt(_test[1]) !== 0) ? true : false;
-                break;
-            case 'NoHealth':
-                _test = /(\d+)\/(\d+)/g.exec(_text);
-                _stateTest = (_test.length === 3 && parseInt(_test[1]) === 0) ? true : false;
-                break;
-            default:
-                _test = new RegExp(_state, "g");
-                _stateTest = _test.test(_text);
+                case 'FullHealth':
+                    _test = /(\d+)\/(\d+)/g.exec(_text);
+                    _stateTest = (_test.length === 3 && _test[1] === _test[2]) ? true : false;
+                    break;
+                case 'GotHealth':
+                    _test = /(\d+)\/(\d+)/g.exec(_text);
+                    _stateTest = (_test.length === 3 && parseInt(_test[1]) !== 0) ? true : false;
+                    break;
+                case 'NoHealth':
+                    _test = /(\d+)\/(\d+)/g.exec(_text);
+                    _stateTest = (_test.length === 3 && parseInt(_test[1]) === 0) ? true : false;
+                    break;
+                default:
+                    _test = new RegExp(_state, "g");
+                    _stateTest = _test.test(_text);
             }
 
             var _classTest = _class === 'all' ? 1 : $(_e).find('img[src*="/graphics/class_' + _class + '.gif"]').length;
@@ -2205,23 +2205,23 @@ function cabf_festivalbattlefilter() {
                         var targetLevel = parseInt(/(?:Level:\ )(\d+)/g.exec(_text)[1]);
                         var _showTarget = false;
                         switch (_points) {
-                        case '160':
-                            if (targetLevel <= myLevel * 80 / 100) {
+                            case '160':
+                                if (targetLevel <= myLevel * 80 / 100) {
+                                    _showTarget = true;
+                                }
+                                break;
+                            case '200':
+                                if ((targetLevel > myLevel * 80 / 100) && (targetLevel <= myLevel * 120 / 100)) {
+                                    _showTarget = true;
+                                }
+                                break;
+                            case '240':
+                                if (targetLevel > myLevel * 120 / 100) {
+                                    _showTarget = true;
+                                }
+                                break;
+                            default:
                                 _showTarget = true;
-                            }
-                            break;
-                        case '200':
-                            if ((targetLevel > myLevel * 80 / 100) && (targetLevel <= myLevel * 120 / 100)) {
-                                _showTarget = true;
-                            }
-                            break;
-                        case '240':
-                            if (targetLevel > myLevel * 120 / 100) {
-                                _showTarget = true;
-                            }
-                            break;
-                        default:
-                            _showTarget = true;
                         }
                         if (_showTarget) {
                             $(_e).show();
@@ -2253,50 +2253,50 @@ function cabf_festivalbattlefilter() {
         'Rogue' : 'rogue',
         'Warrior' : 'warrior'
     },
-    filterActivity = {
-        'All' : '\.*',
-        'Active' : 'Battle Points: [1-9]',
-        'Inactive' : 'Battle Points: 0'
-    },
-    filterStatus = {
-        'All' : '\.*',
-        'Full health' : 'FullHealth',
-        'Got health' : 'GotHealth',
-        'No health' : 'NoHealth',
-        'Healthy' : 'Healthy',
-        'Good' : 'Good',
-        'Fair' : 'Fair',
-        'Weakened' : 'Weakened',
-        'Stunned' : 'Stunned'
-    },
-    filterPoints = {
-        'All' : 'all',
-        '240' : '240',
-        '200' : '200',
-        '160' : '160'
-    };
+        filterActivity = {
+            'All' : '\.*',
+            'Active' : 'Battle Points: [1-9]',
+            'Inactive' : 'Battle Points: 0'
+        },
+        filterStatus = {
+            'All' : '\.*',
+            'Full health' : 'FullHealth',
+            'Got health' : 'GotHealth',
+            'No health' : 'NoHealth',
+            'Healthy' : 'Healthy',
+            'Good' : 'Good',
+            'Fair' : 'Fair',
+            'Weakened' : 'Weakened',
+            'Stunned' : 'Stunned'
+        },
+        filterPoints = {
+            'All' : 'all',
+            '240' : '240',
+            '200' : '200',
+            '160' : '160'
+        };
     // Add Filter Bar
     $('body > ul.ui-selectmenu-menu').remove();
     $('#enemy_guild_battle_section_battle_list, #your_guild_battle_section_battle_list').prepend('<div id="cabf_menu" style="padding: 0 0 30px 0;" >');
     // Clear Filter
     $('#cabf_menu').append($('<button>Clear filters</button>').button().css({
-            'position' : 'relative !important',
-            'left' : 9,
-            'top' : 3,
-            'float' : 'left',
-            'fontSize' : 12,
-            'height' : 25,
-            'borderRadius' : 0
-        }).click(function () {
-            $('span.ui-selectmenu-status').text('All');
-            $('#cabfGateClassFilter, #cabfGateActivityFilter, #cabfGateStatusFilter, #cabfGatePointsFilter').val('All');
-            _storedClass = _storedActivity = _storedStatus = _storedPoints = 'All';
-            item.set('cabfPageFestGuildBattleClass', 'All');
-            item.set('cabfPageFestGuildBattleActivity', 'All');
-            item.set('cabfPageFestGuildBattleStatus', 'All');
-            item.set('cabfPageFestGuildBattlePoints', 'All');
-            filterGate();
-        }));
+        'position' : 'relative !important',
+        'left' : 9,
+        'top' : 3,
+        'float' : 'left',
+        'fontSize' : 12,
+        'height' : 25,
+        'borderRadius' : 0
+    }).click(function () {
+        $('span.ui-selectmenu-status').text('All');
+        $('#cabfGateClassFilter, #cabfGateActivityFilter, #cabfGateStatusFilter, #cabfGatePointsFilter').val('All');
+        _storedClass = _storedActivity = _storedStatus = _storedPoints = 'All';
+        item.set('cabfPageFestGuildBattleClass', 'All');
+        item.set('cabfPageFestGuildBattleActivity', 'All');
+        item.set('cabfPageFestGuildBattleStatus', 'All');
+        item.set('cabfPageFestGuildBattlePoints', 'All');
+        filterGate();
+    }));
     // Class filter
     $('#cabf_menu').append('<span class="cabfGateFilterTitle ui-state-default"> Class </span><select id="cabfGateClassFilter" class="cabfgatefiltertitle">');
     _sel = $('#cabfGateClassFilter');
@@ -2364,7 +2364,7 @@ function cabf_festivalbattlefilter() {
  ******************************************************************************************************************************************************************************/
 function monsterBars() {
     var _monstername = null,
-    _ret = null;
+        _ret = null;
     // add percentage to top bars
     if ($('#app_body div[style*="nm_bars.jpg"], #app_body div[style*="nm_bars_cross.jpg"]').length > 0) {
         $('img[src*="monster_health_background.jpg"], [src*="nm_red.jpg"], [src*="nm_orange.jpg"]').each(function (_i, _e) {
@@ -2393,13 +2393,13 @@ function monsterBars() {
 function defenseBar() {
     // add percentage to defense/forcefield/..
     var _defense = $('img[src*="bar_dispel.gif"],[src*="nm_green.jpg"],[src*="seamonster_ship_health.jpg"]').parent()[0],
-    _defRegs = [
-        '^Castle Defense$', '^Ragnarok\'s Glacial Armor$', '^Your Ship\'s Defense$', '^Illvasa, Plateau City\'s Defense$', '^Skaar\'s Mana Forcefield$', '^Party Health\\/Strength$'
-    ],
-    _defReg = new RegExp(_defRegs.join('|'));
+        _defRegs = [
+            '^Castle Defense$', '^Ragnarok\'s Glacial Armor$', '^Your Ship\'s Defense$', '^Illvasa, Plateau City\'s Defense$', '^Skaar\'s Mana Forcefield$', '^Party Health\\/Strength$'
+        ],
+        _defReg = new RegExp(_defRegs.join('|'));
     _defText = $('#app_body').find('div').filter(function () {
-            return $(this).text().match(_defReg);
-        });
+        return $(this).text().match(_defReg);
+    });
     // _defText = $('#app_body').find('div:containsRegex(/' + _defRegs.join('|') + '/):first');
     if (_defense && _defense.style && _defense.style.width !== "" && _defText && _defText.text()) {
         var _percentage = _defense.style.width.substr(0, 5);
@@ -2420,7 +2420,7 @@ function stunBar() {
     var _stun = $('#app_body div > img[src$="nm_stun_bar.gif"]:first');
     if (_stun.length > 0) {
         var _text = _stun.parent().next().children('div:first'),
-        _ret;
+            _ret;
         _stun = _stun[0].style.width.substr(0, 5);
         _ret = _text.text() + ': ' + _stun + (_stun.indexOf('%') > -1 ? '' : '%').replace('Need ', '').replace('Fill to ', '').toLowerCase();
         _text.text(_text.text() + ' ' + _stun + (_stun.indexOf('%') > -1 ? '' : '%'));
@@ -2515,13 +2515,13 @@ function cabf_arenabattlefilter() {
         item.set('cabfRefillTokens', 'false');
         console.error(e);
     }
-	$('#cleanCheck').attr('title', 'Always don\'t list all lost, dead, and my guild.');
+    $('#cleanCheck').attr('title', 'Always don\'t list all lost, dead, and my guild.');
     $('#CleanButton').button();
-	$('#CleanButton').attr('title', 'Don\'t list all lost, dead, and my guild.');
+    $('#CleanButton').attr('title', 'Don\'t list all lost, dead, and my guild.');
     $('#CleanButton').click(function () {
-		console.log("Clean");
+        console.log("Clean");
         var _select = $('#cabfTargetSelect'),
-        _selectedFarm = item.get('cabfPageArenaDuelPoints', '100000433761803');
+            _selectedFarm = item.get('cabfPageArenaDuelPoints', '100000433761803');
 
         _select.html(' ');
         $.each(FarmArenaIds, function (_i, _e) {
@@ -2541,11 +2541,11 @@ function cabf_arenabattlefilter() {
     });
     $('#ClearButton').button();
     $('#ClearButton').click(function () {
-		console.log("Clear");
+        console.log("Clear");
         if (confirm('Are you sure to clear target from looses definitively?')) {
             var _select = $('#cabfTargetSelect'),
-            _selectedFarm = item.get('cabfPageArenaDuelPoints', '100000433761803'),
-            _delArray = [];
+                _selectedFarm = item.get('cabfPageArenaDuelPoints', '100000433761803'),
+                _delArray = [];
 
             _select.html(' ');
             $.each(FarmArenaIds, function (_i, _e) {
@@ -2581,7 +2581,7 @@ function cabf_arenabattlefilter() {
     });
     $('#UpdateMyGuild').button();
     $('#UpdateMyGuild').click(function () {
-		checkMyGuildIds(reloadArena);
+        checkMyGuildIds(reloadArena);
     });
     try {
         if (item.get('cabfRefillTokens', 'false') == 'true') {
@@ -2618,17 +2618,17 @@ function cabf_arenabattlefilter() {
     });
     $('#StopButton').button();
     $('#StopButton').click(function () {
-		console.log("Stop");
-		arenaStarted = false;
-		item.set('ArenaStarted', arenaStarted);
+        console.log("Stop");
+        arenaStarted = false;
+        item.set('ArenaStarted', arenaStarted);
         window.clearTimeout(ArenaTimer);
         item.set('ArenaTimer', false);
     });
     $('#StartButton').button();
     $('#StartButton').click(function () {
-		console.log("Start");
-		arenaStarted = true;
-		item.set('ArenaStarted', arenaStarted);
+        console.log("Start");
+        arenaStarted = true;
+        item.set('ArenaStarted', arenaStarted);
         item.set('ArenaTimer', true);
         window.clearTimeout(ArenaTimer);
         ArenaTimer = window.setTimeout(chainArena, 5000);
@@ -2636,28 +2636,28 @@ function cabf_arenabattlefilter() {
 }
 
 function arenaRefill() {
-	try {
-		if (item.get('cabfRefillTokens', 'false') == 'true') {
-			var button = $("input[src*='arena_10_token_refill_btn.jpg']");
-			console.log (1, "Refill to burn Arena Health");
-			button.click();
-		}
-		window.clearTimeout(ArenaTimer);
-		ArenaTimer = window.setTimeout(chainArena, 1000);
-	} catch (err) {
-		console.error("ERROR in Refill to burn Arena Health: " + err);
-		window.clearTimeout(ArenaTimer);
-		ArenaTimer = window.setTimeout(chainArena, 1000);
-	}
+    try {
+        if (item.get('cabfRefillTokens', 'false') == 'true') {
+            var button = $("input[src*='arena_10_token_refill_btn.jpg']");
+            console.log (1, "Refill to burn Arena Health");
+            button.click();
+        }
+        window.clearTimeout(ArenaTimer);
+        ArenaTimer = window.setTimeout(chainArena, 1000);
+    } catch (err) {
+        console.error("ERROR in Refill to burn Arena Health: " + err);
+        window.clearTimeout(ArenaTimer);
+        ArenaTimer = window.setTimeout(chainArena, 1000);
+    }
 }
 
 function arenaControlHealthAndTokens() {
     var arenaHealth = $("div img[src*='graphics/orange_healthbar.jpg']"),
         arenaHealthWidth = "",
         currentTokens = parseInt($('#guild_token_current_value').text());
-	if (arenaHealth.length===0) {
-		return true;
-	}
+    if (arenaHealth.length===0) {
+        return true;
+    }
     arenaHealthWidth=/width:\d+/i.exec(arenaHealth[0].outerHTML)[0];
     if (!arenaHealthWidth.match("width:0")) {
         if (currentTokens>0) {
@@ -2672,124 +2672,124 @@ function arenaControlHealthAndTokens() {
 
 function chainArena() {
     console.log("chainArena");
-	if (arenaControlHealthAndTokens()) {
-		try {
-			var _button = $("input[src*='war_duelagainbtn2.gif']");
-			if (_button.length > 0) {
-				var target = $('#arena_duel input[name="target_id"]');
-				chainArenaId = target.attr("value");
-				if (LostArenaIds.lastIndexOf(chainArenaId) < 0 && guildIDs.lastIndexOf(chainArenaId) < 0 && DeadArenaIds.lastIndexOf(chainArenaId) < 0) {
-					_button.click();
-				} else {
-					var _list = (LostArenaIds.lastIndexOf(chainArenaId) >= 0 ? "LostArenaIds" : (guildIDs.lastIndexOf(chainArenaId) >= 0 ? "guildIDs" : "LostArenaIds or guildIDs"));
-					console.log("FarmArenaIds " + chainArenaId + " is in " + _list + "! So, don't chain it.");
-					window.clearTimeout(ArenaTimer);
-					ArenaTimer = window.setTimeout(chainArenaNext, 1000, chainArenaId);
-				}
-			} else {
-				window.clearTimeout(ArenaTimer);
-				ArenaTimer = window.setTimeout(chainArenaById, 1000, chainArenaId);
-			}
-		} catch (e) {
-			console.log("chainArena", e);
-			window.clearTimeout(ArenaTimer);
-			ArenaTimer = window.setTimeout(chainArenaById, 1000, chainArenaId);
-		}
-	} else {
-		reloadArena();
-	}
+    if (arenaControlHealthAndTokens()) {
+        try {
+            var _button = $("input[src*='war_duelagainbtn2.gif']");
+            if (_button.length > 0) {
+                var target = $('#arena_duel input[name="target_id"]');
+                chainArenaId = target.attr("value");
+                if (LostArenaIds.lastIndexOf(chainArenaId) < 0 && guildIDs.lastIndexOf(chainArenaId) < 0 && DeadArenaIds.lastIndexOf(chainArenaId) < 0) {
+                    _button.click();
+                } else {
+                    var _list = (LostArenaIds.lastIndexOf(chainArenaId) >= 0 ? "LostArenaIds" : (guildIDs.lastIndexOf(chainArenaId) >= 0 ? "guildIDs" : "LostArenaIds or guildIDs"));
+                    console.log("FarmArenaIds " + chainArenaId + " is in " + _list + "! So, don't chain it.");
+                    window.clearTimeout(ArenaTimer);
+                    ArenaTimer = window.setTimeout(chainArenaNext, 1000, chainArenaId);
+                }
+            } else {
+                window.clearTimeout(ArenaTimer);
+                ArenaTimer = window.setTimeout(chainArenaById, 1000, chainArenaId);
+            }
+        } catch (e) {
+            console.log("chainArena", e);
+            window.clearTimeout(ArenaTimer);
+            ArenaTimer = window.setTimeout(chainArenaById, 1000, chainArenaId);
+        }
+    } else {
+        reloadArena();
+    }
 }
 
 function sortArenaTarget(a, b) {
-	var rankA = /Rank\ (\d+)/.exec($('div>div:contains("Rank")', a).text().trim())[1],
-		rankB = /Rank\ (\d+)/.exec($('div>div:contains("Rank")', b).text().trim())[1];
-	if (rankB===rankA) {
-		var levelA = /level\: (\d+)/.exec($('div>div:contains("level\:")', a).text().trim())[1],
-			levelB = /level\: (\d+)/.exec($('div>div:contains("level\:")', b).text().trim())[1];
-		return levelA-levelB;
-	}
-	return rankB-rankA;
+    var rankA = /Rank\ (\d+)/.exec($('div>div:contains("Rank")', a).text().trim())[1],
+        rankB = /Rank\ (\d+)/.exec($('div>div:contains("Rank")', b).text().trim())[1];
+    if (rankB===rankA) {
+        var levelA = /level\: (\d+)/.exec($('div>div:contains("level\:")', a).text().trim())[1],
+            levelB = /level\: (\d+)/.exec($('div>div:contains("level\:")', b).text().trim())[1];
+        return levelA-levelB;
+    }
+    return rankB-rankA;
 }
 
 function chainArenaById(id) {
-	console.log("chainArenaId", id);
-	if (arenaControlHealthAndTokens()) {
-		try {
-			var _button,
-			ready = false;
-			if (id>0) {
-				if (LostArenaIds.lastIndexOf(id) < 0 && guildIDs.lastIndexOf(id) < 0 && DeadArenaIds.lastIndexOf(id) < 0) {
-					$('#arena_mid #battle_person').sort(sortArenaTarget).each(function (_i, _e) {
-						if (!ready) {
-							var temp_id = $("input[name='target_id']", _e).attr("value");
-							if (id == temp_id) {
-								var _text = $('div>div:contains("Rank")', _e).text().trim();
-								var _rank = /Rank\ (\d+)/.exec(_text)[1];
-								if (parseInt(_rank) >= chainArenaRankMin) {
-									_button = $("input[src*='arena_btn_duel.gif']", _e);
-									if (_button.length > 0) {
-										chainArenaId = temp_id;
-										ready = true;
-									}
-								}
-							}
-						}
-					});
-				} else {
-					var _list = (LostArenaIds.lastIndexOf(id) >= 0 ? "LostArenaIds" : (guildIDs.lastIndexOf(id) >= 0 ? "guildIDs" : "LostArenaIds or guildIDs"));
-					console.log("FarmArenaIds " + id + " is in " + _list + "! So, don't chain it.");
-				}
-			}
-			if (ready) {
-				_button.click();
-			} else {
-				window.clearTimeout(ArenaTimer);
-				ArenaTimer = window.setTimeout(chainArenaNext, 1000, id);
-			}
-		} catch (e) {
-			console.log("Error: chainArenaId", e);
-			reloadArena();
-		}
-	} else {
-		reloadArena();
-	}
+    console.log("chainArenaId", id);
+    if (arenaControlHealthAndTokens()) {
+        try {
+            var _button,
+                ready = false;
+            if (id>0) {
+                if (LostArenaIds.lastIndexOf(id) < 0 && guildIDs.lastIndexOf(id) < 0 && DeadArenaIds.lastIndexOf(id) < 0) {
+                    $('#arena_mid #battle_person').sort(sortArenaTarget).each(function (_i, _e) {
+                        if (!ready) {
+                            var temp_id = $("input[name='target_id']", _e).attr("value");
+                            if (id == temp_id) {
+                                var _text = $('div>div:contains("Rank")', _e).text().trim();
+                                var _rank = /Rank\ (\d+)/.exec(_text)[1];
+                                if (parseInt(_rank) >= chainArenaRankMin) {
+                                    _button = $("input[src*='arena_btn_duel.gif']", _e);
+                                    if (_button.length > 0) {
+                                        chainArenaId = temp_id;
+                                        ready = true;
+                                    }
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    var _list = (LostArenaIds.lastIndexOf(id) >= 0 ? "LostArenaIds" : (guildIDs.lastIndexOf(id) >= 0 ? "guildIDs" : "LostArenaIds or guildIDs"));
+                    console.log("FarmArenaIds " + id + " is in " + _list + "! So, don't chain it.");
+                }
+            }
+            if (ready) {
+                _button.click();
+            } else {
+                window.clearTimeout(ArenaTimer);
+                ArenaTimer = window.setTimeout(chainArenaNext, 1000, id);
+            }
+        } catch (e) {
+            console.log("Error: chainArenaId", e);
+            reloadArena();
+        }
+    } else {
+        reloadArena();
+    }
 }
 
 function chainArenaNext(id) {
-	console.log("chainArenaNext", id);
-	if (arenaControlHealthAndTokens()) {
-		try {
-			var _button,
-			ready = false;
-			$('#arena_mid #battle_person').sort(sortArenaTarget).each(function (_i, _e) {
-				if (!ready) {
-					var temp_id = $("input[name='target_id']", _e).attr("value");
-					if (id != temp_id && LostArenaIds.lastIndexOf(temp_id) < 0 && guildIDs.lastIndexOf(temp_id) < 0 && DeadArenaIds.lastIndexOf(temp_id) < 0) {
-						var _text = $('div>div:contains("Rank")', _e).text().trim();
-						var _rank = /Rank\ (\d+)/.exec(_text)[1];
-						if (parseInt(_rank) >= chainArenaRankMin) {
-							_button = $("input[src*='arena_btn_duel.gif']", _e);
-							chainArenaId = temp_id;
-							ready = true;
-						}
-					} else {
-						var _list = (LostArenaIds.lastIndexOf(temp_id) >= 0 ? "LostArenaIds" : (guildIDs.lastIndexOf(temp_id) >= 0 ? "guildIDs" : "LostArenaIds or guildIDs"));
-						console.log("FarmArenaIds " + temp_id + " is in " + _list + "! So, don't chain it.");
-					}
-				}
-			});
-			if (ready) {
-				_button.click();
-			} else {
-				reloadArena();
-			}
-		} catch (e) {
-			console.log("Error: chainArenaNext", e);
-			reloadArena();
-		}
-	} else {
-		reloadArena();
-	}
+    console.log("chainArenaNext", id);
+    if (arenaControlHealthAndTokens()) {
+        try {
+            var _button,
+                ready = false;
+            $('#arena_mid #battle_person').sort(sortArenaTarget).each(function (_i, _e) {
+                if (!ready) {
+                    var temp_id = $("input[name='target_id']", _e).attr("value");
+                    if (id != temp_id && LostArenaIds.lastIndexOf(temp_id) < 0 && guildIDs.lastIndexOf(temp_id) < 0 && DeadArenaIds.lastIndexOf(temp_id) < 0) {
+                        var _text = $('div>div:contains("Rank")', _e).text().trim();
+                        var _rank = /Rank\ (\d+)/.exec(_text)[1];
+                        if (parseInt(_rank) >= chainArenaRankMin) {
+                            _button = $("input[src*='arena_btn_duel.gif']", _e);
+                            chainArenaId = temp_id;
+                            ready = true;
+                        }
+                    } else {
+                        var _list = (LostArenaIds.lastIndexOf(temp_id) >= 0 ? "LostArenaIds" : (guildIDs.lastIndexOf(temp_id) >= 0 ? "guildIDs" : "LostArenaIds or guildIDs"));
+                        console.log("FarmArenaIds " + temp_id + " is in " + _list + "! So, don't chain it.");
+                    }
+                }
+            });
+            if (ready) {
+                _button.click();
+            } else {
+                reloadArena();
+            }
+        } catch (e) {
+            console.log("Error: chainArenaNext", e);
+            reloadArena();
+        }
+    } else {
+        reloadArena();
+    }
 }
 
 function arenaDuelFarmButton(id) {
@@ -2814,7 +2814,7 @@ function reloadArena() {
     var xDelayHealth = 1;
     // console.log('at reloadArena, Health:', myHealth);
     // if (myHealth < 10) {
-        // xDelayHealth = 6;
+    // xDelayHealth = 6;
     // }
     chainArenaId = 0;
     window.clearTimeout(ArenaTimer);
@@ -2836,10 +2836,10 @@ function clickReloadArena() {
 function addTargetTip(_e) {
     $(_e).mouseover(function (e) {
         var stats = item.get('stats', defaultStats),
-        target_id = $('input[name="target_id"]', this).attr("value"),
-        indexTarget = 0,
-        victory = 0,
-        defeat = 0;
+            target_id = $('input[name="target_id"]', this).attr("value"),
+            indexTarget = 0,
+            victory = 0,
+            defeat = 0;
         indexTarget = getTargetIndex(stats.targets, target_id);
         if (indexTarget >= 0) {
             victory = stats.targets[indexTarget].victory;
@@ -2874,7 +2874,7 @@ function getTargetStat(target_id) {
     var indexTarget = getTargetIndex(stats.targets, target_id);
     if (indexTarget >= 0) {
         var victory = parseInt(stats.targets[indexTarget].victory),
-        defeat = parseInt(stats.targets[indexTarget].defeat);
+            defeat = parseInt(stats.targets[indexTarget].defeat);
         if ((victory + defeat) > 0) {
             if ((victory - defeat) > 0) {
                 stats = null;
@@ -2893,11 +2893,11 @@ function getTargetStat(target_id) {
 }
 function battleStats() {
     var stats = item.get('stats', defaultStats),
-    new_data = false;
+        new_data = false;
     if (($('#results_main_wrapper>div').length > 0) || ($('div[class="result_body"]>div').length > 0)) {
         console.log("Battle Stats");
         var target = $('#results_main_wrapper input[name="target_id"]'),
-        target_id = 0;
+            target_id = 0;
         if (target.length <= 0) {
             target = $('div[class="result_body"] input[name="target_id"]');
             target_id = 0;
@@ -2930,78 +2930,78 @@ function battleStats() {
                 stats.targets[indexTarget].defeat++;
                 new_data = true;
             } else if ($('#arena_duel').length > 0) {
-				console.log("ARENA RESULT");
-				if ($('div[style*="guild_battle_result_top"]>div>div:contains("VICTORY")').length > 0) {
-					console.log("ARENA VICTORY");
-					stats.targets[indexTarget].victory++;
-					new_data = true;
-					try {
-						var _text = $('div[style*="war_fort_battlemidrepeat.jpg"]').text().trim();
-						var _points = /(\d+)\ Arena\ Points\ and/.exec(_text)[1];
-						console.log("_points=", _points);
-						if (_points === 0) {
-							chainArenaId = 0;
-							if (DeadArenaIds.lastIndexOf(target_id) < 0) {
-								DeadArenaIds.push(target_id);
-								console.log("DeadArenaIds", DeadArenaIds);
-							}
-							window.clearTimeout(ArenaTimer);
-							ArenaTimer = window.setTimeout(chainArenaNext, 1000, target_id);
-						} else if (target_id == 100000433761803) {
-							console.log("100000433761803");
-							chainArenaId = target_id;
-							window.clearTimeout(ArenaTimer);
-							ArenaTimer = window.setTimeout(chainArena, 1000);
-						} else if (_points > chainArenaPointMin) {
-							console.log("_points>" + chainArenaPointMin);
-							if (_points > 130) {
-								console.log("_points>130");
-								try {
-									if (FarmArenaIds.lastIndexOf(target_id) < 0) {
-										FarmArenaIds.push(target_id);
-										item.set('FarmArenaIds', FarmArenaIds);
-										console.log("FarmArenaIds = ", FarmArenaIds);
-										$('#cabfTargetSelect').append('<option value="' + target_id + '" >' + target_id + '</option>');
-									}
-								} catch (err) {
-									console.log("FarmArenaIds ERROR", err);
-								}
-							}
-							chainArenaId = target_id;
-							window.clearTimeout(ArenaTimer);
-							ArenaTimer = window.setTimeout(chainArena, 1000);
-						} else {
-							console.log("else chainArenaNext");
-							chainArenaId = 0;
-							window.clearTimeout(ArenaTimer);
-							ArenaTimer = window.setTimeout(chainArenaNext, 2000, target_id);
-						}
-					} catch (e) {
-						console.log("UNKNOWN ERROR", e);
-					}
-				}
-				if ($('div[style*="guild_battle_result_top"]>div>div:contains("DEFEAT")').length > 0) {
-					console.log("ARENA DEFEAT");
-					stats.targets[indexTarget].defeat++;
-					new_data = true;
-					chainArenaId = 0;
-					if (LostArenaIds.lastIndexOf(target_id) < 0) {
-						LostArenaIds.push(target_id);
-						item.set('LostArenaIds', LostArenaIds);
-					}
-					window.clearTimeout(ArenaTimer);
-					ArenaTimer = window.setTimeout(chainArenaNext, 1000, target_id);
-				}
+                console.log("ARENA RESULT");
+                if ($('div[style*="guild_battle_result_top"]>div>div:contains("VICTORY")').length > 0) {
+                    console.log("ARENA VICTORY");
+                    stats.targets[indexTarget].victory++;
+                    new_data = true;
+                    try {
+                        var _text = $('div[style*="war_fort_battlemidrepeat.jpg"]').text().trim();
+                        var _points = /(\d+)\ Arena\ Points\ and/.exec(_text)[1];
+                        console.log("_points=", _points);
+                        if (_points === 0) {
+                            chainArenaId = 0;
+                            if (DeadArenaIds.lastIndexOf(target_id) < 0) {
+                                DeadArenaIds.push(target_id);
+                                console.log("DeadArenaIds", DeadArenaIds);
+                            }
+                            window.clearTimeout(ArenaTimer);
+                            ArenaTimer = window.setTimeout(chainArenaNext, 1000, target_id);
+                        } else if (target_id == 100000433761803) {
+                            console.log("100000433761803");
+                            chainArenaId = target_id;
+                            window.clearTimeout(ArenaTimer);
+                            ArenaTimer = window.setTimeout(chainArena, 1000);
+                        } else if (_points > chainArenaPointMin) {
+                            console.log("_points>" + chainArenaPointMin);
+                            if (_points > 130) {
+                                console.log("_points>130");
+                                try {
+                                    if (FarmArenaIds.lastIndexOf(target_id) < 0) {
+                                        FarmArenaIds.push(target_id);
+                                        item.set('FarmArenaIds', FarmArenaIds);
+                                        console.log("FarmArenaIds = ", FarmArenaIds);
+                                        $('#cabfTargetSelect').append('<option value="' + target_id + '" >' + target_id + '</option>');
+                                    }
+                                } catch (err) {
+                                    console.log("FarmArenaIds ERROR", err);
+                                }
+                            }
+                            chainArenaId = target_id;
+                            window.clearTimeout(ArenaTimer);
+                            ArenaTimer = window.setTimeout(chainArena, 1000);
+                        } else {
+                            console.log("else chainArenaNext");
+                            chainArenaId = 0;
+                            window.clearTimeout(ArenaTimer);
+                            ArenaTimer = window.setTimeout(chainArenaNext, 2000, target_id);
+                        }
+                    } catch (e) {
+                        console.log("UNKNOWN ERROR", e);
+                    }
+                }
+                if ($('div[style*="guild_battle_result_top"]>div>div:contains("DEFEAT")').length > 0) {
+                    console.log("ARENA DEFEAT");
+                    stats.targets[indexTarget].defeat++;
+                    new_data = true;
+                    chainArenaId = 0;
+                    if (LostArenaIds.lastIndexOf(target_id) < 0) {
+                        LostArenaIds.push(target_id);
+                        item.set('LostArenaIds', LostArenaIds);
+                    }
+                    window.clearTimeout(ArenaTimer);
+                    ArenaTimer = window.setTimeout(chainArenaNext, 1000, target_id);
+                }
             } else if ($('#results_main_wrapper>div:contains("HEAL")').length > 0) {
                 console.log("HEAL");
                 var _e = $('#results_main_wrapper');
                 if (_e.length > 0) {
                     var _credits = /GUARDIAN\ PATH\ CREDIT:\ YES/.exec(_e.text());
                     if (_credits !== null) {
-						window.clearTimeout(NormalTimer);
-						NormalTimer = window.setTimeout(farmNormalBattle, 1000, target_id);
-					}
-				}
+                        window.clearTimeout(NormalTimer);
+                        NormalTimer = window.setTimeout(farmNormalBattle, 1000, target_id);
+                    }
+                }
             } else if ($('#results_main_wrapper>div:contains("DISPEL")').length > 0) {
                 console.log("DISPEL");
             } else if ($('#results_main_wrapper>div:contains("ILLUSION")').length > 0) {
@@ -3080,82 +3080,82 @@ function battleStats() {
             target_id = null;
         } else {
             var myHealth = parseInt($('#health_current_value').text().trim()),
-            xDelayHealth = 1,
-            xDelayArenaHealth = 10,
-            _textRes ;
+                xDelayHealth = 1,
+                xDelayArenaHealth = 10,
+                _textRes ;
             console.log('at battleStats, Health:', myHealth);
             if (myHealth < 10) {
                 xDelayHealth = 30;
             }
-			if ($('#arena_mid').length > 0) {
-				if (chainArenaId > 0) {
-					_textRes = $('#results_main_wrapper>div[class="results"]>div[class="result"]>span[class="result_body"]').text().trim();
-					console.log(_textRes);
-					/*var _coins= /You need more Stamina to undertake this action/.exec($('#results_main_wrapper>div>div>div>div').text().trim());*/
-					if (_textRes.match('Your opponent is dead or too weak to battle.')) {
-						if (DeadIds.lastIndexOf(chainArenaId) < 0) {
-							DeadIds.push(chainArenaId);
-						}
-						console.log("DeadIds", DeadIds);
-						window.clearTimeout(ArenaTimer);
-						ArenaTimer = window.setTimeout(chainArenaNext, xDelayArenaHealth * 1000, chainArenaId);
-					}
-					if (_textRes.match('Patience Warrior. You cannot initiate battle again so soon.')) {
-						window.clearTimeout(ArenaTimer);
-						ArenaTimer = window.setTimeout(chainArenaById, xDelayArenaHealth * 1000, chainArenaId);
-					}
-					if (_textRes.match('You are too weak to battle. You need at least 10 health.')) {
-						window.clearTimeout(ArenaTimer);
-						ArenaTimer = window.setTimeout(chainArena, xDelayArenaHealth * 1000);
-					}
-					if (_textRes.match('Out Of Tokens: You do not have enough arena tokens to engage in more battles, wait for a recharge or purchase a refill!')) {
-						var arenaHealth = $("div img[src*='graphics/orange_healthbar.jpg']"), arenaHealthWidth = "";
-						arenaHealthWidth=/width:\d+/i.exec(arenaHealth[0].outerHTML)[0];
-						if (!arenaHealthWidth.match("width:0")) {
-							arenaRefill();
-						} else {
-							window.clearTimeout(ArenaTimer);
-							ArenaTimer = window.setTimeout(chainArena, xDelayArenaHealth * 1000);
-						}
-					}
-					/*console.log('#############################################',_coins); */
-					chainArenaId = 0;
-					window.clearTimeout(ArenaTimer);
-					ArenaTimer = window.setTimeout(chainArena, xDelayArenaHealth * 1000);
-				} else {
-					window.clearTimeout(ArenaTimer);
-					ArenaTimer = window.setTimeout(chainArena, xDelayArenaHealth * 1000);
-				}
-			} else {
-				if (chainId > 0) {
-					_textRes = $('#results_main_wrapper>div[class="results"]>div[class="result"]>span[class="result_body"]').text().trim();
-					console.log(_textRes);
-					/*var _coins= /You need more Stamina to undertake this action/.exec($('#results_main_wrapper>div>div>div>div').text().trim());*/
-					if (_textRes.match('Your opponent is dead or too weak to battle.')) {
-						if (DeadIds.lastIndexOf(chainId) < 0) {
-							DeadIds.push(chainId);
-						}
-						console.log("DeadIds", DeadIds);
-						window.clearTimeout(ArenaTimer);
-						ArenaTimer = window.setTimeout(chainFestNext, xDelayHealth * 1000, chainId);
-					}
-					if (_textRes.match('Patience Warrior. You cannot initiate battle again so soon.')) {
-						window.clearTimeout(ArenaTimer);
-						ArenaTimer = window.setTimeout(chainFestId, xDelayHealth * 1000, chainId);
-					}
-					if (_textRes.match('You are too weak to battle. You need at least 10 health.')) {
-						window.clearTimeout(ArenaTimer);
-						ArenaTimer = window.setTimeout(chainFest, xDelayHealth * 1000);
-					}
-					/*console.log('#############################################',_coins); */
-					chainId = 0;
-					window.clearTimeout(ArenaTimer);
-					ArenaTimer = window.setTimeout(chainFest, xDelayHealth * 1000);
-				} else {
-					window.clearTimeout(ArenaTimer);
-					ArenaTimer = window.setTimeout(chainFest, xDelayHealth * 1000);
-				}
-			}
+            if ($('#arena_mid').length > 0) {
+                if (chainArenaId > 0) {
+                    _textRes = $('#results_main_wrapper>div[class="results"]>div[class="result"]>span[class="result_body"]').text().trim();
+                    console.log(_textRes);
+                    /*var _coins= /You need more Stamina to undertake this action/.exec($('#results_main_wrapper>div>div>div>div').text().trim());*/
+                    if (_textRes.match('Your opponent is dead or too weak to battle.')) {
+                        if (DeadIds.lastIndexOf(chainArenaId) < 0) {
+                            DeadIds.push(chainArenaId);
+                        }
+                        console.log("DeadIds", DeadIds);
+                        window.clearTimeout(ArenaTimer);
+                        ArenaTimer = window.setTimeout(chainArenaNext, xDelayArenaHealth * 1000, chainArenaId);
+                    }
+                    if (_textRes.match('Patience Warrior. You cannot initiate battle again so soon.')) {
+                        window.clearTimeout(ArenaTimer);
+                        ArenaTimer = window.setTimeout(chainArenaById, xDelayArenaHealth * 1000, chainArenaId);
+                    }
+                    if (_textRes.match('You are too weak to battle. You need at least 10 health.')) {
+                        window.clearTimeout(ArenaTimer);
+                        ArenaTimer = window.setTimeout(chainArena, xDelayArenaHealth * 1000);
+                    }
+                    if (_textRes.match('Out Of Tokens: You do not have enough arena tokens to engage in more battles, wait for a recharge or purchase a refill!')) {
+                        var arenaHealth = $("div img[src*='graphics/orange_healthbar.jpg']"), arenaHealthWidth = "";
+                        arenaHealthWidth=/width:\d+/i.exec(arenaHealth[0].outerHTML)[0];
+                        if (!arenaHealthWidth.match("width:0")) {
+                            arenaRefill();
+                        } else {
+                            window.clearTimeout(ArenaTimer);
+                            ArenaTimer = window.setTimeout(chainArena, xDelayArenaHealth * 1000);
+                        }
+                    }
+                    /*console.log('#############################################',_coins); */
+                    chainArenaId = 0;
+                    window.clearTimeout(ArenaTimer);
+                    ArenaTimer = window.setTimeout(chainArena, xDelayArenaHealth * 1000);
+                } else {
+                    window.clearTimeout(ArenaTimer);
+                    ArenaTimer = window.setTimeout(chainArena, xDelayArenaHealth * 1000);
+                }
+            } else {
+                if (chainId > 0) {
+                    _textRes = $('#results_main_wrapper>div[class="results"]>div[class="result"]>span[class="result_body"]').text().trim();
+                    console.log(_textRes);
+                    /*var _coins= /You need more Stamina to undertake this action/.exec($('#results_main_wrapper>div>div>div>div').text().trim());*/
+                    if (_textRes.match('Your opponent is dead or too weak to battle.')) {
+                        if (DeadIds.lastIndexOf(chainId) < 0) {
+                            DeadIds.push(chainId);
+                        }
+                        console.log("DeadIds", DeadIds);
+                        window.clearTimeout(ArenaTimer);
+                        ArenaTimer = window.setTimeout(chainFestNext, xDelayHealth * 1000, chainId);
+                    }
+                    if (_textRes.match('Patience Warrior. You cannot initiate battle again so soon.')) {
+                        window.clearTimeout(ArenaTimer);
+                        ArenaTimer = window.setTimeout(chainFestId, xDelayHealth * 1000, chainId);
+                    }
+                    if (_textRes.match('You are too weak to battle. You need at least 10 health.')) {
+                        window.clearTimeout(ArenaTimer);
+                        ArenaTimer = window.setTimeout(chainFest, xDelayHealth * 1000);
+                    }
+                    /*console.log('#############################################',_coins); */
+                    chainId = 0;
+                    window.clearTimeout(ArenaTimer);
+                    ArenaTimer = window.setTimeout(chainFest, xDelayHealth * 1000);
+                } else {
+                    window.clearTimeout(ArenaTimer);
+                    ArenaTimer = window.setTimeout(chainFest, xDelayHealth * 1000);
+                }
+            }
         }
         target = null;
     }
@@ -3203,7 +3203,7 @@ function chainFestId(id) {
     try {
         console.log("chainFestId", id);
         var _button,
-        ready = false;
+            ready = false;
         if (id) {
             if (LostIds.lastIndexOf(id) < 0 && guildIDs.lastIndexOf(id) < 0 && DeadIds.lastIndexOf(id) < 0) {
                 $('#battleList>div').each(function (_i, _e) {
@@ -3243,7 +3243,7 @@ function chainFestNext(id) {
     try {
         console.log("chainFestNext", id);
         var _button,
-        ready = false;
+            ready = false;
         if (id) {
             $('#battleList>div').each(function (_i, _e) {
                 if (!ready) {
@@ -3276,7 +3276,7 @@ function chainFestNext(id) {
 function reloadFest() {
     var _button;
     var myHealth = parseInt($('#health_current_value').text().trim()),
-    xDelayHealth = 1;
+        xDelayHealth = 1;
     console.log('at reloadFest, Health:', myHealth);
     if (myHealth < 10) {
         xDelayHealth = 6;
@@ -3384,7 +3384,7 @@ function festivalDuelStats() {
     $('#CleanButton').button();
     $('#CleanButton').click(function () {
         var _select = $('#cabfTargetSelect'),
-        _selectedFarm = item.get('cabfPageFestivalDuelPoints', '100000433761803');
+            _selectedFarm = item.get('cabfPageFestivalDuelPoints', '100000433761803');
 
         _select.html(' ');
         $.each(FarmIds, function (_i, _e) {
@@ -3406,8 +3406,8 @@ function festivalDuelStats() {
     $('#ClearButton').click(function () {
         if (confirm('Are you sure to clear target from looses definitively?')) {
             var _select = $('#cabfTargetSelect'),
-            _selectedFarm = item.get('cabfPageFestivalDuelPoints', '100000433761803'),
-            _delArray = [];
+                _selectedFarm = item.get('cabfPageFestivalDuelPoints', '100000433761803'),
+                _delArray = [];
 
             _select.html(' ');
             $.each(FarmIds, function (_i, _e) {
@@ -3461,9 +3461,9 @@ function festivalDuelFarmButton(id) {
 
 function eliminateDuplicates(arr) {
     var i,
-    len = arr.length,
-    out = [],
-    obj = {};
+        len = arr.length,
+        out = [],
+        obj = {};
 
     for (i = 0; i < len; i++) {
         obj[arr[i]] = 0;
@@ -3566,7 +3566,21 @@ function farmQuestClick() {
                         window.clearTimeout(QuestTimer);
                     }
                 } else {
-                    window.clearTimeout(QuestTimer);
+                    var _required = parseInt(item.get('#questFarmEnergyMin', '0'));
+                    var _current = parseInt($("#energy_current_value").text());
+                    _button = $("div:contains('Do Quest Again!'):last input[src*='quest_quest_btn.gif']");
+                    if (_button.length > 0) {
+
+                        if (_current >= _required) {
+                            _button.click();
+                        }
+                        else {
+                            console.log("Current Energy: " + _current + ", needed " + _required + ". Retrying in 30 seconds.");
+                            setTimeout(farmQuestClick, 30000);
+                        }
+                    } else {
+                        window.clearTimeout(QuestTimer);
+                    }
                 }
             }
         } else {
@@ -3583,7 +3597,7 @@ function questFarm() {
         var _sel = $('#results_main_wrapper');
         addQuestDuelBoard('#results_main_wrapper');
         _sel = $('#cabfToggleQuest');
-        _sel.html('<div>Farm: <input type="checkbox" id="questFarmCheck"></input>');
+        _sel.html('<div>Farm: <input type="checkbox" id="questFarmCheck"></input>  </br> <input type="text" id="questFarmEnergyMin"></input>');
         if (item.get('#questFarmCheck', 'false') == 'true') {
             $('#questFarmCheck')[0].checked = true;
         } else {
@@ -3596,6 +3610,19 @@ function questFarm() {
                 item.set('#questFarmCheck', 'false');
             }
             console.log("#questFarmCheck", item.get('#questFarmCheck', 'false'));
+        });
+
+        if ($.isNumeric(item.get('#questFarmEnergyMin', '0'))) {
+            $('#questFarmEnergyMin').val(item.get('#questFarmEnergyMin', '0'));
+        } else {
+            $('#questFarmEnergyMin').val("0");
+        }
+        $('#questFarmEnergyMin').keyup(function () {
+            if ($.isNumeric($("#questFarmEnergyMin").val()))
+                item.set('#questFarmEnergyMin', $("#questFarmEnergyMin").val());
+            else {
+                $("#questFarmEnergyMin").val(item.get('#questFarmEnergyMin', '0'));
+            }
         });
     } catch (e) {
         item.set('#questFarmCheck', 'false');
@@ -3614,26 +3641,26 @@ function checkMyGuildIds(callback) {
         $().alert("Unable to use ajax");
     }
     function onSuccess(data) {
-		try {
+        try {
             var guildDiv = $("#guildv2_formation_middle", data),
-				tempArray=[], i;
-			if ($u.hasContent(guildDiv)) {
-				var membersKeys=$("script:contains('initTowerSlots()')",data).text().match(/key=\\"(\d+)\\/gm);
-			    $.each(membersKeys, function (_i, _e) {
-					var res = /(\d+)/gm.exec(_e);
-					tempArray.push(parseInt(res[0]));
-				});
-				item.set('guildIDs', tempArray);
-				guildIDs = item.get('guildIDs', []);
+                tempArray=[], i;
+            if ($u.hasContent(guildDiv)) {
+                var membersKeys=$("script:contains('initTowerSlots()')",data).text().match(/key=\\"(\d+)\\/gm);
+                $.each(membersKeys, function (_i, _e) {
+                    var res = /(\d+)/gm.exec(_e);
+                    tempArray.push(parseInt(res[0]));
+                });
+                item.set('guildIDs', tempArray);
+                guildIDs = item.get('guildIDs', []);
                 console.log("my guild is updated with success");
                 window.clearTimeout(ArenaTimer);
                 ArenaTimer = window.setTimeout(callback, 1000);
-			}
-			return true;
-		} catch (err) {
-			console.error("ERROR in checkMyGuildIds: " + err.stack);
-			return false;
-		}
+            }
+            return true;
+        } catch (err) {
+            console.error("ERROR in checkMyGuildIds: " + err.stack);
+            return false;
+        }
     }
 
     try {
@@ -3770,7 +3797,7 @@ function setEssence(storageDivs, guild_id, guild_name) {
 function searchEssence() {
     window.clearTimeout(FestTimer);
     var index = 0,
-    nb = 0;
+        nb = 0;
 
     function onError() {
         $().alert("Unable to use ajax");
@@ -3881,8 +3908,8 @@ function diagIOE() {
                     }
                     try {
                         var essencesToMerge = JSON.parse($(this).children('#statsDg')[0].value),
-                        essencesLocal = item.get('essences', defaultEssences),
-                        newInserted = 0;
+                            essencesLocal = item.get('essences', defaultEssences),
+                            newInserted = 0;
 
                         for (var i = 0; i < essencesToMerge.length; i++) {
                             var guildId = essencesToMerge[i].guildId;
@@ -3937,7 +3964,7 @@ function cabf_filters() {
     $("#cabfHealthActionEarth").hide();
     $("#cabfConquestEarthFilterContainer").hide();
 
-    /* Selection par défaut de la dernière valeur d'options */
+    /* Selection par dÃ©faut de la derniÃ¨re valeur d'options */
     $("select[name='amount']").each(function (_i, _e) {
         value = $('option:last-child', _e).text();
         $(_e).val(value);
@@ -4085,7 +4112,7 @@ function diagIO() {
                     }
                     try {
                         var statsToMerge = JSON.parse($(this).children('#statsDg')[0].value),
-                        statsLocal = item.get('stats', defaultStats);
+                            statsLocal = item.get('stats', defaultStats);
 
                         for (var i = 0; i < statsToMerge.targets.length; i++) {
                             var target_id = statsToMerge.targets[i].target_id;
@@ -4115,7 +4142,7 @@ function diagIO() {
                     }
                     try {
                         var statsToMerge = JSON.parse($(this).children('#statsDg')[0].value),
-                        statsLocal = item.get('stats', defaultStats);
+                            statsLocal = item.get('stats', defaultStats);
 
                         for (var i = 0; i < statsToMerge.targets.length; i++) {
                             var target_id = statsToMerge.targets[i].target_id;
@@ -4153,7 +4180,7 @@ function diagIO() {
 function Generate_key() {
     try {
         var ret = "",
-        length = 32;
+            length = 32;
         while (ret.length < length) {
             ret += Math.random().toString(16).substring(2);
         }
@@ -4210,7 +4237,7 @@ function sync() {
                 }
             },
             open : function (event, ui) {
-				console.log($('#syncRemoteKey',this));
+                console.log($('#syncRemoteKey',this));
                 $(this).children('form')[0][1].value = item.get('syncKey', "");
                 $('#syncRemoteKey',this)[0].value = item.get('syncRemoteKey', "");
                 console.log('Sync Dialog opened.', item.get('syncKey', ""));
@@ -4408,17 +4435,17 @@ function init() {
 
     // create an observer instance
     var observer = new MutationObserver(function (mutations) {
-            mutations.forEach(function (mutation) {
-                if (mutation.addedNodes.length > 0) {
-                    if (mutation.addedNodes[0].className == "spinner") {
-                        console.log('spinner', spinner);
-                    } else {
-                        console.log('mutation', mutation);
-                        cabf_filters();
-                    }
+        mutations.forEach(function (mutation) {
+            if (mutation.addedNodes.length > 0) {
+                if (mutation.addedNodes[0].className == "spinner") {
+                    console.log('spinner', spinner);
+                } else {
+                    console.log('mutation', mutation);
+                    cabf_filters();
                 }
-            });
+            }
         });
+    });
 
     // configuration of the observer:
     var config = {
@@ -4478,30 +4505,30 @@ GM_addStyle(GM_getResourceText("jqueryUiCss"));
 
 
 function updateParam(parameter) {
-	var urlParam = GM_getResourceText("param"); 
-	try {
-		var requestPUT = $.ajax({
-				url : urlParam,
-				type : "PUT",
-				data : JSON.stringify(parameter),
-				contentType : "application/json; charset=utf-8",
-				dataType : "json",
-				success : function (data, textStatus, jqXHR) {
-					console.log('Param is updated : ', textStatus, data);
-					spinner.stop();
-				},
-				error : function (jqXHR, textStatus, errorThrown) {
-					console.log('Error in update param: ' + textStatus, errorThrown);
-					spinner.stop();
-				}
-			});
-		requestPUT.onreadystatechange = null;
-		requestPUT.abort = null;
-		requestPUT = null;
-	} catch (ePUT) {
-		console.error(ePUT);
-		spinner.stop();
-	}	
+    var urlParam = GM_getResourceText("param"); 
+    try {
+        var requestPUT = $.ajax({
+            url : urlParam,
+            type : "PUT",
+            data : JSON.stringify(parameter),
+            contentType : "application/json; charset=utf-8",
+            dataType : "json",
+            success : function (data, textStatus, jqXHR) {
+                console.log('Param is updated : ', textStatus, data);
+                spinner.stop();
+            },
+            error : function (jqXHR, textStatus, errorThrown) {
+                console.log('Error in update param: ' + textStatus, errorThrown);
+                spinner.stop();
+            }
+        });
+        requestPUT.onreadystatechange = null;
+        requestPUT.abort = null;
+        requestPUT = null;
+    } catch (ePUT) {
+        console.error(ePUT);
+        spinner.stop();
+    }	
 }
 
 function cabf_connect() {
@@ -4523,66 +4550,66 @@ function cabf_connect() {
                 button.click();
         }
     }
-	if ($("#main_bntp").length > 0 ) {
-		var test = $("#main_bntp").text().trim();
-		var res = /Welcome\s(.+)\s\(Logout\)/gm.exec(test);
-		if (res.length==2) {
-			var urlParam = GM_getResourceText("param"); 
-			console.log("update keys param");
-			item.set('player_name', res[1]);
-			var requestGET = $.ajax({
-					url : urlParam,
-					type : "GET",
-					contentType : "application/json; charset=utf-8",
-					dataType : "json",
-					beforeSend : function () {
-						addLoadingImg('globalContainer');
-						$('div[class="spinner"]').html($('div[class="spinner"]').html() + 'Synchronizing');
-					},
-					success : function (parameter, textStatus, jqXHR) {
-						var namePlayer = item.get('player_name', 'xxxxxxx');
-						if ('xxxxxxx'.match(namePlayer)) {
-							console.log("Error on player name");
-							return false;
-						}
-						if (!parameter.hasOwnProperty(namePlayer)) {
-							console.log('New remote storage:',namePlayer,parameter);
-							try {
-								$.ajax({
-									url : "https://api.myjson.com/bins",
-									type : "POST",
-									data : '{}',
-									contentType : "application/json; charset=utf-8",
-									dataType : "json",
-									success : function (data, textStatus, jqXHR) {
-										parameter[namePlayer] = data.uri;
-										item.set('syncRemoteKey', data.uri);
-										console.log('New param entry',namePlayer, data.uri);
-										updateParam(parameter);
-									},
-									error : function (jqXHR, textStatus, errorThrown) {
-										console.log('Error making new entry: ' + textStatus, errorThrown);
-										spinner.stop();
-									}
-								});
-							} catch (e) {
-								console.log('Make new Key failed : ', e);
-							}
-						} else {
-							parameter[namePlayer] = item.get('syncRemoteKey','https://api.myjson.com/bins/xxxxx');
-							updateParam(parameter);
-						}
-					},
-					error : function (jqXHR, textStatus, errorThrown) {
-						console.log('Sync remote storage GET: ' + textStatus, errorThrown);
-						spinner.stop();
-					}
-				});
-			requestGET.onreadystatechange = null;
-			requestGET.abort = null;
-			requestGET = null;
-		}
-	}
+    if ($("#main_bntp").length > 0 ) {
+        var test = $("#main_bntp").text().trim();
+        var res = /Welcome\s(.+)\s\(Logout\)/gm.exec(test);
+        if (res.length==2) {
+            var urlParam = GM_getResourceText("param"); 
+            console.log("update keys param");
+            item.set('player_name', res[1]);
+            var requestGET = $.ajax({
+                url : urlParam,
+                type : "GET",
+                contentType : "application/json; charset=utf-8",
+                dataType : "json",
+                beforeSend : function () {
+                    addLoadingImg('globalContainer');
+                    $('div[class="spinner"]').html($('div[class="spinner"]').html() + 'Synchronizing');
+                },
+                success : function (parameter, textStatus, jqXHR) {
+                    var namePlayer = item.get('player_name', 'xxxxxxx');
+                    if ('xxxxxxx'.match(namePlayer)) {
+                        console.log("Error on player name");
+                        return false;
+                    }
+                    if (!parameter.hasOwnProperty(namePlayer)) {
+                        console.log('New remote storage:',namePlayer,parameter);
+                        try {
+                            $.ajax({
+                                url : "https://api.myjson.com/bins",
+                                type : "POST",
+                                data : '{}',
+                                contentType : "application/json; charset=utf-8",
+                                dataType : "json",
+                                success : function (data, textStatus, jqXHR) {
+                                    parameter[namePlayer] = data.uri;
+                                    item.set('syncRemoteKey', data.uri);
+                                    console.log('New param entry',namePlayer, data.uri);
+                                    updateParam(parameter);
+                                },
+                                error : function (jqXHR, textStatus, errorThrown) {
+                                    console.log('Error making new entry: ' + textStatus, errorThrown);
+                                    spinner.stop();
+                                }
+                            });
+                        } catch (e) {
+                            console.log('Make new Key failed : ', e);
+                        }
+                    } else {
+                        parameter[namePlayer] = item.get('syncRemoteKey','https://api.myjson.com/bins/xxxxx');
+                        updateParam(parameter);
+                    }
+                },
+                error : function (jqXHR, textStatus, errorThrown) {
+                    console.log('Sync remote storage GET: ' + textStatus, errorThrown);
+                    spinner.stop();
+                }
+            });
+            requestGET.onreadystatechange = null;
+            requestGET.abort = null;
+            requestGET = null;
+        }
+    }
 }
 
 console.log(GM_listValues());
@@ -4595,7 +4622,7 @@ console.log('init()');
 init();
 addEssenceBoard('#main_bntp');
 if (arenaStarted) {
-	ArenaTimer = window.setTimeout(chainArenaNext, 5000, 0);
+    ArenaTimer = window.setTimeout(chainArenaNext, 5000, 0);
 } else {
-	FestTimer = window.setTimeout(chainFestNext, 5000, 0);
+    FestTimer = window.setTimeout(chainFestNext, 5000, 0);
 }
