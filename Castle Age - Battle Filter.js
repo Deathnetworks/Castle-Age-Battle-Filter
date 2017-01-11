@@ -2456,16 +2456,33 @@ function addMonsterFilter() {
         _hideBoss = item.get('cabfBossHideActivity', 'Yes'),
         _bossActive = item.get('cabfBossActive', "").split(",");
 
-    var BossTypeLow = {
+ var BossTypeLow = {
         'All' : ''
     }, BossTypeMedium = {
         'All' : '',
-        'Jahanna' : 'Jahanna',
-        'War of the Red Plains' : 'War of the Red Plain',
+        "Aurelius, Lion's Rebellion" : "Aurelius, Lion's Reb",
+        'Ambrosia' : 'Ambrosia',
+        'Bahamut, Volcanic Dragon'  : 'Bahamut',
+        'Corvintheus' : 'Corvintheus',
+        'Gehenna, The Fire Elemental' : 'Gehenna, The Fire El',
+        'Genesis, Earth Elemental' : 'Genesis',
+        'Glacius' : 'Glacius',
+        'Jahanna, Priestess of Aurora' : 'Jahanna',
+        'Ragnarok, The Ice Elemental' : 'Ragnarok, The Ice El',
+        'Shardros' : 'Shardros',
         'Skaar Deathrune' : 'Skaar Deathrune',
-        'Glacius' : 'Glacius'
+        'Thanatos' : 'Thanatos',
+        'War of the Red Plains' : 'War of the Red Plain'
     }, BossTypeHigh = {
-        'All' : ''
+        'All' : '',
+        'Azriel, the Angel of Wrath' : 'Azriel, the Angel of',
+        'Kessaran' : 'Kessaran',
+        'Magmos' : 'Magmos',
+        'Malekus' : 'Malekus',
+        'Typhonus' : 'Typhonus',
+        'Agamemnon the Overseer' : 'Agamemnon the Overse',
+        'Thanatos Reborn' : 'Thanatos Reborn',
+        'Vermilion' : 'Vermilion'
     }, HideBossOptions = {
         'Yes' : 'true',
         'No' : 'false'
