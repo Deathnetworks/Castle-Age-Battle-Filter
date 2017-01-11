@@ -2462,7 +2462,7 @@ function addMonsterFilter() {
         'All' : '',
         "Aurelius, Lion's Rebellion" : "Aurelius, Lion's Reb",
         'Ambrosia' : 'Ambrosia',
-        'Bahamut, Volcanic Dragon'  : 'Bahamut',
+        'Bahamut, Volcanic Dragon'  : 'Bahamut, the Volcani',
         'Corvintheus' : 'Corvintheus',
         'Gehenna, The Fire Elemental' : 'Gehenna, The Fire El',
         'Genesis, Earth Elemental' : 'Genesis',
@@ -2475,14 +2475,23 @@ function addMonsterFilter() {
         'War of the Red Plains' : 'War of the Red Plain'
     }, BossTypeHigh = {
         'All' : '',
+        'Agamemnon the Overseer' : 'Agamemnon the Overse',
+        'Alexandra' : 'Alexandra',
+        'Alpha Bahamut, the Volcanic Dragon' : 'Alpha Bahamut, the V',
+        'Alpha Kraken' : 'Alpha Kraken',
+        'Alpha Mephistopheles' : 'Alpha Mephistopheles',
+        'Azeron' : 'Azeron',
         'Azriel, the Angel of Wrath' : 'Azriel, the Angel of',
+        'Cronus Astaroth' : 'Cronus Astaroth',
         'Kessaran' : 'Kessaran',
+        'Lothorewyn' : 'Lothorewyn',
         'Magmos' : 'Magmos',
         'Malekus' : 'Malekus',
         'Typhonus' : 'Typhonus',
-        'Agamemnon the Overseer' : 'Agamemnon the Overse',
+        'Samael' : 'Samael',
         'Thanatos Reborn' : 'Thanatos Reborn',
-        'Vermilion' : 'Vermilion'
+        'Vermilion' : 'Vermilion',
+        'Verminarch' : 'Verminarch'
     }, HideBossOptions = {
         'Yes' : 'true',
         'No' : 'false'
